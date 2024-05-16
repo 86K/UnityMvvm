@@ -16,25 +16,18 @@ namespace Fusion.Mvvm
         private readonly SimpleCommand cancelCommand;
 
         private Account account;
-
-        private readonly Preferences globalPreferences;
+        
         private readonly IAccountService accountService;
 
         private readonly InteractionRequest interactionFinished;
         private readonly InteractionRequest<ToastNotification> toastRequest;
 
-        public LoginViewModel(IAccountService accountService, Preferences globalPreferences)
+        public LoginViewModel(IAccountService accountService)
         {
             this.accountService = accountService;
-            this.globalPreferences = globalPreferences;
 
             interactionFinished = new InteractionRequest(this);
             toastRequest = new InteractionRequest<ToastNotification>(this);
-
-            if (username == null)
-            {
-                username = globalPreferences.GetString(LAST_USERNAME_KEY, "");
-            }
 
             loginCommand = new SimpleCommand(Login);
             cancelCommand = new SimpleCommand(() =>
@@ -121,9 +114,6 @@ namespace Fusion.Mvvm
                 Account account = await accountService.Login(username, password);
                 if (account != null)
                 {
-                    
-                    globalPreferences.SetString(LAST_USERNAME_KEY, username);
-                    globalPreferences.Save();
                     this.account = account;
                     interactionFinished.Raise();
                 }

@@ -21,14 +21,13 @@ namespace Fusion.Mvvm
         {
             ApplicationContext context = Context.GetApplicationContext();
             var accountService = context.GetService<IAccountService>();
-            var globalPreferences = context.GetGlobalPreferences();
 
             //this.LoginRequest = new InteractionRequest<LoginViewModel>(this);          
             LoginRequest = new AsyncInteractionRequest<WindowNotification>(this);
             LoadSceneRequest = new AsyncInteractionRequest<ProgressBar>(this);
             DismissRequest = new InteractionRequest(this);
 
-            var loginViewModel = new LoginViewModel(accountService, globalPreferences);
+            var loginViewModel = new LoginViewModel(accountService);
             //this.command = new SimpleCommand(() =>
             //{
             //    this.LoginRequest.Raise(loginViewModel, vm =>
