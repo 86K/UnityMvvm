@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Linq.Expressions;
 
@@ -7,35 +5,35 @@ namespace Fusion.Mvvm
 {
     public class BindingBuilderBase : IBindingBuilder
     {
-        //private static readonly ILog log = LogManager.GetLogger(typeof(BindingBuilderBase));
-
-        private bool builded = false;
+        private bool builded;
         private object scopeKey;
         private readonly object target;
         private readonly IBindingContext context;
-        protected BindingDescription description;
+        protected readonly TargetDescription description;
 
         private IPathParser pathParser;
         private IConverterRegistry converterRegistry;
 
-        protected IPathParser PathParser => pathParser ?? (pathParser = Context.GetApplicationContext().GetService<IPathParser>());
+        protected IPathParser PathParser => pathParser ??= Context.GetApplicationContext().GetService<IPathParser>();
 
-        protected IConverterRegistry ConverterRegistry => converterRegistry ?? (converterRegistry = Context.GetApplicationContext().GetService<IConverterRegistry>());
+        private IConverterRegistry ConverterRegistry => converterRegistry ??= Context.GetApplicationContext().GetService<IConverterRegistry>();
 
 
-        public BindingBuilderBase(IBindingContext context, object target)
+        protected BindingBuilderBase(IBindingContext context, object target)
         {
             this.context = context ?? throw new ArgumentNullException("context");
             this.target = target ?? throw new ArgumentNullException("target", "Failed to create data binding, the bound UI control cannot be null.");
 
-            description = new BindingDescription();
-            description.Mode = BindingMode.Default;
+            description = new TargetDescription
+            {
+                Mode = BindingMode.Default
+            };
         }
 
         protected void SetLiteral(object value)
         {
             if (description.Source != null)
-                throw new BindingException("You cannot set the source path of a Fluent binding more than once");
+                throw new Exception("You cannot set the source path of a Fluent binding more than once");
 
             description.Source = new LiteralSourceDescription()
             {
@@ -62,7 +60,7 @@ namespace Fusion.Mvvm
         protected void SetMemberPath(Path path)
         {
             if (description.Source != null)
-                throw new BindingException("You cannot set the source path of a Fluent binding more than once");
+                throw new Exception("You cannot set the source path of a Fluent binding more than once");
 
             if (path == null)
                 throw new ArgumentException("the path is null.");
@@ -85,7 +83,7 @@ namespace Fusion.Mvvm
         protected void SetStaticMemberPath(Path path)
         {
             if (description.Source != null)
-                throw new BindingException("You cannot set the source path of a Fluent binding more than once");
+                throw new Exception("You cannot set the source path of a Fluent binding more than once");
 
             if (path == null)
                 throw new ArgumentException("the path is null.");
@@ -102,7 +100,7 @@ namespace Fusion.Mvvm
         protected void SetExpression<TResult>(Expression<Func<TResult>> expression)
         {
             if (description.Source != null)
-                throw new BindingException("You cannot set the source path of a Fluent binding more than once");
+                throw new Exception("You cannot set the source path of a Fluent binding more than once");
 
             description.Source = new ExpressionSourceDescription()
             {
@@ -113,7 +111,7 @@ namespace Fusion.Mvvm
         protected void SetExpression<T, TResult>(Expression<Func<T, TResult>> expression)
         {
             if (description.Source != null)
-                throw new BindingException("You cannot set the source path of a Fluent binding more than once");
+                throw new Exception("You cannot set the source path of a Fluent binding more than once");
 
             description.Source = new ExpressionSourceDescription()
             {
@@ -121,10 +119,11 @@ namespace Fusion.Mvvm
             };
         }
 
+        [Obsolete("Never used..")]
         protected void SetExpression(LambdaExpression expression)
         {
             if (description.Source != null)
-                throw new BindingException("You cannot set the source path of a Fluent binding more than once");
+                throw new Exception("You cannot set the source path of a Fluent binding more than once");
 
             description.Source = new ExpressionSourceDescription()
             {
@@ -153,18 +152,18 @@ namespace Fusion.Mvvm
         protected void SetSourceDescription(SourceDescription source)
         {
             if (description.Source != null)
-                throw new BindingException("You cannot set the source path of a Fluent binding more than once");
+                throw new Exception("You cannot set the source path of a Fluent binding more than once");
             description.Source = source;
         }
 
-        public void SetDescription(BindingDescription bindingDescription)
+        public void SetDescription(TargetDescription targetDescription)
         {
-            description.Mode = bindingDescription.Mode;
-            description.TargetName = bindingDescription.TargetName;
-            description.TargetType = bindingDescription.TargetType;
-            description.UpdateTrigger = bindingDescription.UpdateTrigger;
-            description.Converter = bindingDescription.Converter;
-            description.Source = bindingDescription.Source;
+            description.Mode = targetDescription.Mode;
+            description.TargetName = targetDescription.TargetName;
+            description.TargetType = targetDescription.TargetType;
+            description.UpdateTrigger = targetDescription.UpdateTrigger;
+            description.Converter = targetDescription.Converter;
+            description.Source = targetDescription.Source;
         }
 
         protected IConverter ConverterByName(string name)
@@ -172,13 +171,13 @@ namespace Fusion.Mvvm
             return ConverterRegistry.Find(name);
         }
 
-        protected void CheckBindingDescription()
+        private void CheckBindingDescription()
         {
             if (string.IsNullOrEmpty(description.TargetName))
-                throw new BindingException("TargetName is null!");
+                throw new Exception("TargetName is null!");
 
             if (description.Source == null)
-                throw new BindingException("Source description is null!");
+                throw new Exception("Source description is null!");
         }
 
         public void Build()
@@ -192,13 +191,9 @@ namespace Fusion.Mvvm
                 context.Add(target, description, scopeKey);
                 builded = true;
             }
-            catch (BindingException e)
-            {
-                throw e;
-            }
             catch (Exception e)
             {
-                throw new BindingException(e, "An exception occurred while building the data binding for {0}.", description.ToString());
+                throw new Exception($"An exception occurred while building the data binding for {description}.\n Exception:\n{e}");
             }
         }
     }

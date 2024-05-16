@@ -11,12 +11,12 @@ namespace Fusion.Mvvm
         public static readonly IMessenger Messenger = new Messenger();
 
         [SerializeField] private WindowType windowType = WindowType.FULL;
-        [SerializeField] [Range(0, 10)] private int windowPriority = 0;
+        [SerializeField] [Range(0, 10)] private int windowPriority;
         [SerializeField] private bool stateBroadcast = true;
         private IWindowManager windowManager;
-        private bool created = false;
-        private bool dismissed = false;
-        private bool activated = false;
+        private bool created;
+        private bool dismissed;
+        private bool activated;
         private ITransition dismissTransition;
         private WindowState state = WindowState.NONE;
 

@@ -10,7 +10,7 @@ namespace Fusion.Mvvm
     public class CoroutineAwaiter : IAwaiter, ICriticalNotifyCompletion
     {
         protected object _lock = new object();
-        protected bool done = false;
+        protected bool done;
         protected Exception exception;
         protected Action continuation;
 

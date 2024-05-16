@@ -60,12 +60,12 @@ namespace Fusion.Mvvm
                     ParseIndex(path);
                     SkipWhiteSpace();
                     if (!Current.Equals(']'))
-                        throw new BindingException("Error parsing indexer , unterminated in text {0}", text);
+                        throw new Exception($"Error parsing indexer , unterminated in text {text}");
 
                     if (MoveNext())
                     {
                         if (!Current.Equals('.'))
-                            throw new BindingException("Error parsing path , unterminated in text {0}", text);
+                            throw new Exception($"Error parsing path , unterminated in text {text}");
                     }
                 }
                 else if (char.IsLetter(Current) || Current == '_')
@@ -74,11 +74,11 @@ namespace Fusion.Mvvm
                     string memberName = ReadMemberName();
                     path.Append(new MemberNode(memberName));
                     if (!IsEOF() && !Current.Equals('.') && !Current.Equals('[') && !char.IsWhiteSpace(Current))
-                        throw new BindingException("Error parsing path , unterminated in text {0}", text);
+                        throw new Exception($"Error parsing path , unterminated in text {text}");
                 }
                 else
                 {
-                    throw new BindingException("Error parsing path , unterminated in text {0}", text);
+                    throw new Exception($"Error parsing path , unterminated in text {text}");
                 }
             } while (!IsEOF());
             return path;
@@ -87,7 +87,7 @@ namespace Fusion.Mvvm
         private void ParseIndex(Path path)
         {
             if (!MoveNext())
-                throw new BindingException("Error parsing string indexer , unterminated in text {0}", text);
+                throw new Exception($"Error parsing string indexer , unterminated in text {text}");
 
             var ch = Current;
             if (ch == '\'' || ch == '\"')
@@ -105,7 +105,7 @@ namespace Fusion.Mvvm
                 return;
             }
 
-            throw new BindingException("Error parsing indexer , unterminated in text {0}", text);
+            throw new Exception($"Error parsing indexer , unterminated in text {text}");
         }
 
         private unsafe string ReadMemberName()
@@ -123,7 +123,7 @@ namespace Fusion.Mvvm
             } while (MoveNext());
 
             if (i <= 0)
-                throw new BindingException("Error parsing member name , unterminated in text {0}", text);
+                throw new Exception($"Error parsing member name , unterminated in text {text}");
 
             return new string(buffer, 0, i);
         }
@@ -145,7 +145,7 @@ namespace Fusion.Mvvm
             uint index;
             string num = new string(buffer, 0, i);
             if (!uint.TryParse(num, out index))
-                throw new BindingException("Unable to parse integer text from {0} in {1}", num, text);
+                throw new Exception($"Unable to parse integer text from {num} in {text}");
             return index;
         }
 
@@ -153,11 +153,10 @@ namespace Fusion.Mvvm
         {
             char ch = Current;
             if (ch != '\'' && ch != '\"')
-                throw new BindingException("Error parsing string indexer , unexpected quote character {0} in text {1}",
-                                       ch, text);
+                throw new Exception($"Error parsing string indexer , unexpected quote character {ch} in text {text}");
 
             if (!MoveNext())
-                throw new BindingException("Error parsing string indexer , unterminated in text {0}", text);
+                throw new Exception($"Error parsing string indexer , unterminated in text {text}");
 
             char* buffer = stackalloc char[128];
             int i = 0;
@@ -171,8 +170,7 @@ namespace Fusion.Mvvm
             } while (MoveNext());
 
             if (i <= 0 || (ch != '\'' && ch != '\"'))
-                throw new BindingException("Error parsing string indexer , unexpected quote character {0} in text {1}",
-                                       ch, text);
+                throw new Exception($"Error parsing string indexer , unexpected quote character {ch} in text {text}");
             return new string(buffer, 0, i);
         }
 

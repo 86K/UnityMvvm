@@ -11,7 +11,7 @@ namespace Fusion.Mvvm
 {
     public abstract class UnityEventProxyBase<T> : EventTargetProxyBase where T : UnityEventBase
     {
-        private bool disposed = false;
+        private bool disposed;
         protected ICommand command;
         protected IInvoker invoker;
         protected Delegate handler;

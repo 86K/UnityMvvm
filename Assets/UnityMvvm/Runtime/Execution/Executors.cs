@@ -16,7 +16,7 @@ namespace Fusion.Mvvm
     {
         
         private static readonly object syncLock = new object();
-        private static bool disposed = false;
+        private static bool disposed;
         private static MainThreadExecutor executor;
         private static SynchronizationContext context;
 #if NETFX_CORE || !NET_LEGACY
@@ -601,7 +601,7 @@ namespace Fusion.Mvvm
         class MainThreadExecutor : MonoBehaviour
         {
             
-            public bool useFixedUpdate = false;
+            public bool useFixedUpdate;
             private readonly List<object> pendingQueue = new List<object>();
             private readonly List<object> stopingQueue = new List<object>();
 

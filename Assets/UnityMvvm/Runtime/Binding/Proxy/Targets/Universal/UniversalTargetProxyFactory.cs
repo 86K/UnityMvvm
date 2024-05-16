@@ -11,7 +11,7 @@ namespace Fusion.Mvvm
             this.pathParser = pathParser;
         }
 
-        public ITargetProxy CreateProxy(object target, BindingDescription description)
+        public ITargetProxy CreateProxy(object target, TargetDescription description)
         {
             IProxyType type = description.TargetType != null ? description.TargetType.AsProxy() : target.GetType().AsProxy();
             if (TargetNameUtil.IsCollection(description.TargetName))
@@ -86,7 +86,7 @@ namespace Fusion.Mvvm
             return null;
         }
 
-        private ITargetProxy CreateItemProxy(object target, IProxyType type, BindingDescription description)
+        private ITargetProxy CreateItemProxy(object target, IProxyType type, TargetDescription description)
         {
             Path path = pathParser.Parse(description.TargetName);
             if (path.Count < 1 || path.Count > 2)

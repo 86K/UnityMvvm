@@ -119,7 +119,7 @@ namespace Fusion.Mvvm
             public Color color;
             public IMixedObjectPool<PooledCube> pool;
             public string typeName;
-            public bool IsLoaded = false;
+            public bool IsLoaded;
             private GameObject child;
 
             public async Task<GameObject> LoadAsync()

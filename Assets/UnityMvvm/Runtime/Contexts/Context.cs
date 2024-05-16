@@ -9,8 +9,8 @@ namespace Fusion.Mvvm
 {
     public class Context : IDisposable
     {
-        private static ApplicationContext context = null;
-        private static Dictionary<string, Context> contexts = null;
+        private static ApplicationContext context;
+        private static Dictionary<string, Context> contexts;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnInitialize()
@@ -68,7 +68,7 @@ namespace Fusion.Mvvm
             contexts.Remove(key);
         }
 
-        private readonly bool innerContainer = false;
+        private readonly bool innerContainer;
         private readonly Context contextBase;
         private readonly IServiceContainer container;
         private readonly Dictionary<string, object> attributes;
@@ -201,7 +201,7 @@ namespace Fusion.Mvvm
         }
 
         #region IDisposable Support
-        private bool disposed = false;
+        private bool disposed;
 
         protected virtual void Dispose(bool disposing)
         {

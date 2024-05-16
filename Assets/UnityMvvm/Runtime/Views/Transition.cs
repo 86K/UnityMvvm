@@ -10,15 +10,15 @@ namespace Fusion.Mvvm
     public abstract class Transition : ITransition
     {
         private IManageable window;
-        private bool done = false;
-        private bool animationDisabled = false;
-        private int layer = 0;
+        private bool done;
+        private bool animationDisabled;
+        private int layer;
         private Func<IWindow, IWindow, ActionType> overlayPolicy;
 
-        private bool running = false;
+        private bool running;
 
         //bind the StateChange event.
-        private bool bound = false;
+        private bool bound;
         private Action onStart;
         private Action<IWindow, WindowState> onStateChanged;
         private Action onFinish;

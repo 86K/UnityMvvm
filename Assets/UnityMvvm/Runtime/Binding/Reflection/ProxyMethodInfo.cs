@@ -8,7 +8,7 @@ namespace Fusion.Mvvm
 {
     public class ProxyMethodInfo : IProxyMethodInfo
     {
-        protected bool isValueType = false;
+        protected bool isValueType;
         protected MethodInfo methodInfo;
         public ProxyMethodInfo(MethodInfo methodInfo)
         {

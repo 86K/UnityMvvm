@@ -12,9 +12,9 @@ namespace Fusion.Mvvm
         private readonly ISourceProxyFactory sourceProxyFactory;
         private readonly ITargetProxyFactory targetProxyFactory;
 
-        private bool disposed = false;
+        private bool disposed;
         private BindingMode bindingMode = BindingMode.Default;
-        private BindingDescription bindingDescription;
+        private TargetDescription _targetDescription;
         private ISourceProxy sourceProxy;
         private ITargetProxy targetProxy;
 
@@ -27,17 +27,17 @@ namespace Fusion.Mvvm
         private readonly string targetTypeName;
         private SendOrPostCallback updateTargetAction;
 
-        public Binding(IBindingContext bindingContext, object source, object target, BindingDescription bindingDescription, ISourceProxyFactory sourceProxyFactory, ITargetProxyFactory targetProxyFactory) : base(bindingContext, source, target)
+        public Binding(IBindingContext bindingContext, object source, object target, TargetDescription targetDescription, ISourceProxyFactory sourceProxyFactory, ITargetProxyFactory targetProxyFactory) : base(bindingContext, source, target)
         {
             targetTypeName = target.GetType().Name;
-            this.bindingDescription = bindingDescription;
+            this._targetDescription = targetDescription;
 
-            converter = bindingDescription.Converter;
+            converter = targetDescription.Converter;
             this.sourceProxyFactory = sourceProxyFactory;
             this.targetProxyFactory = targetProxyFactory;
 
-            CreateTargetProxy(target, this.bindingDescription);
-            CreateSourceProxy(DataContext, this.bindingDescription.Source);
+            CreateTargetProxy(target, this._targetDescription);
+            CreateSourceProxy(DataContext, this._targetDescription.Source);
             UpdateDataOnBind();
         }
 
@@ -57,10 +57,10 @@ namespace Fusion.Mvvm
 
         protected override void OnDataContextChanged()
         {
-            if (bindingDescription.Source.IsStatic)
+            if (_targetDescription.Source.IsStatic)
                 return;
 
-            CreateSourceProxy(DataContext, bindingDescription.Source);
+            CreateSourceProxy(DataContext, _targetDescription.Source);
             UpdateDataOnBind();
         }
 
@@ -71,7 +71,7 @@ namespace Fusion.Mvvm
                 if (bindingMode != BindingMode.Default)
                     return bindingMode;
 
-                bindingMode = bindingDescription.Mode;
+                bindingMode = _targetDescription.Mode;
                 if (bindingMode == BindingMode.Default)
                     bindingMode = targetProxy.DefaultMode;
 
@@ -134,7 +134,7 @@ namespace Fusion.Mvvm
             catch (Exception) { }
         }
 
-        protected void CreateTargetProxy(object target, BindingDescription description)
+        protected void CreateTargetProxy(object target, TargetDescription description)
         {
             DisposeTargetProxy();
 
@@ -351,7 +351,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("An exception occurs when the target property is updated.Please check the binding \"{0}{1}\" in the view \"{2}\".exception: {3}", targetTypeName, bindingDescription.ToString(), GetViewName(), e));
+                Debug.LogWarning(string.Format("An exception occurs when the target property is updated.Please check the binding \"{0}{1}\" in the view \"{2}\".exception: {3}", targetTypeName, _targetDescription.ToString(), GetViewName(), e));
             }
             finally
             {
@@ -525,7 +525,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("An exception occurs when the source property is updated.Please check the binding \"{0}{1}\" in the view \"{2}\".exception: {3}", targetTypeName, bindingDescription.ToString(), GetViewName(), e));
+                Debug.LogWarning(string.Format("An exception occurs when the source property is updated.Please check the binding \"{0}{1}\" in the view \"{2}\".exception: {3}", targetTypeName, _targetDescription.ToString(), GetViewName(), e));
             }
             finally
             {
@@ -584,7 +584,7 @@ namespace Fusion.Mvvm
                     return false;
 
                 default:
-                    throw new BindingException("Unexpected BindingMode");
+                    throw new Exception("Unexpected BindingMode");
             }
         }
 
@@ -604,7 +604,7 @@ namespace Fusion.Mvvm
                     return true;
 
                 default:
-                    throw new BindingException("Unexpected BindingMode");
+                    throw new Exception("Unexpected BindingMode");
             }
         }
 
@@ -624,7 +624,7 @@ namespace Fusion.Mvvm
                     return false;
 
                 default:
-                    throw new BindingException("Unexpected BindingMode");
+                    throw new Exception("Unexpected BindingMode");
             }
         }
 
@@ -644,7 +644,7 @@ namespace Fusion.Mvvm
                     return false;
 
                 default:
-                    throw new BindingException("Unexpected BindingMode");
+                    throw new Exception("Unexpected BindingMode");
             }
         }
 
@@ -654,7 +654,7 @@ namespace Fusion.Mvvm
             {
                 DisposeSourceProxy();
                 DisposeTargetProxy();
-                bindingDescription = null;
+                _targetDescription = null;
                 disposed = true;
                 base.Dispose(disposing);
             }

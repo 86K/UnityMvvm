@@ -5,8 +5,8 @@ namespace Fusion.Mvvm
     public class EventNodeProxy : SourceProxyBase, ISourceProxy, IModifiable
     {
         protected readonly IProxyEventInfo eventInfo;
-        private bool disposed = false;
-        private readonly bool isStatic = false;
+        private bool disposed;
+        private readonly bool isStatic;
         protected Delegate handler;
 
         public EventNodeProxy(IProxyEventInfo eventInfo) : this(null, eventInfo)

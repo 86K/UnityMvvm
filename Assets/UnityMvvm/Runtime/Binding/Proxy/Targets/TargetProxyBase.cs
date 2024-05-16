@@ -78,8 +78,8 @@ namespace Fusion.Mvvm
 
     public abstract class ValueTargetProxyBase : TargetProxyBase, IModifiable, IObtainable, INotifiable
     {
-        private bool disposed = false;
-        private bool subscribed = false;
+        private bool disposed;
+        private bool subscribed;
 
         protected readonly object _lock = new object();
         protected EventHandler valueChanged;

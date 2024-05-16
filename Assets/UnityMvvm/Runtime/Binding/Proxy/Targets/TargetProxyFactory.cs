@@ -10,7 +10,7 @@ namespace Fusion.Mvvm
     {
         private readonly List<PriorityFactoryPair> factories = new List<PriorityFactoryPair>();
 
-        public ITargetProxy CreateProxy(object target, BindingDescription description)
+        public ITargetProxy CreateProxy(object target, TargetDescription description)
         {
             try
             {
@@ -26,7 +26,7 @@ namespace Fusion.Mvvm
             }
         }
 
-        protected virtual bool TryCreateProxy(object target, BindingDescription description, out ITargetProxy proxy)
+        protected virtual bool TryCreateProxy(object target, TargetDescription description, out ITargetProxy proxy)
         {
             proxy = null;
             foreach (PriorityFactoryPair pair in factories)

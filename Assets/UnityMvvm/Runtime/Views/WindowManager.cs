@@ -1,4 +1,4 @@
-
+﻿
 
 using System;
 using System.Collections;
@@ -534,7 +534,7 @@ namespace Fusion.Mvvm
         class BlockingCoroutineTransitionExecutor
         {
             private IAsyncResult taskResult;
-            private bool running = false;
+            private bool running;
             private readonly List<Transition> transitions = new List<Transition>();
             public bool IsRunning => running;
 

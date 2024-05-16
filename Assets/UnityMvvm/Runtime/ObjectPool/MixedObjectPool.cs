@@ -107,7 +107,7 @@ namespace Fusion.Mvvm
         }
 
         #region IDisposable Support
-        private bool disposed = false;
+        private bool disposed;
 
         protected virtual void Dispose(bool disposing)
         {

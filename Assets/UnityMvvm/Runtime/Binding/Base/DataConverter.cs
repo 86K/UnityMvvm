@@ -1,5 +1,3 @@
-
-
 using UnityEngine;
 using System;
 using System.Text;
@@ -25,7 +23,7 @@ namespace Fusion.Mvvm
 
         public static string GetString(string value)
         {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(value == null ? "" : value));
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(value ?? ""));
         }
 
         public static string GetString(Color value)

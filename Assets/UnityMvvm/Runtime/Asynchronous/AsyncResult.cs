@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Threading;
 
@@ -7,14 +5,12 @@ namespace Fusion.Mvvm
 {
     public class AsyncResult : IAsyncResult, IPromise
     {
-        //private static readonly ILog log = LogManager.GetLogger(typeof(AsyncResult));
+        private bool done;
+        private object result;
+        private Exception exception;
 
-        private bool done = false;
-        private object result = null;
-        private Exception exception = null;
-
-        private bool cancelled = false;
-        protected bool cancelable = false;
+        private bool cancelled;
+        protected bool cancelable;
         protected bool cancellationRequested;
 
         protected readonly object _lock = new object();

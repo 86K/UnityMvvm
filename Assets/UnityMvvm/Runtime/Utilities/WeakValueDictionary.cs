@@ -13,7 +13,7 @@ namespace Fusion.Mvvm
     public class WeakValueDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary where TValue : class
     {
         private const int MIN_CLEANUP_INTERVAL = 500;
-        private int cleanupFlag = 0;
+        private int cleanupFlag;
         protected Dictionary<TKey, WeakReference<TValue>> dictionary;
 
         public WeakValueDictionary()

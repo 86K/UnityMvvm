@@ -15,7 +15,7 @@ namespace Fusion.Mvvm
     {
         private readonly ComparerImpl<IDelayTask> comparer = new ComparerImpl<IDelayTask>();
         private readonly List<IDelayTask> queue = new List<IDelayTask>();
-        private bool running = false;
+        private bool running;
         public CoroutineScheduledExecutor() : this(false)
         {
         }
@@ -278,7 +278,7 @@ namespace Fusion.Mvvm
             private TimeSpan period;
             private readonly CoroutineScheduledExecutor executor;
             private readonly Action command;
-            private int count = 0;
+            private int count;
             private readonly ITime time;
             public FixedRateDelayTask(CoroutineScheduledExecutor executor, Action command, TimeSpan initialDelay, TimeSpan period) : base()
             {

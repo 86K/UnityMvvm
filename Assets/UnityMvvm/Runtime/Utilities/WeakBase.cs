@@ -14,7 +14,7 @@ namespace Fusion.Mvvm
     public abstract class WeakBase<TDelegate> : IExecute where TDelegate : class
     {
         private readonly bool isStatic;
-        private readonly int hashCode = 0;
+        private readonly int hashCode;
 
         protected TDelegate del;
         protected WeakReference targetReference;

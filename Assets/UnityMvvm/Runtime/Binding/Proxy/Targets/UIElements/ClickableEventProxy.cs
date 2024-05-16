@@ -12,7 +12,7 @@ namespace Fusion.Mvvm
 {
     public class ClickableEventProxy : EventTargetProxyBase
     {
-        private bool disposed = false;
+        private bool disposed;
         protected ICommand command;
         protected IInvoker invoker;
         protected Delegate handler;

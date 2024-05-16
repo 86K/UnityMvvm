@@ -7,7 +7,7 @@ namespace Fusion.Mvvm
 {
     public class ObjectPool<T> : IObjectPool<T> where T : class
     {
-        private readonly Entry[] entries = null;
+        private readonly Entry[] entries;
         private readonly int maxSize;
         private readonly int initialSize;
         protected readonly IObjectFactory<T> factory;
@@ -126,7 +126,7 @@ namespace Fusion.Mvvm
         }
 
         #region IDisposable Support
-        private bool disposed = false;
+        private bool disposed;
 
         protected virtual void Dispose(bool disposing)
         {

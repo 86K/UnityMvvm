@@ -76,12 +76,12 @@ namespace Fusion.Mvvm
             return behaviour.BindingContext().DataContext;
         }
 
-        public static void AddBinding(this Behaviour behaviour, BindingDescription bindingDescription)
+        public static void AddBinding(this Behaviour behaviour, TargetDescription targetDescription)
         {
-            behaviour.BindingContext().Add(behaviour, bindingDescription);
+            behaviour.BindingContext().Add(behaviour, targetDescription);
         }
 
-        public static void AddBindings(this Behaviour behaviour, IEnumerable<BindingDescription> bindingDescriptions)
+        public static void AddBindings(this Behaviour behaviour, IEnumerable<TargetDescription> bindingDescriptions)
         {
             behaviour.BindingContext().Add(behaviour, bindingDescriptions);
         }
@@ -104,17 +104,17 @@ namespace Fusion.Mvvm
             behaviour.BindingContext().Add(bindings, key);
         }
 
-        public static void AddBinding(this Behaviour behaviour, object target, BindingDescription bindingDescription, object key = null)
+        public static void AddBinding(this Behaviour behaviour, object target, TargetDescription targetDescription, object key = null)
         {
-            behaviour.BindingContext().Add(target, bindingDescription, key);
+            behaviour.BindingContext().Add(target, targetDescription, key);
         }
 
-        public static void AddBindings(this Behaviour behaviour, object target, IEnumerable<BindingDescription> bindingDescriptions, object key = null)
+        public static void AddBindings(this Behaviour behaviour, object target, IEnumerable<TargetDescription> bindingDescriptions, object key = null)
         {
             behaviour.BindingContext().Add(target, bindingDescriptions, key);
         }
 
-        public static void AddBindings(this Behaviour behaviour, IDictionary<object, IEnumerable<BindingDescription>> bindingMap, object key = null)
+        public static void AddBindings(this Behaviour behaviour, IDictionary<object, IEnumerable<TargetDescription>> bindingMap, object key = null)
         {
             if (bindingMap == null)
                 return;

@@ -12,7 +12,7 @@ namespace Fusion.Mvvm
         private readonly IComparer<IDelayTask> comparer = new ComparerImpl<IDelayTask>();
         private readonly List<IDelayTask> queue = new List<IDelayTask>();
         private readonly object _lock = new object();
-        private bool running = false;
+        private bool running;
 
         public ThreadScheduledExecutor()
         {
@@ -301,7 +301,7 @@ namespace Fusion.Mvvm
             private TimeSpan period;
             private readonly ThreadScheduledExecutor executor;
             private readonly Action wrappedAction;
-            private int count = 0;
+            private int count;
 
             public FixedRateDelayTask(ThreadScheduledExecutor executor, Action command, TimeSpan initialDelay, TimeSpan period) : base()
             {

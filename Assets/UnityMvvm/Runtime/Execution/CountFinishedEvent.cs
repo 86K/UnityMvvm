@@ -10,7 +10,7 @@ namespace Fusion.Mvvm
     public class CountFinishedEvent
     {
         private readonly ManualResetEvent resetEvent = new ManualResetEvent(false);
-        private int count = 0;
+        private int count;
 
         public CountFinishedEvent(int count)
         {

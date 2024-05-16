@@ -1,12 +1,10 @@
-
-
 using System;
 using System.Text;
 
 namespace Fusion.Mvvm
 {
     [Serializable]
-    public class BindingDescription
+    public class TargetDescription
     {
         public string TargetName { get; set; }
 
@@ -22,11 +20,11 @@ namespace Fusion.Mvvm
 
         public object CommandParameter { get; set; }
 
-        public BindingDescription()
+        public TargetDescription()
         {
         }
 
-        public BindingDescription(string targetName, Path path, IConverter converter = null, BindingMode mode = BindingMode.Default)
+        public TargetDescription(string targetName, Path path, IConverter converter = null, BindingMode mode = BindingMode.Default)
         {
             TargetName = targetName;
             Mode = mode;

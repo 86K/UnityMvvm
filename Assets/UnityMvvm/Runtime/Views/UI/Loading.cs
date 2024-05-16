@@ -8,7 +8,7 @@ namespace Fusion.Mvvm
     {
         private const string DEFAULT_VIEW_NAME = "UI/Loading";
         private static readonly object _lock = new object();
-        private static int refCount = 0;
+        private static int refCount;
         private static LoadingWindow window;
         private static string viewName;
         private readonly bool ignoreAnimation;
@@ -40,7 +40,7 @@ namespace Fusion.Mvvm
         }
 
         #region IDisposable Support
-        private bool disposed = false;
+        private bool disposed;
 
         protected virtual void Dispose(bool disposing)
         {

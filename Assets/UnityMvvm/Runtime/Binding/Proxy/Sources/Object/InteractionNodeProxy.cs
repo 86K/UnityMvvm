@@ -10,7 +10,7 @@ namespace Fusion.Mvvm
         
         private readonly IInteractionRequest request;
 
-        private bool disposed = false;
+        private bool disposed;
         protected IInvoker invoker;
         protected Delegate handler;
 

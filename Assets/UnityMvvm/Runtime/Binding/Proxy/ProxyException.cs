@@ -4,7 +4,7 @@ using System;
 
 namespace Fusion.Mvvm
 {
-    public class ProxyException : BindingException
+    public class ProxyException : Exception
     {
         public ProxyException()
         {

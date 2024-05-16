@@ -47,7 +47,7 @@ namespace Fusion.Mvvm
 
         private string text;
         private char[] separators;
-        private int total = 0;
+        private int total;
         private int pos = -1;
         private readonly List<string> items = new List<string>();
         private StringSpliter()

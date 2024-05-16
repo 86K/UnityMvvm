@@ -38,11 +38,11 @@ namespace Fusion.Mvvm
             DataContext = dataContext;
         }
 
-        public BindingContext(object owner, IBinder binder, IDictionary<object, IEnumerable<BindingDescription>> firstBindings) : this(owner, binder, null, firstBindings)
+        public BindingContext(object owner, IBinder binder, IDictionary<object, IEnumerable<TargetDescription>> firstBindings) : this(owner, binder, null, firstBindings)
         {
         }
 
-        public BindingContext(object owner, IBinder binder, object dataContext, IDictionary<object, IEnumerable<BindingDescription>> firstBindings)
+        public BindingContext(object owner, IBinder binder, object dataContext, IDictionary<object, IEnumerable<TargetDescription>> firstBindings)
         {
             this.owner = owner;
             this.binder = binder;
@@ -145,13 +145,13 @@ namespace Fusion.Mvvm
             }
         }
 
-        public virtual void Add(object target, BindingDescription description, object key = null)
+        public virtual void Add(object target, TargetDescription description, object key = null)
         {
             IBinding binding = Binder.Bind(this, DataContext, target, description);
             Add(binding, key);
         }
 
-        public virtual void Add(object target, IEnumerable<BindingDescription> descriptions, object key = null)
+        public virtual void Add(object target, IEnumerable<TargetDescription> descriptions, object key = null)
         {
             IEnumerable<IBinding> bindings = Binder.Bind(this, DataContext, target, descriptions);
             Add(bindings, key);
@@ -195,7 +195,7 @@ namespace Fusion.Mvvm
         }
 
         #region IDisposable Support
-        private bool disposed = false;
+        private bool disposed;
 
         protected virtual void Dispose(bool disposing)
         {

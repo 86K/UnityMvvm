@@ -26,14 +26,11 @@ namespace Fusion.Mvvm
 #if UNITY_2019_1_OR_NEWER
             targetFactory.Register(new VisualElementProxyFactory(), 30);
 #endif
-
-            BindingFactory bindingFactory = new BindingFactory(sourceFactory, targetFactory);
-            StandardBinder binder = new StandardBinder(bindingFactory);
-
+            
+            Binder binder = new Binder(sourceFactory, targetFactory);
             container.Register<IBinder>(binder);
-            container.Register<IBindingFactory>(bindingFactory);
+            
             container.Register<IConverterRegistry>(converterRegistry);
-
             container.Register<IExpressionPathFinder>(expressionPathFinder);
             container.Register<IPathParser>(pathParser);
 
@@ -49,10 +46,7 @@ namespace Fusion.Mvvm
 
         protected override void OnStop(IServiceContainer container)
         {
-            container.Unregister<IBinder>();
-            container.Unregister<IBindingFactory>();
             container.Unregister<IConverterRegistry>();
-
             container.Unregister<IExpressionPathFinder>();
             container.Unregister<IPathParser>();
 

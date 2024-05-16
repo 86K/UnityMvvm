@@ -17,9 +17,9 @@ namespace Fusion.Mvvm
 
         void Add(IEnumerable<IBinding> bindings,object key = null);
 
-        void Add(object target, BindingDescription description,object key = null);
+        void Add(object target, TargetDescription description,object key = null);
 
-        void Add(object target, IEnumerable<BindingDescription> descriptions, object key = null);
+        void Add(object target, IEnumerable<TargetDescription> descriptions, object key = null);
 
         void Clear(object key);
 

@@ -12,7 +12,7 @@ namespace Fusion.Mvvm
         [ThreadStatic]
         private static readonly List<Type> TYPES = new List<Type>();
         private static readonly Type[] EMPTY_TYPES = new Type[0];
-        public ITargetProxy CreateProxy(object target, BindingDescription description)
+        public ITargetProxy CreateProxy(object target, TargetDescription description)
         {
             if (TargetNameUtil.IsCollection(description.TargetName))
                 return null;

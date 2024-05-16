@@ -26,7 +26,7 @@ namespace Fusion.Mvvm
 
     public class Attributes : IAttributes
     {
-        private Dictionary<Type, object> attributes = null;
+        private Dictionary<Type, object> attributes;
 
         public virtual void Add(Type type, object target)
         {

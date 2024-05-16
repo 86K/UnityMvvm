@@ -7,7 +7,7 @@ namespace Fusion.Mvvm
 {
     public class ExpressionSourceProxy : NotifiableSourceProxyBase, IExpressionSourceProxy
     {
-        private bool disposed = false;
+        private bool disposed;
         private readonly Type type;
         private readonly Func<object[], object> func;
         private readonly List<ISourceProxy> inners = new List<ISourceProxy>();
@@ -76,7 +76,7 @@ namespace Fusion.Mvvm
 
     public class ExpressionSourceProxy<T, TResult> : NotifiableSourceProxyBase, IExpressionSourceProxy
     {
-        private bool disposed = false;
+        private bool disposed;
         private readonly Func<T, TResult> func;
         private readonly List<ISourceProxy> inners;
 
@@ -138,7 +138,7 @@ namespace Fusion.Mvvm
 
     public class ExpressionSourceProxy<TResult> : NotifiableSourceProxyBase, IExpressionSourceProxy
     {
-        private bool disposed = false;
+        private bool disposed;
         private readonly Func<TResult> func;
         private readonly List<ISourceProxy> inners;
 

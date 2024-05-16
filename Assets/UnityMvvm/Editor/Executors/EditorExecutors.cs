@@ -12,7 +12,7 @@ namespace Fusion.Mvvm
     [InitializeOnLoad]
     public class EditorExecutors
     {
-        private static bool running = false;
+        private static bool running;
         private static readonly List<Task> pending = new List<Task>();
         private static readonly List<IEnumerator> routines = new List<IEnumerator>();
 

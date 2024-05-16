@@ -10,7 +10,7 @@ namespace Fusion.Mvvm
     public class CountDownEvent
     {
         private readonly int max = 1;
-        private int count = 0;
+        private int count;
         private readonly AutoResetEvent reset = new AutoResetEvent(false);
 
         public CountDownEvent(int max)

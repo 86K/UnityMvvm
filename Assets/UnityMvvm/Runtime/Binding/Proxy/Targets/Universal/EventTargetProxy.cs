@@ -4,7 +4,7 @@ namespace Fusion.Mvvm
 {
     public class EventTargetProxy : EventTargetProxyBase
     {
-        private bool disposed = false;
+        private bool disposed;
         protected readonly IProxyEventInfo eventInfo;
         protected Delegate handler;
 

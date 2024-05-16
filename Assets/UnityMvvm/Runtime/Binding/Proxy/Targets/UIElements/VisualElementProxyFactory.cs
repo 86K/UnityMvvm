@@ -10,7 +10,7 @@ namespace Fusion.Mvvm
     public class VisualElementProxyFactory : ITargetProxyFactory
     {
         private static readonly string REGISTER_VALUE_CHANGED_CALLBACK = "RegisterValueChangedCallback";
-        public ITargetProxy CreateProxy(object target, BindingDescription description)
+        public ITargetProxy CreateProxy(object target, TargetDescription description)
         {
             if (TargetNameUtil.IsCollection(description.TargetName))
                 return null;
