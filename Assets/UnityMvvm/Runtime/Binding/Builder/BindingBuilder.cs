@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Linq.Expressions;
 #if UNITY_2019_1_OR_NEWER
@@ -10,21 +8,12 @@ namespace Fusion.Mvvm
 {
     public class BindingBuilder<TTarget, TSource> : BindingBuilderBase where TTarget : class
     {
-        //private static readonly ILog log = LogManager.GetLogger(typeof(BindingBuilder<TTarget, TSource>));
-
         public BindingBuilder(IBindingContext context, TTarget target) : base(context, target)
         {
             description.TargetType = typeof(TTarget);
         }
 
-        public BindingBuilder<TTarget, TSource> For(string targetName)
-        {
-            description.TargetName = targetName;
-            description.UpdateTrigger = null;
-            return this;
-        }
-
-        public BindingBuilder<TTarget, TSource> For(string targetName, string updateTrigger)
+        BindingBuilder<TTarget, TSource> ForInternal(string targetName, string updateTrigger = null)
         {
             description.TargetName = targetName;
             description.UpdateTrigger = updateTrigger;
@@ -34,35 +23,29 @@ namespace Fusion.Mvvm
         public BindingBuilder<TTarget, TSource> For<TResult>(Expression<Func<TTarget, TResult>> memberExpression)
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = null;
-            return this;
+
+            return ForInternal(targetName);
         }
 
         public BindingBuilder<TTarget, TSource> For<TResult>(Expression<Func<TTarget, TResult>> memberExpression, string updateTrigger)
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = updateTrigger;
-            return this;
+            return ForInternal(targetName, updateTrigger);
         }
 
         public BindingBuilder<TTarget, TSource> For<TResult, TEvent>(Expression<Func<TTarget, TResult>> memberExpression, Expression<Func<TTarget, TEvent>> updateTriggerExpression)
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
             string updateTrigger = PathParser.ParseMemberName(updateTriggerExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = updateTrigger;
-            return this;
+            return ForInternal(targetName, updateTrigger);
         }
 
         public BindingBuilder<TTarget, TSource> For(Expression<Func<TTarget, EventHandler<InteractionEventArgs>>> memberExpression)
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = null;
             OneWayToSource();
-            return this;
+            
+            return ForInternal(targetName);
         }
 
 #if UNITY_2019_1_OR_NEWER
@@ -70,18 +53,16 @@ namespace Fusion.Mvvm
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
             string updateTrigger = PathParser.ParseMemberName(updateTriggerExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = updateTrigger;
-            return this;
+            
+            return ForInternal(targetName, updateTrigger);
         }
 
         public BindingBuilder<TTarget, TSource> For<TResult>(Expression<Func<TTarget, Func<EventCallback<ChangeEvent<TResult>>, bool>>> memberExpression)
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = null;
             OneWayToSource();
-            return this;
+            
+            return ForInternal(targetName);
         }
 #endif
 
@@ -139,13 +120,7 @@ namespace Fusion.Mvvm
             SetMode(BindingMode.OneTime);
             return this;
         }
-
-        //public BindingBuilder<TTarget, TSource> CommandParameter(object parameter)
-        //{
-        //    this.SetCommandParameter(parameter);
-        //    return this;
-        //}
-
+        
         public BindingBuilder<TTarget, TSource> CommandParameter<T>(T parameter)
         {
             SetCommandParameter(parameter);
@@ -179,21 +154,12 @@ namespace Fusion.Mvvm
 
     public class BindingBuilder<TTarget> : BindingBuilderBase where TTarget : class
     {
-        //private static readonly ILog log = LogManager.GetLogger(typeof(BindingBuilder<TTarget>));
-
         public BindingBuilder(IBindingContext context, TTarget target) : base(context, target)
         {
             description.TargetType = typeof(TTarget);
         }
 
-        public BindingBuilder<TTarget> For(string targetPropertyName)
-        {
-            description.TargetName = targetPropertyName;
-            description.UpdateTrigger = null;
-            return this;
-        }
-
-        public BindingBuilder<TTarget> For(string targetPropertyName, string updateTrigger)
+        BindingBuilder<TTarget> ForInternal(string targetPropertyName, string updateTrigger = null)
         {
             description.TargetName = targetPropertyName;
             description.UpdateTrigger = updateTrigger;
@@ -203,35 +169,27 @@ namespace Fusion.Mvvm
         public BindingBuilder<TTarget> For<TResult>(Expression<Func<TTarget, TResult>> memberExpression)
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = null;
-            return this;
+            return ForInternal(targetName);
         }
 
         public BindingBuilder<TTarget> For<TResult>(Expression<Func<TTarget, TResult>> memberExpression, string updateTrigger)
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = updateTrigger;
-            return this;
+            return ForInternal(targetName, updateTrigger);
         }
 
         public BindingBuilder<TTarget> For<TResult, TEvent>(Expression<Func<TTarget, TResult>> memberExpression, Expression<Func<TTarget, TEvent>> updateTriggerExpression)
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
             string updateTrigger = PathParser.ParseMemberName(updateTriggerExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = updateTrigger;
-            return this;
+            return ForInternal(targetName, updateTrigger);
         }
 
         public BindingBuilder<TTarget> For(Expression<Func<TTarget, EventHandler<InteractionEventArgs>>> memberExpression)
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = null;
             OneWayToSource();
-            return this;
+            return ForInternal(targetName);
         }
 
 #if UNITY_2019_1_OR_NEWER
@@ -239,18 +197,14 @@ namespace Fusion.Mvvm
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
             string updateTrigger = PathParser.ParseMemberName(updateTriggerExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = updateTrigger;
-            return this;
+            return ForInternal(targetName, updateTrigger);
         }
 
         public BindingBuilder<TTarget> For<TResult>(Expression<Func<TTarget, Func<EventCallback<ChangeEvent<TResult>>, bool>>> memberExpression)
         {
             string targetName = PathParser.ParseMemberName(memberExpression);
-            description.TargetName = targetName;
-            description.UpdateTrigger = null;
             OneWayToSource();
-            return this;
+            return ForInternal(targetName);
         }
 #endif
 
@@ -317,12 +271,6 @@ namespace Fusion.Mvvm
             return this;
         }
 
-        //public BindingBuilder<TTarget> CommandParameter(object parameter)
-        //{
-        //    this.SetCommandParameter(parameter);
-        //    return this;
-        //}
-
         public BindingBuilder<TTarget> CommandParameter<T>(T parameter)
         {
             SetCommandParameter(parameter);
@@ -354,10 +302,9 @@ namespace Fusion.Mvvm
         }
     }
 
+    [Obsolete]
     public class BindingBuilder : BindingBuilderBase
     {
-        //private static readonly ILog log = LogManager.GetLogger(typeof(BindingBuilder));
-
         public BindingBuilder(IBindingContext context, object target) : base(context, target)
         {
         }

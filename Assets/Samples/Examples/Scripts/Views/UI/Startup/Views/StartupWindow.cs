@@ -1,5 +1,3 @@
-
-
 using UnityEngine;
 using UnityEngine.UI;
 using System.Threading.Tasks;
@@ -25,24 +23,24 @@ namespace Fusion.Mvvm
             sceneInteractionAction = new AsynSceneInteractionAction("Prefabs/Cube");
             viewModel = new StartupViewModel();
 
-            
+
             BindingSet<StartupWindow, StartupViewModel> bindingSet = this.CreateBindingSet(viewModel);
             //bindingSet.Bind().For(v => v.OnOpenLoginWindow).To(vm => vm.LoginRequest);
             bindingSet.Bind().For(v => v.loginWindowInteractionAction).To(vm => vm.LoginRequest);
             bindingSet.Bind().For(v => v.OnDismissRequest).To(vm => vm.DismissRequest);
             bindingSet.Bind().For(v => v.sceneInteractionAction).To(vm => vm.LoadSceneRequest);
 
-            bindingSet.Bind(progressBarSlider).For("value", "onValueChanged").To("ProgressBar.Progress").TwoWay();
-            //bindingSet.Bind (this.progressBarSlider).For (v => v.value, v => v.onValueChanged).To (vm => vm.ProgressBar.Progress).TwoWay ();
+            // bindingSet.Bind(progressBarSlider).For("value", "onValueChanged").To("ProgressBar.Progress").TwoWay();// 不推荐的写法
+            bindingSet.Bind(this.progressBarSlider).For(v => v.value, v => v.onValueChanged).To(vm => vm.ProgressBar.Progress).TwoWay();
 
-            
 
             bindingSet.Bind(progressBarSlider.gameObject).For(v => v.activeSelf).To(vm => vm.ProgressBar.Enable).OneWay();
             bindingSet.Bind(progressBarText).For(v => v.text).ToExpression(vm => $"{Mathf.FloorToInt(vm.ProgressBar.Progress * 100f)}%").OneWay();
             bindingSet.Bind(tipText).For(v => v.text).To(vm => vm.ProgressBar.Tip).OneWay();
 
             //bindingSet.Bind(this.button).For(v => v.onClick).To(vm=>vm.OnClick()).OneWay(); //Method binding,only bound to the onClick event.
-            bindingSet.Bind(button).For(v => v.onClick).To(vm => vm.Click).OneWay();//Command binding,bound to the onClick event and interactable property.
+            bindingSet.Bind(button).For(v => v.onClick).To(vm => vm.Click)
+                .OneWay(); //Command binding,bound to the onClick event and interactable property.
             bindingSet.Build();
 
             viewModel.Unzip();
@@ -89,10 +87,12 @@ namespace Fusion.Mvvm
         class AsynSceneInteractionAction : AsyncInteractionActionBase<ProgressBar>
         {
             private readonly string path;
+
             public AsynSceneInteractionAction(string path)
             {
                 this.path = path;
             }
+
             public override async Task Action(ProgressBar progressBar)
             {
                 progressBar.Enable = true;
