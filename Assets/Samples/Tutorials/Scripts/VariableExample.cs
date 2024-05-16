@@ -59,11 +59,6 @@ namespace Fusion.Mvvm
             ApplicationContext context = Context.GetApplicationContext();
             BindingServiceBundle bindingService = new BindingServiceBundle(context.GetContainer());
             bindingService.Start();
-
-            CultureInfo cultureInfo = Locale.GetCultureInfo();
-            var localization = Localization.Current;
-            localization.CultureInfo = cultureInfo;
-            // localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
         }
 
         protected override void Start()

@@ -6,7 +6,6 @@ namespace Fusion.Mvvm
     {
         private readonly ProgressBar progressBar = new ProgressBar();
         private readonly SimpleCommand command;
-        private readonly Localization localization;
 
         //public InteractionRequest<LoginViewModel> LoginRequest;
         public AsyncInteractionRequest<WindowNotification> LoginRequest { get; private set; }
@@ -21,7 +20,6 @@ namespace Fusion.Mvvm
         public StartupViewModel(IMessenger messenger) : base(messenger)
         {
             ApplicationContext context = Context.GetApplicationContext();
-            localization = context.GetService<Localization>();
             var accountService = context.GetService<IAccountService>();
             var globalPreferences = context.GetGlobalPreferences();
 
@@ -30,7 +28,7 @@ namespace Fusion.Mvvm
             LoadSceneRequest = new AsyncInteractionRequest<ProgressBar>(this);
             DismissRequest = new InteractionRequest(this);
 
-            var loginViewModel = new LoginViewModel(accountService, localization, globalPreferences);
+            var loginViewModel = new LoginViewModel(accountService, globalPreferences);
             //this.command = new SimpleCommand(() =>
             //{
             //    this.LoginRequest.Raise(loginViewModel, vm =>
@@ -66,7 +64,7 @@ namespace Fusion.Mvvm
         {
             command.Enabled = false;
             progressBar.Enable = true;
-            ProgressBar.Tip = R.startup_progressbar_tip_unziping;
+            // ProgressBar.Tip = R.startup_progressbar_tip_unziping;
 
             try
             {

@@ -74,12 +74,6 @@ namespace Fusion.Mvvm
             IServiceContainer container = context.GetContainer();
             container.Register<IUIViewLocator>(new DefaultUIViewLocator());
 
-            CultureInfo cultureInfo = Locale.GetCultureInfo();
-            var localization = Localization.Current;
-            localization.CultureInfo = cultureInfo;
-            // localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
-            container.Register(localization); 
-
             
             IDialogService dialogService = new DefaultDialogService();
             container.Register<IDialogService>(dialogService);

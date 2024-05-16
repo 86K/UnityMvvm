@@ -31,16 +31,6 @@ namespace Fusion.Mvvm
             container.Register<IUIViewLocator>(new ResourcesViewLocator());
 
             
-            //CultureInfo cultureInfo = Locale.GetCultureInfoByLanguage (SystemLanguage.English);
-            CultureInfo cultureInfo = Locale.GetCultureInfo();
-            var localization = Localization.Current;
-            localization.CultureInfo = cultureInfo;
-            // localization.AddDataProvider(new ResourcesDataProvider("LocalizationExamples", new XmlDocumentParser()));
-
-            
-            container.Register<Localization>(localization);
-
-            
             IAccountRepository accountRepository = new AccountRepository();
             container.Register<IAccountService>(new AccountService(accountRepository));
 

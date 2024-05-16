@@ -135,19 +135,12 @@ namespace Fusion.Mvvm
         public InputField emailEdit;
         public Toggle rememberEdit;
         public Button submit;
-
-        private Localization localization;
-
+        
         protected override void Awake()
         {
             ApplicationContext context = Context.GetApplicationContext();
             BindingServiceBundle bindingService = new BindingServiceBundle(context.GetContainer());
             bindingService.Start();
-
-            CultureInfo cultureInfo = Locale.GetCultureInfo();
-            localization = Localization.Current;
-            localization.CultureInfo = cultureInfo;
-            // localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
         }
 
         protected override void Start()
@@ -182,7 +175,7 @@ namespace Fusion.Mvvm
              vm.Account.Birthday.ToString("yyyy-MM-dd"), (DateTime.Now.Year - vm.Account.Birthday.Year))).OneWay();
 
             bindingSet.Bind(address).For(v => v.text).To(vm => vm.Account.Address).OneWay();
-            bindingSet.Bind(description).For(v => v.text).ToExpression(vm => localization.GetFormattedText("databinding.tutorials.description", vm.Account.Username, vm.Username)).OneWay();
+            // bindingSet.Bind(description).For(v => v.text).ToExpression(vm => localization.GetFormattedText("databinding.tutorials.description", vm.Account.Username, vm.Username)).OneWay();
 
             bindingSet.Bind(errorMessage).For(v => v.text).To(vm => vm.Errors["errorMessage"]).OneWay();
 
@@ -195,7 +188,7 @@ namespace Fusion.Mvvm
             bindingSet.Build();
 
             BindingSet<DatabindingExample> staticBindingSet = this.CreateBindingSet<DatabindingExample>();
-            staticBindingSet.Bind(title).For(v => v.text).To(() => Res.databinding_tutorials_title).OneTime();
+            // staticBindingSet.Bind(title).For(v => v.text).To(() => Res.databinding_tutorials_title).OneTime();
             //staticBindingSet.Bind(this.title).For(v => v.text).To("Res.databinding_tutorials_title").OneTime();
             staticBindingSet.Build();
         }

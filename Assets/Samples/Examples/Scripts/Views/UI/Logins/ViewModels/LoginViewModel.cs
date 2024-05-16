@@ -19,14 +19,12 @@ namespace Fusion.Mvvm
 
         private readonly Preferences globalPreferences;
         private readonly IAccountService accountService;
-        private readonly Localization localization;
 
         private readonly InteractionRequest interactionFinished;
         private readonly InteractionRequest<ToastNotification> toastRequest;
 
-        public LoginViewModel(IAccountService accountService, Localization localization, Preferences globalPreferences)
+        public LoginViewModel(IAccountService accountService, Preferences globalPreferences)
         {
-            this.localization = localization;
             this.accountService = accountService;
             this.globalPreferences = globalPreferences;
 
@@ -79,7 +77,7 @@ namespace Fusion.Mvvm
         {
             if (string.IsNullOrEmpty(username) || !Regex.IsMatch(username, "^[a-zA-Z0-9_-]{4,12}$"))
             {
-                errors["username"] = localization.GetText("login.validation.username.error", "Please enter a valid username.");
+                // errors["username"] = localization.GetText("login.validation.username.error", "Please enter a valid username.");
                 return false;
             }
             else
@@ -93,7 +91,7 @@ namespace Fusion.Mvvm
         {
             if (string.IsNullOrEmpty(password) || !Regex.IsMatch(password, "^[a-zA-Z0-9_-]{4,12}$"))
             {
-                errors["password"] = localization.GetText("login.validation.password.error", "Please enter a valid password.");
+                // errors["password"] = localization.GetText("login.validation.password.error", "Please enter a valid password.");
                 return false;
             }
             else
@@ -132,16 +130,16 @@ namespace Fusion.Mvvm
                 else
                 {
                     
-                    var tipContent = localization.GetText("login.failure.tip", "Login failure.");
-                    toastRequest.Raise(new ToastNotification(tipContent, 2f));
+                    // var tipContent = localization.GetText("login.failure.tip", "Login failure.");
+                    toastRequest.Raise(new ToastNotification("", 2f));
                 }
             }
             catch (Exception e)
             {
                 Debug.LogWarning(string.Format("Exception:{0}", e));
 
-                var tipContent = localization.GetText("login.exception.tip", "Login exception.");
-                toastRequest.Raise(new ToastNotification(tipContent, 2f));
+                // var tipContent = localization.GetText("login.exception.tip", "Login exception.");
+                toastRequest.Raise(new ToastNotification("", 2f));
             }
             finally
             {

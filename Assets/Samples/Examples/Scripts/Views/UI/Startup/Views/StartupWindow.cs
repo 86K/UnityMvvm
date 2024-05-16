@@ -96,7 +96,7 @@ namespace Fusion.Mvvm
             public override async Task Action(ProgressBar progressBar)
             {
                 progressBar.Enable = true;
-                progressBar.Tip = R.startup_progressbar_tip_loading;
+                // progressBar.Tip = R.startup_progressbar_tip_loading;
                 try
                 {
                     var request = Resources.LoadAsync<GameObject>(path);
