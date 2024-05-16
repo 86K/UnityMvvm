@@ -1,35 +1,10 @@
-﻿/*
- * MIT License
- *
- * Copyright (c) 2018 Clark Yang
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of 
- * this software and associated documentation files (the "Software"), to deal in 
- * the Software without restriction, including without limitation the rights to 
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
- * of the Software, and to permit persons to whom the Software is furnished to do so, 
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all 
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
- * SOFTWARE.
- */
-
-using Loxodon.Framework.Asynchronous;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-namespace Loxodon.Framework.Execution
+namespace Fusion.Mvvm
 {
     public interface ITime
     {
@@ -124,12 +99,12 @@ namespace Loxodon.Framework.Execution
                 throw new RejectedExecutionException("The ScheduledExecutor isn't started.");
         }
 
-        public virtual Asynchronous.IAsyncResult Schedule(Action command, long delay)
+        public virtual IAsyncResult Schedule(Action command, long delay)
         {
             return Schedule(command, new TimeSpan(delay * TimeSpan.TicksPerMillisecond));
         }
 
-        public virtual Asynchronous.IAsyncResult Schedule(Action command, TimeSpan delay)
+        public virtual IAsyncResult Schedule(Action command, TimeSpan delay)
         {
             Check();
             return new OneTimeDelayTask(this, command, delay);
@@ -146,23 +121,23 @@ namespace Loxodon.Framework.Execution
             return new OneTimeDelayTask<TResult>(this, command, delay);
         }
 
-        public virtual Asynchronous.IAsyncResult ScheduleAtFixedRate(Action command, long initialDelay, long period)
+        public virtual IAsyncResult ScheduleAtFixedRate(Action command, long initialDelay, long period)
         {
             return ScheduleAtFixedRate(command, new TimeSpan(initialDelay * TimeSpan.TicksPerMillisecond), new TimeSpan(period * TimeSpan.TicksPerMillisecond));
         }
 
-        public virtual Asynchronous.IAsyncResult ScheduleAtFixedRate(Action command, TimeSpan initialDelay, TimeSpan period)
+        public virtual IAsyncResult ScheduleAtFixedRate(Action command, TimeSpan initialDelay, TimeSpan period)
         {
             Check();
             return new FixedRateDelayTask(this, command, initialDelay, period);
         }
 
-        public virtual Asynchronous.IAsyncResult ScheduleWithFixedDelay(Action command, long initialDelay, long delay)
+        public virtual IAsyncResult ScheduleWithFixedDelay(Action command, long initialDelay, long delay)
         {
             return ScheduleWithFixedDelay(command, new TimeSpan(initialDelay * TimeSpan.TicksPerMillisecond), new TimeSpan(delay * TimeSpan.TicksPerMillisecond));
         }
 
-        public virtual Asynchronous.IAsyncResult ScheduleWithFixedDelay(Action command, TimeSpan initialDelay, TimeSpan delay)
+        public virtual IAsyncResult ScheduleWithFixedDelay(Action command, TimeSpan initialDelay, TimeSpan delay)
         {
             Check();
             return new FixedDelayDelayTask(this, command, initialDelay, delay);
@@ -175,7 +150,7 @@ namespace Loxodon.Framework.Execution
 
 
 
-        interface IDelayTask : Asynchronous.IAsyncResult
+        interface IDelayTask : IAsyncResult
         {
             TimeSpan Delay { get; }
 

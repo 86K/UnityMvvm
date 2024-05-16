@@ -5,15 +5,7 @@
 // ==--==
 //
 // <OWNER>Microsoft</OWNER>
-/*============================================================
-**
-** Class:   ConcurrentDictionary
-**
-**
-** Purpose: A scalable dictionary for concurrent access
-**
-**
-===========================================================*/
+
 
 // If CDS_COMPILE_JUST_THIS symbol is defined, the ConcurrentDictionary.cs file compiles separately,
 // with no dependencies other than .NET Framework 3.5.
@@ -41,7 +33,7 @@ using System.Diagnostics.Contracts;
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Loxodon.Framework.Utilities
+namespace Fusion.Mvvm
 {
 
     /// <summary>

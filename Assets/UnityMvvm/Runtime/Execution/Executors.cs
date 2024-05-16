@@ -1,26 +1,4 @@
-﻿/*
- * MIT License
- *
- * Copyright (c) 2018 Clark Yang
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of 
- * this software and associated documentation files (the "Software"), to deal in 
- * the Software without restriction, including without limitation the rights to 
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
- * of the Software, and to permit persons to whom the Software is furnished to do so, 
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all 
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
- * SOFTWARE.
- */
+
 
 using System;
 using System.Collections;
@@ -30,10 +8,9 @@ using UnityEngine;
 #if NETFX_CORE || !NET_LEGACY
 #endif
 using System.Threading;
-using Loxodon.Framework.Asynchronous;
 using Object = UnityEngine.Object;
 
-namespace Loxodon.Framework.Execution
+namespace Fusion.Mvvm
 {
     public class Executors
     {
@@ -399,14 +376,14 @@ namespace Loxodon.Framework.Execution
             });
         }
 
-        public static Asynchronous.IAsyncResult RunOnCoroutine(IEnumerator routine)
+        public static IAsyncResult RunOnCoroutine(IEnumerator routine)
         {
             CoroutineResult result = new CoroutineResult();
             DoRunOnCoroutine(routine, result);
             return result;
         }
 
-        public static Asynchronous.IAsyncResult RunOnCoroutine(Func<IPromise, IEnumerator> func)
+        public static IAsyncResult RunOnCoroutine(Func<IPromise, IEnumerator> func)
         {
             CoroutineResult result = new CoroutineResult();
             DoRunOnCoroutine(func(result), result);
@@ -499,7 +476,7 @@ namespace Loxodon.Framework.Execution
             DoRunAsync(() => { action(t); });
         }
 
-        public static Asynchronous.IAsyncResult RunAsync(Action action)
+        public static IAsyncResult RunAsync(Action action)
         {
             AsyncResult result = new AsyncResult();
             DoRunAsync(() =>
@@ -537,7 +514,7 @@ namespace Loxodon.Framework.Execution
             return result;
         }
 
-        public static Asynchronous.IAsyncResult RunAsync(Action<IPromise> action)
+        public static IAsyncResult RunAsync(Action<IPromise> action)
         {
             AsyncResult result = new AsyncResult();
             DoRunAsync(() =>

@@ -1,28 +1,3 @@
-﻿/*
- * MIT License
- *
- * Copyright (c) 2018 Clark Yang
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of 
- * this software and associated documentation files (the "Software"), to deal in 
- * the Software without restriction, including without limitation the rights to 
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
- * of the Software, and to permit persons to whom the Software is furnished to do so, 
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all 
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
- * SOFTWARE.
- */
-
-using Loxodon.Framework.Asynchronous;
 using System;
 using System.IO;
 using System.Collections;
@@ -30,7 +5,7 @@ using UnityEngine.Networking;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Loxodon.Framework.Net.Http
+namespace Fusion.Mvvm
 {
     public class UnityWebRequestFileDownloader : FileDownloaderBase
     {
@@ -44,7 +19,7 @@ namespace Loxodon.Framework.Net.Http
 
         public override IProgressResult<ProgressInfo, FileInfo> DownloadFileAsync(Uri path, FileInfo fileInfo)
         {
-            return Execution.Executors.RunOnCoroutine<ProgressInfo, FileInfo>((promise) => DoDownloadFileAsync(path, fileInfo, promise));
+            return Executors.RunOnCoroutine<ProgressInfo, FileInfo>((promise) => DoDownloadFileAsync(path, fileInfo, promise));
         }
 
         protected virtual IEnumerator DoDownloadFileAsync(Uri path, FileInfo fileInfo, IProgressPromise<ProgressInfo> promise)
@@ -94,7 +69,7 @@ namespace Loxodon.Framework.Net.Http
 
         public override IProgressResult<ProgressInfo, ResourceInfo[]> DownloadFileAsync(ResourceInfo[] infos)
         {
-            return Execution.Executors.RunOnCoroutine<ProgressInfo, ResourceInfo[]>((promise) => DoDownloadFileAsync(infos, promise));
+            return Executors.RunOnCoroutine<ProgressInfo, ResourceInfo[]>((promise) => DoDownloadFileAsync(infos, promise));
         }
 
         protected virtual IEnumerator DoDownloadFileAsync(ResourceInfo[] infos, IProgressPromise<ProgressInfo> promise)

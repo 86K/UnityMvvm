@@ -1,26 +1,4 @@
-﻿/*
- * MIT License
- *
- * Copyright (c) 2018 Clark Yang
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of 
- * this software and associated documentation files (the "Software"), to deal in 
- * the Software without restriction, including without limitation the rights to 
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
- * of the Software, and to permit persons to whom the Software is furnished to do so, 
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all 
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
- * SOFTWARE.
- */
+
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,19 +6,9 @@ using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-using Loxodon.Framework.Contexts;
-using Loxodon.Framework.Observables;
-using Loxodon.Framework.Views;
-using Loxodon.Framework.ViewModels;
-
-using Loxodon.Framework.Localizations;
-using Loxodon.Framework.Binding;
-using Loxodon.Framework.Binding.Contexts;
-using Loxodon.Framework.Binding.Builder;
-
-namespace Loxodon.Framework.Tutorials
+namespace Fusion.Mvvm
 {
-    public class Account : ObservableObject
+    public class DataBindingAccount : ObservableObject
     {
         private int id;
         private string username;
@@ -84,13 +52,13 @@ namespace Loxodon.Framework.Tutorials
 
     public class AccountViewModel : ViewModelBase
     {
-        private Account account;
+        private DataBindingAccount account;
         private bool remember;
         private string username;
         private string email;
         private ObservableDictionary<string, string> errors = new ObservableDictionary<string, string>();
 
-        public Account Account
+        public DataBindingAccount Account
         {
             get => account;
             set => Set(ref account, value);
@@ -179,12 +147,12 @@ namespace Loxodon.Framework.Tutorials
             CultureInfo cultureInfo = Locale.GetCultureInfo();
             localization = Localization.Current;
             localization.CultureInfo = cultureInfo;
-            localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
+            // localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
         }
 
         protected override void Start()
         {
-            Account account = new Account()
+            DataBindingAccount account = new DataBindingAccount()
             {
                 ID = 1,
                 Username = "test",
@@ -202,7 +170,7 @@ namespace Loxodon.Framework.Tutorials
             IBindingContext bindingContext = this.BindingContext();
             bindingContext.DataContext = accountViewModel;
 
-            /* databinding */
+            
             BindingSet<DatabindingExample, AccountViewModel> bindingSet = this.CreateBindingSet<DatabindingExample, AccountViewModel>();
             //			bindingSet.Bind (this.username).For ("text").To ("Account.Username").OneWay ();
             //			bindingSet.Bind (this.password).For ("text").To ("Account.Password").OneWay ();

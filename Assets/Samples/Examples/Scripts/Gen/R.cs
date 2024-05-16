@@ -1,5 +1,5 @@
-using Loxodon.Framework.Localizations;
 using System;
+using Fusion.Mvvm;
 using UnityEngine;
 
 public static partial class R

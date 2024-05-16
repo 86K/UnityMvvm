@@ -1,35 +1,10 @@
-﻿/*
- * MIT License
- *
- * Copyright (c) 2018 Clark Yang
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of 
- * this software and associated documentation files (the "Software"), to deal in 
- * the Software without restriction, including without limitation the rights to 
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
- * of the Software, and to permit persons to whom the Software is furnished to do so, 
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all 
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
- * SOFTWARE.
- */
+
 
 using UnityEngine;
 using System.Collections;
 using System.Text;
 
-using Loxodon.Framework.Asynchronous;
-using Loxodon.Framework.Execution;
-
-namespace Loxodon.Framework.Tutorials
+namespace Fusion.Mvvm
 {
 	public class CoroutineExecutorExample : MonoBehaviour
 	{
@@ -71,7 +46,7 @@ namespace Loxodon.Framework.Tutorials
 		{
 			Debug.Log ("The task2 start");
 			yield return null;
-			promise.SetResult (); /* set a result of the task */
+			promise.SetResult (); 
 			Debug.Log ("The task2 end");
 		}
 
@@ -80,7 +55,7 @@ namespace Loxodon.Framework.Tutorials
 			Debug.Log ("The task3 start");
 			StringBuilder buf = new StringBuilder ();
 			for (int i = 0; i < 50; i++) {
-				/* If the task is cancelled, then stop the task */
+				
 				if (promise.IsCancellationRequested) {
 					promise.SetCancelled ();			
 					yield break;
@@ -89,7 +64,7 @@ namespace Loxodon.Framework.Tutorials
 				buf.Append (i).Append (" ");
 				yield return null;
 			}
-			promise.SetResult (buf.ToString ()); /* set a result of the task */
+			promise.SetResult (buf.ToString ()); 
 			Debug.Log ("The task3 end");
 		}
 
@@ -99,7 +74,7 @@ namespace Loxodon.Framework.Tutorials
 			int n = 10;
 			StringBuilder buf = new StringBuilder ();
 			for (int i = 1; i <= n; i++) {
-				/* If the task is cancelled, then stop the task */
+				
 				if (promise.IsCancellationRequested) {
 					promise.SetCancelled ();
 					yield break;
@@ -110,7 +85,7 @@ namespace Loxodon.Framework.Tutorials
 				promise.UpdateProgress (i / (float)n);
 				yield return null;
 			}
-			promise.SetResult (buf.ToString ()); /* set a result of the task */
+			promise.SetResult (buf.ToString ()); 
 			Debug.Log ("The task4 end");
 		}
 	}

@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections;
 using UnityEngine;
 
-namespace Loxodon.Framework.Localizations
+namespace Fusion.Mvvm
 {
     [AddComponentMenu("Loxodon/Localization/LocalizedSpriteRendererInResources")]
     [DisallowMultipleComponent]

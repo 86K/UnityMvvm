@@ -1,4 +1,5 @@
-using Loxodon.Framework.Localizations;
+using Fusion;
+using Fusion.Mvvm;
 
 public static partial class Res
 {

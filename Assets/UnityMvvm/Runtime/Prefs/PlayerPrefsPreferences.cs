@@ -1,26 +1,4 @@
-﻿/*
- * MIT License
- *
- * Copyright (c) 2018 Clark Yang
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of 
- * this software and associated documentation files (the "Software"), to deal in 
- * the Software without restriction, including without limitation the rights to 
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
- * of the Software, and to permit persons to whom the Software is furnished to do so, 
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all 
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
- * SOFTWARE.
- */
+
 
 using System;
 using System.Collections.Generic;
@@ -28,7 +6,7 @@ using System.Text;
 
 using UnityEngine;
 
-namespace Loxodon.Framework.Prefs
+namespace Fusion.Mvvm
 {
     /// <summary>
     /// 
@@ -55,7 +33,7 @@ namespace Loxodon.Framework.Prefs
         /// </summary>
         /// <param name="serializer"></param>
         /// <param name="encryptor"></param>
-        public PlayerPrefsPreferencesFactory(ISerializer serializer, IEncryptor encryptor) : base(serializer, encryptor)
+        public PlayerPrefsPreferencesFactory(ISerializer serializer, IPrefsEncryptor encryptor) : base(serializer, encryptor)
         {
         }
 
@@ -87,7 +65,7 @@ namespace Loxodon.Framework.Prefs
         /// <summary>
         /// 
         /// </summary>
-        protected readonly IEncryptor encryptor;
+        protected readonly IPrefsEncryptor encryptor;
 
         /// <summary>
         /// 
@@ -100,7 +78,7 @@ namespace Loxodon.Framework.Prefs
         /// <param name="name"></param>
         /// <param name="serializer"></param>
         /// <param name="encryptor"></param>
-        public PlayerPrefsPreferences(string name, ISerializer serializer, IEncryptor encryptor) : base(name)
+        public PlayerPrefsPreferences(string name, ISerializer serializer, IPrefsEncryptor encryptor) : base(name)
         {
             this.serializer = serializer;
             this.encryptor = encryptor;

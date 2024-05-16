@@ -1,39 +1,10 @@
-﻿/*
- * MIT License
- *
- * Copyright (c) 2018 Clark Yang
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of 
- * this software and associated documentation files (the "Software"), to deal in 
- * the Software without restriction, including without limitation the rights to 
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
- * of the Software, and to permit persons to whom the Software is furnished to do so, 
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all 
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
- * SOFTWARE.
- */
+
 
 using UnityEngine;
 using UnityEngine.UI;
-using Loxodon.Framework.Contexts;
-using Loxodon.Framework.Views;
-using Loxodon.Framework.Binding;
-using Loxodon.Framework.Binding.Builder;
-using Loxodon.Framework.Interactivity;
-using Loxodon.Framework.Views.InteractionActions;
-using Loxodon.Framework.Asynchronous;
 using System.Threading.Tasks;
 
-namespace Loxodon.Framework.Examples
+namespace Fusion.Mvvm
 {
     public class StartupWindow : Window
     {
@@ -54,7 +25,7 @@ namespace Loxodon.Framework.Examples
             sceneInteractionAction = new AsynSceneInteractionAction("Prefabs/Cube");
             viewModel = new StartupViewModel();
 
-            /* databinding, Bound to the ViewModel. */
+            
             BindingSet<StartupWindow, StartupViewModel> bindingSet = this.CreateBindingSet(viewModel);
             //bindingSet.Bind().For(v => v.OnOpenLoginWindow).To(vm => vm.LoginRequest);
             bindingSet.Bind().For(v => v.loginWindowInteractionAction).To(vm => vm.LoginRequest);
@@ -64,14 +35,10 @@ namespace Loxodon.Framework.Examples
             bindingSet.Bind(progressBarSlider).For("value", "onValueChanged").To("ProgressBar.Progress").TwoWay();
             //bindingSet.Bind (this.progressBarSlider).For (v => v.value, v => v.onValueChanged).To (vm => vm.ProgressBar.Progress).TwoWay ();
 
-            /* //by the way,You can expand your attributes. 		 
-		        ProxyFactory proxyFactory = ProxyFactory.Default;
-		        PropertyInfo info = typeof(GameObject).GetProperty ("activeSelf");
-		        proxyFactory.Register (new ProxyPropertyInfo<GameObject, bool> (info, go => go.activeSelf, (go, value) => go.SetActive (value)));
-		    */
+            
 
             bindingSet.Bind(progressBarSlider.gameObject).For(v => v.activeSelf).To(vm => vm.ProgressBar.Enable).OneWay();
-            bindingSet.Bind(progressBarText).For(v => v.text).ToExpression(vm => $"{Mathf.FloorToInt(vm.ProgressBar.Progress * 100f)}%").OneWay();/* expression binding,support only OneWay mode. */
+            bindingSet.Bind(progressBarText).For(v => v.text).ToExpression(vm => $"{Mathf.FloorToInt(vm.ProgressBar.Progress * 100f)}%").OneWay();
             bindingSet.Bind(tipText).For(v => v.text).To(vm => vm.ProgressBar.Tip).OneWay();
 
             //bindingSet.Bind(this.button).For(v => v.onClick).To(vm=>vm.OnClick()).OneWay(); //Method binding,only bound to the onClick event.
@@ -135,7 +102,7 @@ namespace Loxodon.Framework.Examples
                     var request = Resources.LoadAsync<GameObject>(path);
                     while (!request.isDone)
                     {
-                        progressBar.Progress = request.progress;/* update progress */
+                        progressBar.Progress = request.progress;
                         await new WaitForSecondsRealtime(0.02f);
                     }
 
