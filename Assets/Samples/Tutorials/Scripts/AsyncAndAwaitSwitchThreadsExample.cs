@@ -25,12 +25,8 @@
 using UnityEngine;
 #if NETFX_CORE || NET_STANDARD_2_0 || NET_4_6
 using Loxodon.Framework.Asynchronous;
-using Loxodon.Framework.Execution;
-using System;
-using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine.Networking;
 #endif
 
 namespace Loxodon.Framework.Tutorials

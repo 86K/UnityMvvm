@@ -60,7 +60,7 @@ namespace Loxodon.Framework.Tutorials
             }).Start();
 
             //		/* Cancel the task in three seconds.*/
-            this.StartCoroutine(DoCancel(task));
+            StartCoroutine(DoCancel(task));
 
             /* wait for the task finished. */
             yield return task.WaitForDone();

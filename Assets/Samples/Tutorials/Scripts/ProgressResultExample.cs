@@ -34,7 +34,7 @@ namespace Loxodon.Framework.Tutorials
 		public int bytes;
 		public int TotalBytes;
 
-		public int Percentage { get { return (bytes * 100) / TotalBytes; } }
+		public int Percentage => (bytes * 100) / TotalBytes;
 	}
 
 
@@ -46,7 +46,7 @@ namespace Loxodon.Framework.Tutorials
 			ProgressResult<Progress,string> result = new ProgressResult<Progress,string> (true);
 
 			/* Start the task */
-			this.StartCoroutine (DoTask (result));
+			StartCoroutine (DoTask (result));
 
 			while (!result.IsDone) {
 				Debug.LogFormat ("Percentage: {0}% ", result.Progress.Percentage);

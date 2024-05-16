@@ -51,38 +51,35 @@ namespace Loxodon.Framework.Tutorials
 
         public int ID
         {
-            get { return this.id; }
-            set { this.Set(ref this.id, value); }
+            get => id;
+            set => Set(ref id, value);
         }
 
         public string Username
         {
-            get { return this.username; }
-            set { this.Set(ref this.username, value); }
+            get => username;
+            set => Set(ref username, value);
         }
 
         public string Password
         {
-            get { return this.password; }
-            set { this.Set(ref this.password, value); }
+            get => password;
+            set => Set(ref password, value);
         }
 
         public string Email
         {
-            get { return this.email; }
-            set { this.Set(ref this.email, value); }
+            get => email;
+            set => Set(ref email, value);
         }
 
         public DateTime Birthday
         {
-            get { return this.birthday; }
-            set { this.Set(ref this.birthday, value); }
+            get => birthday;
+            set => Set(ref birthday, value);
         }
 
-        public ObservableProperty<string> Address
-        {
-            get { return this.address; }
-        }
+        public ObservableProperty<string> Address => address;
     }
 
     public class AccountViewModel : ViewModelBase
@@ -95,32 +92,32 @@ namespace Loxodon.Framework.Tutorials
 
         public Account Account
         {
-            get { return this.account; }
-            set { this.Set(ref account, value); }
+            get => account;
+            set => Set(ref account, value);
         }
 
         public string Username
         {
-            get { return this.username; }
-            set { this.Set(ref this.username, value); }
+            get => username;
+            set => Set(ref username, value);
         }
 
         public string Email
         {
-            get { return this.email; }
-            set { this.Set(ref this.email, value); }
+            get => email;
+            set => Set(ref email, value);
         }
 
         public bool Remember
         {
-            get { return this.remember; }
-            set { this.Set(ref this.remember, value); }
+            get => remember;
+            set => Set(ref remember, value);
         }
 
         public ObservableDictionary<string, string> Errors
         {
-            get { return this.errors; }
-            set { this.Set(ref this.errors, value); }
+            get => errors;
+            set => Set(ref errors, value);
         }
 
         public void OnUsernameValueChanged(string value)
@@ -135,21 +132,21 @@ namespace Loxodon.Framework.Tutorials
 
         public void OnSubmit()
         {
-            if (string.IsNullOrEmpty(this.Username) || !Regex.IsMatch(this.Username, "^[a-zA-Z0-9_-]{4,12}$"))
+            if (string.IsNullOrEmpty(Username) || !Regex.IsMatch(Username, "^[a-zA-Z0-9_-]{4,12}$"))
             {
-                this.errors["errorMessage"] = "Please enter a valid username.";
+                errors["errorMessage"] = "Please enter a valid username.";
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.Email) || !Regex.IsMatch(this.Email, @"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"))
+            if (string.IsNullOrEmpty(Email) || !Regex.IsMatch(Email, @"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"))
             {
-                this.errors["errorMessage"] = "Please enter a valid email.";
+                errors["errorMessage"] = "Please enter a valid email.";
                 return;
             }
 
-            this.errors.Clear();
-            this.Account.Username = this.Username;
-            this.Account.Email = this.Email;
+            errors.Clear();
+            Account.Username = Username;
+            Account.Email = Email;
         }
     }
 
@@ -209,28 +206,28 @@ namespace Loxodon.Framework.Tutorials
             BindingSet<DatabindingExample, AccountViewModel> bindingSet = this.CreateBindingSet<DatabindingExample, AccountViewModel>();
             //			bindingSet.Bind (this.username).For ("text").To ("Account.Username").OneWay ();
             //			bindingSet.Bind (this.password).For ("text").To ("Account.Password").OneWay ();
-            bindingSet.Bind(this.username).For(v => v.text).To(vm => vm.Account.Username).OneWay();
-            bindingSet.Bind(this.password).For(v => v.text).To(vm => vm.Account.Password).OneWay();
-            bindingSet.Bind(this.email).For(v => v.text).To(vm => vm.Account.Email).OneWay();
-            bindingSet.Bind(this.remember).For(v => v.text).To(vm => vm.Remember).OneWay();
-            bindingSet.Bind(this.birthday).For(v => v.text).ToExpression(vm => string.Format("{0} ({1})",
+            bindingSet.Bind(username).For(v => v.text).To(vm => vm.Account.Username).OneWay();
+            bindingSet.Bind(password).For(v => v.text).To(vm => vm.Account.Password).OneWay();
+            bindingSet.Bind(email).For(v => v.text).To(vm => vm.Account.Email).OneWay();
+            bindingSet.Bind(remember).For(v => v.text).To(vm => vm.Remember).OneWay();
+            bindingSet.Bind(birthday).For(v => v.text).ToExpression(vm => string.Format("{0} ({1})",
              vm.Account.Birthday.ToString("yyyy-MM-dd"), (DateTime.Now.Year - vm.Account.Birthday.Year))).OneWay();
 
-            bindingSet.Bind(this.address).For(v => v.text).To(vm => vm.Account.Address).OneWay();
-            bindingSet.Bind(this.description).For(v => v.text).ToExpression(vm => localization.GetFormattedText("databinding.tutorials.description", vm.Account.Username, vm.Username)).OneWay();
+            bindingSet.Bind(address).For(v => v.text).To(vm => vm.Account.Address).OneWay();
+            bindingSet.Bind(description).For(v => v.text).ToExpression(vm => localization.GetFormattedText("databinding.tutorials.description", vm.Account.Username, vm.Username)).OneWay();
 
-            bindingSet.Bind(this.errorMessage).For(v => v.text).To(vm => vm.Errors["errorMessage"]).OneWay();
+            bindingSet.Bind(errorMessage).For(v => v.text).To(vm => vm.Errors["errorMessage"]).OneWay();
 
-            bindingSet.Bind(this.usernameEdit).For(v => v.text, v => v.onEndEdit).To(vm => vm.Username).TwoWay();
-            bindingSet.Bind(this.usernameEdit).For(v => v.onValueChanged).To<string>(vm => vm.OnUsernameValueChanged);
-            bindingSet.Bind(this.emailEdit).For(v => v.text, v => v.onEndEdit).To(vm => vm.Email).TwoWay();
-            bindingSet.Bind(this.emailEdit).For(v => v.onValueChanged).To<string>(vm => vm.OnEmailValueChanged);
-            bindingSet.Bind(this.rememberEdit).For(v => v.isOn, v => v.onValueChanged).To(vm => vm.Remember).TwoWay();
-            bindingSet.Bind(this.submit).For(v => v.onClick).To(vm => vm.OnSubmit);
+            bindingSet.Bind(usernameEdit).For(v => v.text, v => v.onEndEdit).To(vm => vm.Username).TwoWay();
+            bindingSet.Bind(usernameEdit).For(v => v.onValueChanged).To<string>(vm => vm.OnUsernameValueChanged);
+            bindingSet.Bind(emailEdit).For(v => v.text, v => v.onEndEdit).To(vm => vm.Email).TwoWay();
+            bindingSet.Bind(emailEdit).For(v => v.onValueChanged).To<string>(vm => vm.OnEmailValueChanged);
+            bindingSet.Bind(rememberEdit).For(v => v.isOn, v => v.onValueChanged).To(vm => vm.Remember).TwoWay();
+            bindingSet.Bind(submit).For(v => v.onClick).To(vm => vm.OnSubmit);
             bindingSet.Build();
 
             BindingSet<DatabindingExample> staticBindingSet = this.CreateBindingSet<DatabindingExample>();
-            staticBindingSet.Bind(this.title).For(v => v.text).To(() => Res.databinding_tutorials_title).OneTime();
+            staticBindingSet.Bind(title).For(v => v.text).To(() => Res.databinding_tutorials_title).OneTime();
             //staticBindingSet.Bind(this.title).For(v => v.text).To("Res.databinding_tutorials_title").OneTime();
             staticBindingSet.Build();
         }

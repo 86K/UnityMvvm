@@ -37,12 +37,12 @@ namespace Loxodon.Framework.Tutorials
 
         void Awake()
         {
-            this.localization = Localization.Current;
-            this.localization.CultureInfo = new CultureInfo("en-CA");
-            this.localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
+            localization = Localization.Current;
+            localization.CultureInfo = new CultureInfo("en-CA");
+            localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
 
-            this.dropdown.value = 0;
-            this.dropdown.onValueChanged.AddListener(OnValueChanged);
+            dropdown.value = 0;
+            dropdown.onValueChanged.AddListener(OnValueChanged);
         }
 
         void OnValueChanged(int value)
@@ -50,26 +50,26 @@ namespace Loxodon.Framework.Tutorials
             switch (value)
             {
                 case 0:
-                    this.localization.CultureInfo = new CultureInfo("en-CA");
+                    localization.CultureInfo = new CultureInfo("en-CA");
                     break;
                 case 1:
-                    this.localization.CultureInfo = new CultureInfo("zh-CN");
+                    localization.CultureInfo = new CultureInfo("zh-CN");
                     break;
                 case 2:
-                    this.localization.CultureInfo = new CultureInfo("ko-KR");
+                    localization.CultureInfo = new CultureInfo("ko-KR");
                     break;
                 case 3:
-                    this.localization.CultureInfo = new CultureInfo("ja-JP");
+                    localization.CultureInfo = new CultureInfo("ja-JP");
                     break;
                 default:
-                    this.localization.CultureInfo = new CultureInfo("zh-CN");
+                    localization.CultureInfo = new CultureInfo("zh-CN");
                     break;
             }
         }
 
         void OnDestroy()
         {
-            this.dropdown.onValueChanged.RemoveListener(OnValueChanged);
+            dropdown.onValueChanged.RemoveListener(OnValueChanged);
         }
     }
 }

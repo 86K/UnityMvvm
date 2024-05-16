@@ -30,7 +30,6 @@ using System.Text;
 using UnityEngine;
 
 using Loxodon.Framework.Localizations;
-using Loxodon.Log;
 using System.Threading.Tasks;
 
 namespace Loxodon.Framework.Examples
@@ -52,21 +51,16 @@ namespace Loxodon.Framework.Examples
     /// </summary>
     public class ResourcesDataProvider : IDataProvider
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(ResourcesDataProvider));
-
-        private string root;
-        private IDocumentParser parser;
+        private readonly string root;
+        private readonly IDocumentParser parser;
 
         public ResourcesDataProvider(string root, IDocumentParser parser)
         {
             if (string.IsNullOrEmpty(root))
                 throw new ArgumentNullException("root");
 
-            if (parser == null)
-                throw new ArgumentNullException("parser");
-
             this.root = root;
-            this.parser = parser;
+            this.parser = parser ?? throw new ArgumentNullException("parser");
         }
 
         protected string GetDefaultPath()
@@ -77,8 +71,8 @@ namespace Loxodon.Framework.Examples
         protected string GetPath(string dir)
         {
             StringBuilder buf = new StringBuilder();
-            buf.Append(this.root);
-            if (!this.root.EndsWith("/"))
+            buf.Append(root);
+            if (!root.EndsWith("/"))
                 buf.Append("/");
             buf.Append(dir);
             return buf.ToString();
@@ -126,12 +120,14 @@ namespace Loxodon.Framework.Examples
                     }
                     catch (Exception e)
                     {
-                        if (log.IsWarnEnabled)
-                            log.WarnFormat("An error occurred when loading localized data from \"{0}\".Error:{1}", text.name, e);
+                        Debug.LogWarning(string.Format("An error occurred when loading localized data from \"{0}\".Error:{1}", text.name, e));
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
     }
 }

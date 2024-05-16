@@ -30,13 +30,14 @@ using UnityEngine;
 using Loxodon.Framework.Asynchronous;
 using Loxodon.Framework.Views;
 using Loxodon.Framework.Execution;
+using Object = UnityEngine.Object;
 
 namespace Loxodon.Framework.Examples
 {
     public class ResourcesViewLocator : UIViewLocatorBase
     {
         private GlobalWindowManagerBase globalWindowManager;
-        private Dictionary<string, WeakReference> templates = new Dictionary<string, WeakReference>();
+        private readonly Dictionary<string, WeakReference> templates = new Dictionary<string, WeakReference>();
 
         protected string Normalize(string name)
         {
@@ -52,7 +53,7 @@ namespace Loxodon.Framework.Examples
             if (globalWindowManager != null)
                 return globalWindowManager;
 
-            globalWindowManager = GameObject.FindObjectOfType<GlobalWindowManagerBase>();
+            globalWindowManager = Object.FindObjectOfType<GlobalWindowManagerBase>();
             if (globalWindowManager == null)
                 throw new NotFoundException("GlobalWindowManager");
 
@@ -71,7 +72,7 @@ namespace Loxodon.Framework.Examples
             GameObject viewTemplateGo = null;
             try
             {
-                if (this.templates.TryGetValue(name, out weakRef) && weakRef.IsAlive)
+                if (templates.TryGetValue(name, out weakRef) && weakRef.IsAlive)
                 {
                     viewTemplateGo = (GameObject)weakRef.Target;
 
@@ -94,18 +95,18 @@ namespace Loxodon.Framework.Examples
                 if (viewTemplateGo != null)
                 {
                     viewTemplateGo.SetActive(false);
-                    this.templates[name] = new WeakReference(viewTemplateGo);
+                    templates[name] = new WeakReference(viewTemplateGo);
                 }
             }
 
             if (viewTemplateGo == null || viewTemplateGo.GetComponent<T>() == null)
                 return default(T);
 
-            GameObject go = GameObject.Instantiate(viewTemplateGo);
+            GameObject go = Object.Instantiate(viewTemplateGo);
             go.name = viewTemplateGo.name;
             T view = go.GetComponent<T>();
             if (view == null && go != null)
-                GameObject.Destroy(go);
+                Object.Destroy(go);
             return view;
         }
 
@@ -123,7 +124,7 @@ namespace Loxodon.Framework.Examples
             GameObject viewTemplateGo = null;
             try
             {
-                if (this.templates.TryGetValue(name, out weakRef) && weakRef.IsAlive)
+                if (templates.TryGetValue(name, out weakRef) && weakRef.IsAlive)
                 {
                     viewTemplateGo = (GameObject)weakRef.Target;
 
@@ -153,7 +154,7 @@ namespace Loxodon.Framework.Examples
                 if (viewTemplateGo != null)
                 {
                     viewTemplateGo.SetActive(false);
-                    this.templates[name] = new WeakReference(viewTemplateGo);
+                    templates[name] = new WeakReference(viewTemplateGo);
                 }
             }
 
@@ -164,12 +165,12 @@ namespace Loxodon.Framework.Examples
                 yield break;
             }
 
-            GameObject go = GameObject.Instantiate(viewTemplateGo);
+            GameObject go = Object.Instantiate(viewTemplateGo);
             go.name = viewTemplateGo.name;
             T view = go.GetComponent<T>();
             if (view == null)
             {
-                GameObject.Destroy(go);
+                Object.Destroy(go);
                 promise.SetException(new NotFoundException(name));
             }
             else
@@ -190,9 +191,9 @@ namespace Loxodon.Framework.Examples
         public override T LoadWindow<T>(IWindowManager windowManager, string name)
         {
             if (windowManager == null)
-                windowManager = this.GetDefaultWindowManager();
+                windowManager = GetDefaultWindowManager();
 
-            T target = this.DoLoadView<T>(name);
+            T target = DoLoadView<T>(name);
             if (target != null)
                 target.WindowManager = windowManager;
 
@@ -201,13 +202,13 @@ namespace Loxodon.Framework.Examples
 
         public override IProgressResult<float, T> LoadWindowAsync<T>(string name)
         {
-            return this.LoadWindowAsync<T>(null, name);
+            return LoadWindowAsync<T>(null, name);
         }
 
         public override IProgressResult<float, T> LoadWindowAsync<T>(IWindowManager windowManager, string name)
         {
             if (windowManager == null)
-                windowManager = this.GetDefaultWindowManager();
+                windowManager = GetDefaultWindowManager();
 
             ProgressResult<float, T> result = new ProgressResult<float, T>();
             Executors.RunOnCoroutineNoReturn(DoLoad<T>(result, name, windowManager));

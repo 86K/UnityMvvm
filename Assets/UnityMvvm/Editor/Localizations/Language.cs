@@ -224,10 +224,10 @@ namespace Loxodon.Framework.Editors
 
         public Language(string key, string name, string country, string code)
         {
-            this.Key = key;
-            this.Name = name;
-            this.Country = country;
-            this.Code = code;
+            Key = key;
+            Name = name;
+            Country = country;
+            Code = code;
         }
 
         public string Key { get; set; }

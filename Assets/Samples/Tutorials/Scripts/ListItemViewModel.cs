@@ -33,8 +33,8 @@ namespace Loxodon.Framework.Tutorials
         private string icon;
         private float price;
         private bool selected;
-        private ICommand clickCommand;
-        private ICommand selectCommand;
+        private readonly ICommand clickCommand;
+        private readonly ICommand selectCommand;
 
         public ListItemViewModel(ICommand selectCommand, ICommand clickCommand)
         {
@@ -42,37 +42,31 @@ namespace Loxodon.Framework.Tutorials
             this.clickCommand = clickCommand;
         }
 
-        public ICommand ClickCommand
-        {
-            get { return this.clickCommand; }
-        }
+        public ICommand ClickCommand => clickCommand;
 
-        public ICommand SelectCommand
-        {
-            get { return this.selectCommand; }
-        }
+        public ICommand SelectCommand => selectCommand;
 
         public string Title
         {
-            get { return this.title; }
-            set { this.Set(ref title, value); }
+            get => title;
+            set => Set(ref title, value);
         }
         public string Icon
         {
-            get { return this.icon; }
-            set { this.Set(ref icon, value); }
+            get => icon;
+            set => Set(ref icon, value);
         }
 
         public float Price
         {
-            get { return this.price; }
-            set { this.Set(ref price, value); }
+            get => price;
+            set => Set(ref price, value);
         }
 
         public bool IsSelected
         {
-            get { return this.selected; }
-            set { this.Set(ref selected, value); }
+            get => selected;
+            set => Set(ref selected, value);
         }
     }
 }

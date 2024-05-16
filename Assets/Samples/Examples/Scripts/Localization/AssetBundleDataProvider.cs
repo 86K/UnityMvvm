@@ -30,7 +30,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 using Loxodon.Framework.Asynchronous;
-using Loxodon.Log;
 using System.Threading.Tasks;
 using Loxodon.Framework.Localizations;
 
@@ -53,27 +52,22 @@ namespace Loxodon.Framework.Examples
 	/// </summary>
 	public class AssetBundleDataProvider : IDataProvider
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(AssetBundleDataProvider));
-
-        private string assetBundleUrl;
-        private IDocumentParser parser;
+        private readonly string assetBundleUrl;
+        private readonly IDocumentParser parser;
 
         public AssetBundleDataProvider(string assetBundleUrl, IDocumentParser parser)
         {
             if (string.IsNullOrEmpty(assetBundleUrl))
                 throw new ArgumentNullException("assetBundleUrl");
 
-            if (parser == null)
-                throw new ArgumentNullException("parser");
-
             this.assetBundleUrl = assetBundleUrl;
-            this.parser = parser;
+            this.parser = parser ?? throw new ArgumentNullException("parser");
         }
 
         public virtual async Task<Dictionary<string, object>> Load(CultureInfo cultureInfo)
         {
             Dictionary<string, object> dict = new Dictionary<string, object>();
-            using (UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(this.assetBundleUrl))
+            using (UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(assetBundleUrl))
             {
                 await www.SendWebRequest();
 
@@ -81,16 +75,16 @@ namespace Loxodon.Framework.Examples
                 AssetBundle bundle = handler.assetBundle;
                 if (bundle == null)
                 {
-                    if (log.IsWarnEnabled)
-                        log.WarnFormat("Failed to load Assetbundle from \"{0}\".", this.assetBundleUrl);
+                    Debug.LogWarning($"Failed to load Assetbundle from \"{assetBundleUrl}\".");
                     return dict;
                 }
                 try
                 {
                     List<string> assetNames = new List<string>(bundle.GetAllAssetNames());
                     List<string> defaultPaths = assetNames.FindAll(p => p.Contains("/default/"));//eg:default
-                    List<string> twoLetterISOpaths = assetNames.FindAll(p => p.Contains(string.Format("/{0}/", cultureInfo.TwoLetterISOLanguageName)));//eg:zh  en
-                    List<string> paths = cultureInfo.Name.Equals(cultureInfo.TwoLetterISOLanguageName) ? null : assetNames.FindAll(p => p.Contains(string.Format("/{0}/", cultureInfo.Name)));//eg:zh-CN  en-US
+                    List<string> twoLetterISOpaths = assetNames.FindAll(p => p.Contains($"/{cultureInfo.TwoLetterISOLanguageName}/"));//eg:zh  en
+                    List<string> paths = cultureInfo.Name.Equals(cultureInfo.TwoLetterISOLanguageName) ? null : assetNames.FindAll(p => p.Contains(
+                        $"/{cultureInfo.Name}/"));//eg:zh-CN  en-US
 
                     FillData(dict, bundle, defaultPaths, cultureInfo);
                     FillData(dict, bundle, twoLetterISOpaths, cultureInfo);
@@ -132,12 +126,14 @@ namespace Loxodon.Framework.Examples
                     }
                     catch (Exception e)
                     {
-                        if (log.IsWarnEnabled)
-                            log.WarnFormat("An error occurred when loading localized data from \"{0}\".Error:{1}", path, e);
+                        Debug.LogWarning($"An error occurred when loading localized data from \"{path}\".Error:{e}");
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
     }
 

@@ -38,11 +38,11 @@ namespace Loxodon.Framework.Examples
 
         private void Start()
         {
-            CubeObjectFactory factory = new CubeObjectFactory(this.template, this.transform);
-            this.pool = new ObjectPool<GameObject>(factory, 10, 20);
+            CubeObjectFactory factory = new CubeObjectFactory(template, transform);
+            pool = new ObjectPool<GameObject>(factory, 10, 20);
 
-            this.list = new List<GameObject>();
-            this.colors = new List<Color>()
+            list = new List<GameObject>();
+            colors = new List<Color>()
             {
                 Color.black,
                 Color.blue,
@@ -57,10 +57,10 @@ namespace Loxodon.Framework.Examples
 
         private void OnDestroy()
         {
-            if (this.pool != null)
+            if (pool != null)
             {
-                this.pool.Dispose();
-                this.pool = null;
+                pool.Dispose();
+                pool = null;
             }
         }
 
@@ -88,12 +88,12 @@ namespace Loxodon.Framework.Examples
         {
             for (int i = 0; i < count; i++)
             {
-                GameObject go = this.pool.Allocate();
+                GameObject go = pool.Allocate();
                 go.GetComponent<MeshRenderer>().material.color = GetColor();
                 go.transform.position = GetPosition();
-                go.name = string.Format("Cube {0}", this.list.Count);
+                go.name = $"Cube {list.Count}";
                 go.SetActive(true);
-                this.list.Add(go);
+                list.Add(go);
             }
         }
 
@@ -101,12 +101,12 @@ namespace Loxodon.Framework.Examples
         {
             for (int i = 0; i < count; i++)
             {
-                if (this.list.Count <= 0)
+                if (list.Count <= 0)
                     return;
 
-                int index = this.list.Count - 1;
-                GameObject go = this.list[index];
-                this.list.RemoveAt(index);
+                int index = list.Count - 1;
+                GameObject go = list[index];
+                list.RemoveAt(index);
 
                 //this.pool.Free(go);
                 //or

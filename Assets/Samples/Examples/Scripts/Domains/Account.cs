@@ -36,18 +36,18 @@ namespace Loxodon.Framework.Examples
 		private DateTime created;
 
 		public string Username {
-			get{ return this.username; }
-			set{ this.Set(ref this.username, value); }
+			get => username;
+			set => Set(ref username, value);
 		}
 
 		public string Password {
-			get{ return this.password; }
-			set{ this.Set(ref this.password, value); }
+			get => password;
+			set => Set(ref password, value);
 		}
 
 		public DateTime Created {
-			get{ return this.created; }
-			set{ this.Set(ref this.created, value); }
+			get => created;
+			set => Set(ref created, value);
 		}
 	}
 }

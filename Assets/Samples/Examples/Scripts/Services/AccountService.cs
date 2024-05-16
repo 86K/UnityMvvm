@@ -29,35 +29,35 @@ namespace Loxodon.Framework.Examples
 {
     public class AccountService : IAccountService
     {
-        private IAccountRepository repository;
-        private IMessenger messenger;
+        private readonly IAccountRepository repository;
+        private readonly IMessenger messenger;
 
-        public IMessenger Messenger { get { return messenger; } }
+        public IMessenger Messenger => messenger;
 
         public AccountService(IAccountRepository repository)
         {
             this.repository = repository;
-            this.messenger = new Messenger();
+            messenger = new Messenger();
         }
 
 
         public virtual async Task<Account> Register(Account account)
         {
-            await this.repository.Save(account);
+            await repository.Save(account);
             messenger.Publish(new AccountEventArgs(AccountEventType.Register, account));
             return account;
         }
 
         public virtual async Task<Account> Update(Account account)
         {
-            await this.repository.Update(account);
+            await repository.Update(account);
             messenger.Publish(new AccountEventArgs(AccountEventType.Update, account));
             return account;
         }
 
         public virtual async Task<Account> Login(string username, string password)
         {
-            Account account = await this.GetAccount(username);
+            Account account = await GetAccount(username);
             if (account == null || !account.Password.Equals(password))
                 return null;
 
@@ -67,7 +67,7 @@ namespace Loxodon.Framework.Examples
 
         public virtual Task<Account> GetAccount(string username)
         {
-            return this.repository.Get(username);
+            return repository.Get(username);
         }
     }
 }

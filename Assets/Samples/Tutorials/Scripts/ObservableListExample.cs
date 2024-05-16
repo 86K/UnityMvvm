@@ -36,25 +36,25 @@ namespace Loxodon.Framework.Tutorials
 
         public string Title
         {
-            get { return this.title; }
-            set { this.Set(ref this.title, value); }
+            get => title;
+            set => Set(ref title, value);
         }
 
         public string IconPath
         {
-            get { return this.iconPath; }
-            set { this.Set(ref this.iconPath, value); }
+            get => iconPath;
+            set => Set(ref iconPath, value);
         }
 
         public string Content
         {
-            get { return this.content; }
-            set { this.Set(ref this.content, value); }
+            get => content;
+            set => Set(ref content, value);
         }
 
         public override string ToString()
         {
-            return string.Format("[Item: Title={0}, IconPath={1}, Content={2}]", Title, IconPath, Content);
+            return $"[Item: Title={Title}, IconPath={IconPath}, Content={Content}]";
         }
     }
 
@@ -64,7 +64,7 @@ namespace Loxodon.Framework.Tutorials
 
         protected void Start()
         {
-            this.list = new ObservableList<Item>();
+            list = new ObservableList<Item>();
             list.CollectionChanged += OnCollectionChanged;
 
             list.Add(new Item() { Title = "title1", IconPath = "xxx/xxx/icon1.png", Content = "this is a test." });
@@ -75,10 +75,10 @@ namespace Loxodon.Framework.Tutorials
 
         protected void OnDestroy()
         {
-            if (this.list != null)
+            if (list != null)
             {
-                this.list.CollectionChanged -= OnCollectionChanged;
-                this.list = null;
+                list.CollectionChanged -= OnCollectionChanged;
+                list = null;
             }
         }
 

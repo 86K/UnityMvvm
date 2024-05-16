@@ -39,13 +39,13 @@ namespace Loxodon.Framework.Tutorials
 
         public string SpriteName
         {
-            get { return this.spriteName; }
-            set { this.Set(ref spriteName, value); }
+            get => spriteName;
+            set => Set(ref spriteName, value);
         }
 
         public void ChangeSpriteName()
         {
-            this.SpriteName = string.Format("EquipImages_{0}", Random.Range(1, 30));
+            SpriteName = $"EquipImages_{Random.Range(1, 30)}";
         }
     }
 
@@ -70,9 +70,9 @@ namespace Loxodon.Framework.Tutorials
             bindingContext.DataContext = viewModel;
 
             BindingSet<DatabindingForAsyncLoadingSpriteExample, SpriteViewModel> bindingSet = this.CreateBindingSet<DatabindingForAsyncLoadingSpriteExample, SpriteViewModel>();
-            bindingSet.Bind(this.spriteLoader).For(v => v.SpriteName).To(vm => vm.SpriteName).OneWay();
+            bindingSet.Bind(spriteLoader).For(v => v.SpriteName).To(vm => vm.SpriteName).OneWay();
 
-            bindingSet.Bind(this.changeSpriteButton).For(v => v.onClick).To(vm => vm.ChangeSpriteName);
+            bindingSet.Bind(changeSpriteButton).For(v => v.onClick).To(vm => vm.ChangeSpriteName);
 
             bindingSet.Build();
         }

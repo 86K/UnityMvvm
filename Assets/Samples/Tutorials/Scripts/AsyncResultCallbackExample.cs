@@ -48,7 +48,7 @@ namespace Loxodon.Framework.Tutorials
             });
 
             /* Start the task */
-            this.StartCoroutine(DoTask(result));
+            StartCoroutine(DoTask(result));
         }
 
         /// <summary>

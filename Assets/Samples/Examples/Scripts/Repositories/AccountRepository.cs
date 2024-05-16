@@ -33,7 +33,7 @@ namespace Loxodon.Framework.Examples
     /// </summary>
     public class AccountRepository : IAccountRepository
     {
-        private Dictionary<string, Account> cache = new Dictionary<string, Account>();
+        private readonly Dictionary<string, Account> cache = new Dictionary<string, Account>();
 
         public AccountRepository()
         {
@@ -44,7 +44,7 @@ namespace Loxodon.Framework.Examples
         public virtual Task<Account> Get(string username)
         {
             Account account = null;
-            this.cache.TryGetValue(username, out account);
+            cache.TryGetValue(username, out account);
             return Task.FromResult(account);
         }
 

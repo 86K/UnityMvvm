@@ -36,38 +36,38 @@ namespace Loxodon.Framework.Tutorials
 
         public ListItemEditViewModel(ListItemViewModel vm)
         {
-            this.title = vm.Title;
-            this.icon = vm.Icon;
-            this.price = vm.Price;
+            title = vm.Title;
+            icon = vm.Icon;
+            price = vm.Price;
         }
 
         public string Title
         {
-            get { return this.title; }
-            set { this.Set(ref title, value); }
+            get => title;
+            set => Set(ref title, value);
         }
         public string Icon
         {
-            get { return this.icon; }
-            set { this.Set(ref icon, value); }
+            get => icon;
+            set => Set(ref icon, value);
         }
 
         public float Price
         {
-            get { return this.price; }
-            set { this.Set(ref price, value); }
+            get => price;
+            set => Set(ref price, value);
         }
 
         public bool Cancelled
         {
-            get { return this.cancelled; }
-            set { this.Set(ref this.cancelled, value); }
+            get => cancelled;
+            set => Set(ref cancelled, value);
         }
 
         public void OnChangeIcon()
         {
             int iconIndex = Random.Range(1, 30);
-            this.Icon = string.Format("EquipImages_{0}", iconIndex);
+            Icon = $"EquipImages_{iconIndex}";
         }
     }
 }

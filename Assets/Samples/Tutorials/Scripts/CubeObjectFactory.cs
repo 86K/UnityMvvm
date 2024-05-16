@@ -29,8 +29,8 @@ namespace Loxodon.Framework.Examples
 {
     public class CubeObjectFactory : UnityGameObjectFactoryBase
     {
-        private GameObject template;
-        private Transform parent;
+        private readonly GameObject template;
+        private readonly Transform parent;
         public CubeObjectFactory(GameObject template, Transform parent)
         {
             this.template = template;
@@ -40,7 +40,7 @@ namespace Loxodon.Framework.Examples
         protected override GameObject Create()
         {
             Debug.LogFormat("Create a cube.");
-            return Object.Instantiate(this.template, parent);
+            return Object.Instantiate(template, parent);
         }
 
         public override void Reset(GameObject obj)

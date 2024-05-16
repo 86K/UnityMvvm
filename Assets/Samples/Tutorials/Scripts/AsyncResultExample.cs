@@ -37,10 +37,10 @@ namespace Loxodon.Framework.Tutorials
 			AsyncResult result = new AsyncResult (true);
 
 			/* Start the task */
-			this.StartCoroutine (DoTask (result));
+			StartCoroutine (DoTask (result));
 
 			/* Cancel the task in three seconds.*/
-			this.StartCoroutine (DoCancel (result));
+			StartCoroutine (DoCancel (result));
 	
 			/* wait for the task finished. */
 			yield return result.WaitForDone ();

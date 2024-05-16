@@ -111,7 +111,7 @@ namespace Loxodon.Framework.Editors
             {
                 case VariableType.Component:
                     EditorGUI.BeginChangeCheck();
-                    objectValue.objectReferenceValue = EditorGUI.ObjectField(valueRect, GUIContent.none, objectValue.objectReferenceValue, typeof(UnityEngine.Component), true);
+                    objectValue.objectReferenceValue = EditorGUI.ObjectField(valueRect, GUIContent.none, objectValue.objectReferenceValue, typeof(Component), true);
                     if (EditorGUI.EndChangeCheck())
                     {
                         if (string.IsNullOrEmpty(name.stringValue) && objectValue.objectReferenceValue != null)
@@ -120,7 +120,7 @@ namespace Loxodon.Framework.Editors
                     break;
                 case VariableType.GameObject:
                     EditorGUI.BeginChangeCheck();
-                    objectValue.objectReferenceValue = EditorGUI.ObjectField(valueRect, GUIContent.none, objectValue.objectReferenceValue, typeof(UnityEngine.GameObject), true);
+                    objectValue.objectReferenceValue = EditorGUI.ObjectField(valueRect, GUIContent.none, objectValue.objectReferenceValue, typeof(GameObject), true);
                     if (EditorGUI.EndChangeCheck())
                     {
                         if (string.IsNullOrEmpty(name.stringValue) && objectValue.objectReferenceValue != null)
@@ -129,7 +129,7 @@ namespace Loxodon.Framework.Editors
                     break;
                 case VariableType.Object:
                     EditorGUI.BeginChangeCheck();
-                    objectValue.objectReferenceValue = EditorGUI.ObjectField(valueRect, GUIContent.none, objectValue.objectReferenceValue, typeof(UnityEngine.Object), true);
+                    objectValue.objectReferenceValue = EditorGUI.ObjectField(valueRect, GUIContent.none, objectValue.objectReferenceValue, typeof(Object), true);
                     if (EditorGUI.EndChangeCheck())
                     {
                         if (string.IsNullOrEmpty(name.stringValue) && objectValue.objectReferenceValue != null)

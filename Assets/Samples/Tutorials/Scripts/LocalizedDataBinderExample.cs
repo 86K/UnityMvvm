@@ -25,8 +25,6 @@
 using Loxodon.Framework.Binding;
 using Loxodon.Framework.Contexts;
 using Loxodon.Framework.Localizations;
-using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,13 +41,13 @@ namespace Loxodon.Framework.Tutorials
             BindingServiceBundle bindingService = new BindingServiceBundle(context.GetContainer());
             bindingService.Start();
 
-            this.localization = Localization.Current;
+            localization = Localization.Current;
             CultureInfo cultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
-            this.localization.CultureInfo = cultureInfo;
-            this.localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
+            localization.CultureInfo = cultureInfo;
+            localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
             //this.localization.AddDataProvider(new DefaultLocalizationSourceDataProvider("LocalizationTutorials", "LocalizationModule.asset"));
 
-            this.dropdown.onValueChanged.AddListener(OnValueChanged);
+            dropdown.onValueChanged.AddListener(OnValueChanged);
         }
 
         public void OnValueChanged(int value)
@@ -57,13 +55,13 @@ namespace Loxodon.Framework.Tutorials
             switch (value)
             {
                 case 0:
-                    this.localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
+                    localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
                     break;
                 case 1:
-                    this.localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.ChineseSimplified);
+                    localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.ChineseSimplified);
                     break;
                 default:
-                    this.localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
+                    localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
                     break;
             }
         }

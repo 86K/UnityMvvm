@@ -44,19 +44,16 @@ namespace Loxodon.Framework.Tutorials
         private readonly SimpleCommand<string> click;
         public ButtonGroupViewModel()
         {
-            this.click = new SimpleCommand<string>(OnClick);
+            click = new SimpleCommand<string>(OnClick);
         }
 
         public string Text
         {
-            get { return this.text; }
-            set { this.Set(ref text, value); }
+            get => text;
+            set => Set(ref text, value);
         }
 
-        public ICommand Click
-        {
-            get { return this.click; }
-        }
+        public ICommand Click => click;
 
         public void OnClick(string buttonText)
         {
@@ -65,13 +62,13 @@ namespace Loxodon.Framework.Tutorials
 
         private IEnumerator DoClick(string buttonText)
         {
-            this.click.Enabled = false;
-            this.Text = string.Format("Click Button:{0}.Restore button status after one second", buttonText);
+            click.Enabled = false;
+            Text = $"Click Button:{buttonText}.Restore button status after one second";
             Debug.LogFormat("Click Button:{0}", buttonText);
 
             //Restore button status after one second
             yield return new WaitForSeconds(1f);
-            this.click.Enabled = true;
+            click.Enabled = true;
         }
 
     }
@@ -106,13 +103,13 @@ namespace Loxodon.Framework.Tutorials
 
             /* databinding */
             BindingSet<DatabindingForButtonGroupExample, ButtonGroupViewModel> bindingSet = this.CreateBindingSet<DatabindingForButtonGroupExample, ButtonGroupViewModel>();
-            bindingSet.Bind(this.button1).For(v => v.onClick).To(vm => vm.Click).CommandParameter(() => button1.name);
-            bindingSet.Bind(this.button2).For(v => v.onClick).To(vm => vm.Click).CommandParameter(() => button2.name);
-            bindingSet.Bind(this.button3).For(v => v.onClick).To(vm => vm.Click).CommandParameter(() => button3.name);
-            bindingSet.Bind(this.button4).For(v => v.onClick).To(vm => vm.Click).CommandParameter(() => button4.name);
-            bindingSet.Bind(this.button5).For(v => v.onClick).To(vm => vm.Click).CommandParameter(() => button5.name);
+            bindingSet.Bind(button1).For(v => v.onClick).To(vm => vm.Click).CommandParameter(() => button1.name);
+            bindingSet.Bind(button2).For(v => v.onClick).To(vm => vm.Click).CommandParameter(() => button2.name);
+            bindingSet.Bind(button3).For(v => v.onClick).To(vm => vm.Click).CommandParameter(() => button3.name);
+            bindingSet.Bind(button4).For(v => v.onClick).To(vm => vm.Click).CommandParameter(() => button4.name);
+            bindingSet.Bind(button5).For(v => v.onClick).To(vm => vm.Click).CommandParameter(() => button5.name);
 
-            bindingSet.Bind(this.text).For(v => v.text).To(vm => vm.Text).OneWay();
+            bindingSet.Bind(text).For(v => v.text).To(vm => vm.Text).OneWay();
 
             bindingSet.Build();
         }

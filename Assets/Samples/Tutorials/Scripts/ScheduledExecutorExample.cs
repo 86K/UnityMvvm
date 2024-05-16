@@ -23,8 +23,6 @@
  */
 
 using UnityEngine;
-using System.Collections;
-
 using Loxodon.Framework.Asynchronous;
 using Loxodon.Framework.Execution;
 
@@ -38,11 +36,11 @@ namespace Loxodon.Framework.Tutorials
         void Start()
         {
             //		this.scheduled = new CoroutineScheduledExecutor (); /* run on the main thread. */
-            this.scheduled = new ThreadScheduledExecutor(); /* run on the background thread. */
-            this.scheduled.Start();
+            scheduled = new ThreadScheduledExecutor(); /* run on the background thread. */
+            scheduled.Start();
 
 
-            IAsyncResult result = this.scheduled.ScheduleAtFixedRate(() =>
+            IAsyncResult result = scheduled.ScheduleAtFixedRate(() =>
             {
                 Debug.Log("This is a test.");
             }, 1000, 2000);
@@ -50,10 +48,10 @@ namespace Loxodon.Framework.Tutorials
 
         void OnDestroy()
         {
-            if (this.scheduled != null)
+            if (scheduled != null)
             {
-                this.scheduled.Stop();
-                this.scheduled = null;
+                scheduled.Stop();
+                scheduled = null;
             }
         }
 

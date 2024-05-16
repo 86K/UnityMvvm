@@ -80,15 +80,15 @@ namespace Loxodon.Framework.Tutorials
             bindingContext.DataContext = viewModel;
 
             BindingSet<ListViewDatabindingExample, ListViewViewModel> bindingSet = this.CreateBindingSet<ListViewDatabindingExample, ListViewViewModel>();
-            bindingSet.Bind(this.listView).For(v => v.Items).To(vm => vm.Items).OneWay();
-            bindingSet.Bind(this.detailView).For(v => v.Item).To(vm => vm.SelectedItem);
+            bindingSet.Bind(listView).For(v => v.Items).To(vm => vm.Items).OneWay();
+            bindingSet.Bind(detailView).For(v => v.Item).To(vm => vm.SelectedItem);
             bindingSet.Bind().For(v => v.editViewInteractionAction).To(vm => vm.ItemEditRequest);
 
-            bindingSet.Bind(this.addButton).For(v => v.onClick).To(vm => vm.AddItem);
-            bindingSet.Bind(this.removeButton).For(v => v.onClick).To(vm => vm.RemoveItem);
-            bindingSet.Bind(this.clearButton).For(v => v.onClick).To(vm => vm.ClearItem);
-            bindingSet.Bind(this.changeIconButton).For(v => v.onClick).To(vm => vm.ChangeItemIcon);
-            bindingSet.Bind(this.changeItems).For(v => v.onClick).To(vm => vm.ChangeItems);
+            bindingSet.Bind(addButton).For(v => v.onClick).To(vm => vm.AddItem);
+            bindingSet.Bind(removeButton).For(v => v.onClick).To(vm => vm.RemoveItem);
+            bindingSet.Bind(clearButton).For(v => v.onClick).To(vm => vm.ClearItem);
+            bindingSet.Bind(changeIconButton).For(v => v.onClick).To(vm => vm.ChangeItemIcon);
+            bindingSet.Bind(changeItems).For(v => v.onClick).To(vm => vm.ChangeItems);
 
             bindingSet.Build();
 

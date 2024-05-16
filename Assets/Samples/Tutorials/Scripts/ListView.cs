@@ -40,27 +40,27 @@ namespace Loxodon.Framework.Tutorials
 
         public ObservableList<ListItemViewModel> Items
         {
-            get { return this.items; }
+            get => items;
             set
             {
-                if (this.items == value)
+                if (items == value)
                     return;
 
-                if (this.items != null)
-                    this.items.CollectionChanged -= OnCollectionChanged;
+                if (items != null)
+                    items.CollectionChanged -= OnCollectionChanged;
           
-                this.items = value;
-                this.OnItemsChanged();
+                items = value;
+                OnItemsChanged();
 
-                if (this.items != null)
-                    this.items.CollectionChanged += OnCollectionChanged;
+                if (items != null)
+                    items.CollectionChanged += OnCollectionChanged;
             }
         }
 
         protected override void OnDestroy()
         {
-            if (this.items != null)
-                this.items.CollectionChanged -= OnCollectionChanged;
+            if (items != null)
+                items.CollectionChanged -= OnCollectionChanged;
         }
 
         protected void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
@@ -68,42 +68,42 @@ namespace Loxodon.Framework.Tutorials
             switch (eventArgs.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    this.AddItem(eventArgs.NewStartingIndex, eventArgs.NewItems[0]);
+                    AddItem(eventArgs.NewStartingIndex, eventArgs.NewItems[0]);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    this.RemoveItem(eventArgs.OldStartingIndex, eventArgs.OldItems[0]);
+                    RemoveItem(eventArgs.OldStartingIndex, eventArgs.OldItems[0]);
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    this.ReplaceItem(eventArgs.OldStartingIndex, eventArgs.OldItems[0], eventArgs.NewItems[0]);
+                    ReplaceItem(eventArgs.OldStartingIndex, eventArgs.OldItems[0], eventArgs.NewItems[0]);
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    this.ResetItem();
+                    ResetItem();
                     break;
                 case NotifyCollectionChangedAction.Move:
-                    this.MoveItem(eventArgs.OldStartingIndex, eventArgs.NewStartingIndex, eventArgs.NewItems[0]);
+                    MoveItem(eventArgs.OldStartingIndex, eventArgs.NewStartingIndex, eventArgs.NewItems[0]);
                     break;
             }
         }
 
         protected virtual void OnItemsChanged()
         {
-            int count = this.content.childCount;
+            int count = content.childCount;
             for(int i = count - 1; i >= 0; i--)
             {
-                Transform child = this.content.GetChild(i);
-                GameObject.Destroy(child.gameObject);
+                Transform child = content.GetChild(i);
+                Destroy(child.gameObject);
             }
 
-            for (int i = 0; i < this.items.Count; i++)
+            for (int i = 0; i < items.Count; i++)
             {
-                this.AddItem(i, items[i]);
+                AddItem(i, items[i]);
             }
         }
 
         protected virtual void AddItem(int index, object item)
         {
-            var itemViewGo = Instantiate(this.itemTemplate);
-            itemViewGo.transform.SetParent(this.content, false);
+            var itemViewGo = Instantiate(itemTemplate);
+            itemViewGo.transform.SetParent(content, false);
             itemViewGo.transform.SetSiblingIndex(index);
             itemViewGo.SetActive(true);
 
@@ -113,7 +113,7 @@ namespace Loxodon.Framework.Tutorials
 
         protected virtual void RemoveItem(int index, object item)
         {
-            Transform transform = this.content.GetChild(index);
+            Transform transform = content.GetChild(index);
             UIView itemView = transform.GetComponent<UIView>();
             if (itemView.GetDataContext() == item)
             {
@@ -124,7 +124,7 @@ namespace Loxodon.Framework.Tutorials
 
         protected virtual void ReplaceItem(int index, object oldItem, object item)
         {
-            Transform transform = this.content.GetChild(index);
+            Transform transform = content.GetChild(index);
             UIView itemView = transform.GetComponent<UIView>();
             if (itemView.GetDataContext() == oldItem)
             {
@@ -134,16 +134,16 @@ namespace Loxodon.Framework.Tutorials
 
         protected virtual void MoveItem(int oldIndex, int index, object item)
         {
-            Transform transform = this.content.GetChild(oldIndex);
+            Transform transform = content.GetChild(oldIndex);
             UIView itemView = transform.GetComponent<UIView>();
             itemView.transform.SetSiblingIndex(index);
         }
 
         protected virtual void ResetItem()
         {
-            for (int i = this.content.childCount - 1; i >= 0; i--)
+            for (int i = content.childCount - 1; i >= 0; i--)
             {
-                Transform transform = this.content.GetChild(i);
+                Transform transform = content.GetChild(i);
                 Destroy(transform.gameObject);
             }
         }

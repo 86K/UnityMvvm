@@ -40,36 +40,36 @@ namespace Loxodon.Framework.Tutorials
 
         public ListItemEditViewModel ViewModel
         {
-            get { return (ListItemEditViewModel)this.GetDataContext(); }
-            set { this.SetDataContext(value); }
+            get => (ListItemEditViewModel)this.GetDataContext();
+            set => this.SetDataContext(value);
         }
 
         protected override void Start()
         {
             var bindingSet = this.CreateBindingSet<ListItemEditView, ListItemEditViewModel>();
             bindingSet.Bind(title).For(v => v.text).To(vm => vm.Title);
-            bindingSet.Bind(price).For(v => v.text).ToExpression(vm => string.Format("${0:0.00}", vm.Price)).OneWay();
+            bindingSet.Bind(price).For(v => v.text).ToExpression(vm => $"${vm.Price:0.00}").OneWay();
             bindingSet.Bind(priceSlider).For(v => v.value, v => v.onValueChanged).To(vm => vm.Price).TwoWay();
             bindingSet.Bind(image).For(v => v.sprite).To(vm => vm.Icon).WithConversion("spriteConverter").OneWay();
             bindingSet.Bind(changeIcon).For(v => v.onClick).To(vm => vm.OnChangeIcon);
             bindingSet.Build();
 
-            this.cancel.onClick.AddListener(Cancel);
-            this.submit.onClick.AddListener(Submit);
+            cancel.onClick.AddListener(Cancel);
+            submit.onClick.AddListener(Submit);
         }
 
         private void Cancel()
         {            
-            this.ViewModel.Cancelled = true;
-            this.gameObject.SetActive(false);
+            ViewModel.Cancelled = true;
+            gameObject.SetActive(false);
             //this.Visibility = false;
             this.SetDataContext(null);
         }
 
         private void Submit()
         {            
-            this.ViewModel.Cancelled = false;
-            this.gameObject.SetActive(false);
+            ViewModel.Cancelled = false;
+            gameObject.SetActive(false);
             //this.Visibility = false;           
             this.SetDataContext(null);
         }

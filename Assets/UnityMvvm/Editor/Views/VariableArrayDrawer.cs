@@ -85,7 +85,7 @@ namespace Loxodon.Framework.Editors
         {
             var variables = list.serializedProperty;
             int index = variables.arraySize > 0 ? variables.arraySize : 0;
-            this.DrawContextMenu(variables, index);
+            DrawContextMenu(variables, index);
         }
 
         private void OnRemoveElement(ReorderableList list)
@@ -195,7 +195,7 @@ namespace Loxodon.Framework.Editors
                 return;
             }
 
-            if (EditorUtility.DisplayDialog("Confirm delete", string.Format("Are you sure you want to delete the item named \"{0}\"?", name), "Yes", "Cancel"))
+            if (EditorUtility.DisplayDialog("Confirm delete", $"Are you sure you want to delete the item named \"{name}\"?", "Yes", "Cancel"))
             {
                 RemoveVariable(variables, index);
             }

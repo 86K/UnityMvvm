@@ -51,15 +51,15 @@ namespace Loxodon.Framework.Tutorials
 
         public InterationViewModel()
         {
-            this.OpenAlertDialog = new SimpleCommand(() =>
+            OpenAlertDialog = new SimpleCommand(() =>
             {
-                this.OpenAlertDialog.Enabled = false;
+                OpenAlertDialog.Enabled = false;
 
                 DialogNotification notification = new DialogNotification("Interation Example", "This is a dialog test.", "Yes", "No", true);
 
                 Action<DialogNotification> callback = n =>
                 {
-                    this.OpenAlertDialog.Enabled = true;
+                    OpenAlertDialog.Enabled = true;
 
                     if (n.DialogResult == AlertDialog.BUTTON_POSITIVE)
                     {
@@ -71,15 +71,15 @@ namespace Loxodon.Framework.Tutorials
                     }
                 };
 
-                this.AlertDialogRequest.Raise(notification, callback);
+                AlertDialogRequest.Raise(notification, callback);
             });
 
-            this.AsyncOpenAlertDialog = new SimpleCommand(async () =>
+            AsyncOpenAlertDialog = new SimpleCommand(async () =>
             {
-                this.AsyncOpenAlertDialog.Enabled = false;
+                AsyncOpenAlertDialog.Enabled = false;
                 DialogNotification notification = new DialogNotification("Interation Example", "This is a dialog test.", "Yes", "No", true);
-                await this.AsyncAlertDialogRequest.Raise(notification);
-                this.AsyncOpenAlertDialog.Enabled = true;
+                await AsyncAlertDialogRequest.Raise(notification);
+                AsyncOpenAlertDialog.Enabled = true;
                 if (notification.DialogResult == AlertDialog.BUTTON_POSITIVE)
                 {
                     Debug.LogFormat("Click: Yes");
@@ -90,22 +90,22 @@ namespace Loxodon.Framework.Tutorials
                 }
             });
 
-            this.ShowToast = new SimpleCommand(() =>
+            ShowToast = new SimpleCommand(() =>
             {
                 ToastNotification notification = new ToastNotification("This is a toast test.", 2f);
-                this.ToastRequest.Raise(notification);
+                ToastRequest.Raise(notification);
             });
 
-            this.ShowLoading = new SimpleCommand(() =>
+            ShowLoading = new SimpleCommand(() =>
             {
                 VisibilityNotification notification = new VisibilityNotification(true);
-                this.LoadingRequest.Raise(notification);
+                LoadingRequest.Raise(notification);
             });
 
-            this.HideLoading = new SimpleCommand(() =>
+            HideLoading = new SimpleCommand(() =>
             {
                 VisibilityNotification notification = new VisibilityNotification(false);
-                this.LoadingRequest.Raise(notification);
+                LoadingRequest.Raise(notification);
             });
 
         }
@@ -125,7 +125,7 @@ namespace Loxodon.Framework.Tutorials
         public Button showLoading;
         public Button hideLoading;
 
-        private List<Loading> list = new List<Loading>();
+        private readonly List<Loading> list = new List<Loading>();
 
         private LoadingInteractionAction loadingInteractionAction;
         private ToastInteractionAction toastInteractionAction;
@@ -150,9 +150,9 @@ namespace Loxodon.Framework.Tutorials
 
         protected override void Start()
         {
-            this.loadingInteractionAction = new LoadingInteractionAction();
-            this.toastInteractionAction = new ToastInteractionAction(this);
-            this.dialogInteractionAction = new AsyncDialogInteractionAction("UI/AlertDialog");
+            loadingInteractionAction = new LoadingInteractionAction();
+            toastInteractionAction = new ToastInteractionAction(this);
+            dialogInteractionAction = new AsyncDialogInteractionAction("UI/AlertDialog");
 
             InterationViewModel viewModel = new InterationViewModel();
             this.SetDataContext(viewModel);
@@ -177,11 +177,11 @@ namespace Loxodon.Framework.Tutorials
             //bindingSet.Bind().For(v => v.OnShowOrHideLoading).To(vm => vm.LoadingRequest);
 
             /* Binding command */
-            bindingSet.Bind(this.openAlert).For(v => v.onClick).To(vm => vm.OpenAlertDialog);
-            bindingSet.Bind(this.asyncOpenAlert).For(v => v.onClick).To(vm => vm.AsyncOpenAlertDialog);
-            bindingSet.Bind(this.showToast).For(v => v.onClick).To(vm => vm.ShowToast);
-            bindingSet.Bind(this.showLoading).For(v => v.onClick).To(vm => vm.ShowLoading);
-            bindingSet.Bind(this.hideLoading).For(v => v.onClick).To(vm => vm.HideLoading);
+            bindingSet.Bind(openAlert).For(v => v.onClick).To(vm => vm.OpenAlertDialog);
+            bindingSet.Bind(asyncOpenAlert).For(v => v.onClick).To(vm => vm.AsyncOpenAlertDialog);
+            bindingSet.Bind(showToast).For(v => v.onClick).To(vm => vm.ShowToast);
+            bindingSet.Bind(showLoading).For(v => v.onClick).To(vm => vm.ShowLoading);
+            bindingSet.Bind(hideLoading).For(v => v.onClick).To(vm => vm.HideLoading);
 
             bindingSet.Build();
         }
@@ -218,16 +218,16 @@ namespace Loxodon.Framework.Tutorials
 
             if (notification.Visible)
             {
-                this.list.Add(Loading.Show());
+                list.Add(Loading.Show());
             }
             else
             {
-                if (this.list.Count <= 0)
+                if (list.Count <= 0)
                     return;
 
-                Loading loading = this.list[0];
+                Loading loading = list[0];
                 loading.Dispose();
-                this.list.RemoveAt(0);
+                list.RemoveAt(0);
             }
         }
     }

@@ -23,7 +23,6 @@
  */
 
 using Loxodon.Framework.Views;
-using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -38,7 +37,7 @@ namespace Loxodon.Framework.Editors
         private bool foldout = true;
         public override void OnInspectorGUI()
         {
-            this.serializedObject.Update();
+            serializedObject.Update();
             SerializedProperty property = serializedObject.GetIterator();
             var windowTypeProperty = serializedObject.FindProperty("windowType");
 
@@ -80,7 +79,7 @@ namespace Loxodon.Framework.Editors
                 expanded = false;
             }
 
-            this.serializedObject.ApplyModifiedProperties();
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }

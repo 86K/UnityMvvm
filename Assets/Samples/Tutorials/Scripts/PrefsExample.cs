@@ -94,8 +94,8 @@ namespace Loxodon.Framework.Tutorials
 
         public int Priority
         {
-            get { return this.priority; }
-            set { this.priority = value; }
+            get => priority;
+            set => priority = value;
         }
 
         public bool IsSupport(Type type)

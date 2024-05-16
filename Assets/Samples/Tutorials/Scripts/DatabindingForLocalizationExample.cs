@@ -26,9 +26,7 @@ using Loxodon.Framework.Binding;
 using Loxodon.Framework.Binding.Builder;
 using Loxodon.Framework.Contexts;
 using Loxodon.Framework.Localizations;
-using Loxodon.Framework.Observables;
 using Loxodon.Framework.ViewModels;
-using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,7 +36,7 @@ namespace Loxodon.Framework.Tutorials
 
     public class DatabindingForLocalizationViewModel : ViewModelBase
     {
-        private Localization localization;
+        private readonly Localization localization;
 
         public DatabindingForLocalizationViewModel(Localization localization)
         {
@@ -50,13 +48,13 @@ namespace Loxodon.Framework.Tutorials
             switch (value)
             {
                 case 0:
-                    this.localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
+                    localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
                     break;
                 case 1:
-                    this.localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.ChineseSimplified);
+                    localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.ChineseSimplified);
                     break;
                 default:
-                    this.localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
+                    localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
                     break;
             }
         }
@@ -76,22 +74,22 @@ namespace Loxodon.Framework.Tutorials
             BindingServiceBundle bindingService = new BindingServiceBundle(context.GetContainer());
             bindingService.Start();
 
-            this.localization = Localization.Current;
+            localization = Localization.Current;
             CultureInfo cultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
-            this.localization.CultureInfo = cultureInfo;
+            localization.CultureInfo = cultureInfo;
             //this.localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
-            this.localization.AddDataProvider(new DefaultLocalizationSourceDataProvider("LocalizationTutorials", "LocalizationModule.asset"));
+            localization.AddDataProvider(new DefaultLocalizationSourceDataProvider("LocalizationTutorials", "LocalizationModule.asset"));
         }
 
         void Start()
         {
-            BindingSet<DatabindingForLocalizationExample, DatabindingForLocalizationViewModel> bindingSet = this.CreateBindingSet(new DatabindingForLocalizationViewModel(this.localization));
-            bindingSet.Bind(this.dropdown).For(v => v.onValueChanged).To<int>(vm => vm.OnValueChanged);
+            BindingSet<DatabindingForLocalizationExample, DatabindingForLocalizationViewModel> bindingSet = this.CreateBindingSet(new DatabindingForLocalizationViewModel(localization));
+            bindingSet.Bind(dropdown).For(v => v.onValueChanged).To<int>(vm => vm.OnValueChanged);
             bindingSet.Build();
 
             BindingSet<DatabindingForLocalizationExample> staticBindingSet = this.CreateBindingSet();
             //staticBindingSet.Bind(this.text).For(v => v.text).To(() => Res.localization_tutorials_content).OneWay();
-            staticBindingSet.Bind(this.text).For(v => v.text).ToValue(this.localization.GetValue("localization.tutorials.content")).OneWay();
+            staticBindingSet.Bind(text).For(v => v.text).ToValue(localization.GetValue("localization.tutorials.content")).OneWay();
             staticBindingSet.Build();
         }
     }

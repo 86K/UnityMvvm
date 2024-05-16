@@ -68,7 +68,7 @@ namespace Loxodon.Framework.Tutorials
 
             //Load configuration files based on platform information. Configuration files loaded later 
             //have a higher priority than configuration files loaded first.
-            text = Resources.Load<TextAsset>(string.Format("application.{0}.properties", Application.platform.ToString().ToLower()));
+            text = Resources.Load<TextAsset>($"application.{Application.platform.ToString().ToLower()}.properties");
             if (text != null)
                 list.Add(new PropertiesConfiguration(text.text));
 

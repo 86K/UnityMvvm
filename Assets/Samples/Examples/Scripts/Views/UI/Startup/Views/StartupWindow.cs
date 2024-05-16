@@ -24,9 +24,6 @@
 
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-
-using Loxodon.Log;
 using Loxodon.Framework.Contexts;
 using Loxodon.Framework.Views;
 using Loxodon.Framework.Binding;
@@ -40,8 +37,6 @@ namespace Loxodon.Framework.Examples
 {
     public class StartupWindow : Window
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(StartupWindow));
-
         public Text progressBarText;
         public Slider progressBarSlider;
         public Text tipText;
@@ -54,10 +49,10 @@ namespace Loxodon.Framework.Examples
 
         protected override void OnCreate(IBundle bundle)
         {
-            this.viewLocator = Context.GetApplicationContext().GetService<IUIViewLocator>();
-            this.loginWindowInteractionAction = new AsyncWindowInteractionAction("UI/Logins/Login", viewLocator, this.WindowManager);
-            this.sceneInteractionAction = new AsynSceneInteractionAction("Prefabs/Cube");
-            this.viewModel = new StartupViewModel();
+            viewLocator = Context.GetApplicationContext().GetService<IUIViewLocator>();
+            loginWindowInteractionAction = new AsyncWindowInteractionAction("UI/Logins/Login", viewLocator, WindowManager);
+            sceneInteractionAction = new AsynSceneInteractionAction("Prefabs/Cube");
+            viewModel = new StartupViewModel();
 
             /* databinding, Bound to the ViewModel. */
             BindingSet<StartupWindow, StartupViewModel> bindingSet = this.CreateBindingSet(viewModel);
@@ -66,7 +61,7 @@ namespace Loxodon.Framework.Examples
             bindingSet.Bind().For(v => v.OnDismissRequest).To(vm => vm.DismissRequest);
             bindingSet.Bind().For(v => v.sceneInteractionAction).To(vm => vm.LoadSceneRequest);
 
-            bindingSet.Bind(this.progressBarSlider).For("value", "onValueChanged").To("ProgressBar.Progress").TwoWay();
+            bindingSet.Bind(progressBarSlider).For("value", "onValueChanged").To("ProgressBar.Progress").TwoWay();
             //bindingSet.Bind (this.progressBarSlider).For (v => v.value, v => v.onValueChanged).To (vm => vm.ProgressBar.Progress).TwoWay ();
 
             /* //by the way,You can expand your attributes. 		 
@@ -75,20 +70,20 @@ namespace Loxodon.Framework.Examples
 		        proxyFactory.Register (new ProxyPropertyInfo<GameObject, bool> (info, go => go.activeSelf, (go, value) => go.SetActive (value)));
 		    */
 
-            bindingSet.Bind(this.progressBarSlider.gameObject).For(v => v.activeSelf).To(vm => vm.ProgressBar.Enable).OneWay();
-            bindingSet.Bind(this.progressBarText).For(v => v.text).ToExpression(vm => string.Format("{0}%", Mathf.FloorToInt(vm.ProgressBar.Progress * 100f))).OneWay();/* expression binding,support only OneWay mode. */
-            bindingSet.Bind(this.tipText).For(v => v.text).To(vm => vm.ProgressBar.Tip).OneWay();
+            bindingSet.Bind(progressBarSlider.gameObject).For(v => v.activeSelf).To(vm => vm.ProgressBar.Enable).OneWay();
+            bindingSet.Bind(progressBarText).For(v => v.text).ToExpression(vm => $"{Mathf.FloorToInt(vm.ProgressBar.Progress * 100f)}%").OneWay();/* expression binding,support only OneWay mode. */
+            bindingSet.Bind(tipText).For(v => v.text).To(vm => vm.ProgressBar.Tip).OneWay();
 
             //bindingSet.Bind(this.button).For(v => v.onClick).To(vm=>vm.OnClick()).OneWay(); //Method binding,only bound to the onClick event.
-            bindingSet.Bind(this.button).For(v => v.onClick).To(vm => vm.Click).OneWay();//Command binding,bound to the onClick event and interactable property.
+            bindingSet.Bind(button).For(v => v.onClick).To(vm => vm.Click).OneWay();//Command binding,bound to the onClick event and interactable property.
             bindingSet.Build();
 
-            this.viewModel.Unzip();
+            viewModel.Unzip();
         }
 
         protected void OnDismissRequest(object sender, InteractionEventArgs args)
         {
-            this.Dismiss();
+            Dismiss();
         }
 
         //// Use AsyncWindowInteractionAction instead of this method.
@@ -126,7 +121,7 @@ namespace Loxodon.Framework.Examples
         //Load game objects in the scene using AsynSceneInteractionAction
         class AsynSceneInteractionAction : AsyncInteractionActionBase<ProgressBar>
         {
-            private string path;
+            private readonly string path;
             public AsynSceneInteractionAction(string path)
             {
                 this.path = path;
@@ -145,7 +140,7 @@ namespace Loxodon.Framework.Examples
                     }
 
                     GameObject sceneTemplate = (GameObject)request.asset;
-                    GameObject.Instantiate(sceneTemplate);
+                    Instantiate(sceneTemplate);
                 }
                 finally
                 {

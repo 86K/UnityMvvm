@@ -31,14 +31,14 @@ namespace Loxodon.Framework.Tutorials
 {
     public class TestMessage : MessageBase
     {
-        private string content;
+        private readonly string content;
 
         public TestMessage(object sender, string content) : base(sender)
         {
             this.content = content;
         }
 
-        public string Content { get { return this.content; } }
+        public string Content => content;
     }
 
     public class MessengerExample : MonoBehaviour
@@ -47,17 +47,17 @@ namespace Loxodon.Framework.Tutorials
         private ISubscription<TestMessage> subscription;
         private ISubscription<TestMessage> subscriptionInUIsThread;
 
-        public IMessenger Messenger { get { return this.messenger; } }
+        public IMessenger Messenger => messenger;
 
         void Start()
         {
-            this.messenger = new Messenger();
+            messenger = new Messenger();
 
             /* Subscribe to the message,if the "subscription" dispose,it will automatically cancel the subscription.  */
-            this.subscription = this.messenger.Subscribe<TestMessage>(OnMessage);
+            subscription = messenger.Subscribe<TestMessage>(OnMessage);
 
             //Use the ObserveOn() method to change the message consumption thread to the UI thread.
-            this.subscriptionInUIsThread = this.messenger.Subscribe<TestMessage>(OnMessageInUIThread).ObserveOn(SynchronizationContext.Current);
+            subscriptionInUIsThread = messenger.Subscribe<TestMessage>(OnMessageInUIThread).ObserveOn(SynchronizationContext.Current);
 
             /*---------------------------------------------*/
 
@@ -67,7 +67,7 @@ namespace Loxodon.Framework.Tutorials
 #else
             Task.Run(() =>
             {
-                this.messenger.Publish(new TestMessage(this, "This is a test."));
+                messenger.Publish(new TestMessage(this, "This is a test."));
             });
 #endif
         }
@@ -84,16 +84,16 @@ namespace Loxodon.Framework.Tutorials
 
         void OnDestroy()
         {
-            if (this.subscription != null)
+            if (subscription != null)
             {
-                this.subscription.Dispose();
-                this.subscription = null;
+                subscription.Dispose();
+                subscription = null;
             }
 
-            if (this.subscriptionInUIsThread != null)
+            if (subscriptionInUIsThread != null)
             {
-                this.subscriptionInUIsThread.Dispose();
-                this.subscriptionInUIsThread = null;
+                subscriptionInUIsThread.Dispose();
+                subscriptionInUIsThread = null;
             }
         }
 

@@ -25,7 +25,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -33,15 +32,12 @@ using UnityEngine.Video;
 
 using Loxodon.Framework.Localizations;
 using Loxodon.Framework.Binding;
-using Loxodon.Log;
 
 namespace Loxodon.Framework.Editors
 {
     [CustomPropertyDrawer(typeof(LocalizedBindingDescriptionSet))]
     public class LocalizedBindingDescriptionSetDrawer : PropertyDrawer
     {
-        private static readonly ILog log = LogManager.GetLogger("LocalizedBindingDescriptionSetDrawer");
-
         //private const float HORIZONTAL_GAP = 5;
         private const float VERTICAL_GAP = 5;
 
@@ -61,8 +57,8 @@ namespace Loxodon.Framework.Editors
                 list.onRemoveCallback = OnRemoveElement;
                 list.drawElementBackgroundCallback = DrawElementBackground;
 
-                this.target = property.serializedObject.targetObject;
-                typeMetas = this.CreateTypeMetas((Component)target);
+                target = property.serializedObject.targetObject;
+                typeMetas = CreateTypeMetas((Component)target);
             }
             else
             {
@@ -91,17 +87,16 @@ namespace Loxodon.Framework.Editors
 
         private void OnAddElement(ReorderableList list)
         {
-            if (this.typeMetas == null || this.typeMetas.Count <= 0)
+            if (typeMetas == null || typeMetas.Count <= 0)
             {
-                if (log.IsWarnEnabled)
-                    log.WarnFormat("No components are supported on the game object, please add UI components and try again");
+                Debug.LogWarning("No components are supported on the game object, please add UI components and try again");
 
                 return;
             }
 
             var entries = list.serializedProperty;
             int index = entries.arraySize > 0 ? entries.arraySize : 0;
-            this.DrawContextMenu(entries, index);
+            DrawContextMenu(entries, index);
         }
 
         private void OnRemoveElement(ReorderableList list)
@@ -152,7 +147,7 @@ namespace Loxodon.Framework.Editors
             string typeFullname = typeNameProperty.stringValue;
             string propertyName = propertyNameProperty.stringValue;
 
-            TypeMeta typeMeta = typeMetas.Find(meta => meta.Type.FullName.Equals(typeFullname));
+            TypeMeta typeMeta = typeMetas.Find(meta => meta.Type.FullName != null && meta.Type.FullName.Equals(typeFullname));
 
             string[] members = typeMeta != null ? typeMeta.Members.ToArray() : new string[] { propertyName };
             int nameSelectedIndex = typeMeta != null ? typeMeta.Members.FindIndex(m => m == propertyName) : 0;
@@ -164,7 +159,7 @@ namespace Loxodon.Framework.Editors
             {
                 Color old = GUI.color;
                 GUI.color = Color.red;
-                EditorGUI.LabelField(typeRect, new GUIContent(GetTypeName(typeFullname), string.Format("The \"{0}\" component has been deleted", typeFullname)));
+                EditorGUI.LabelField(typeRect, new GUIContent(GetTypeName(typeFullname), $"The \"{typeFullname}\" component has been deleted"));
                 GUI.color = old;
             }
             else
@@ -347,7 +342,7 @@ namespace Loxodon.Framework.Editors
                 return;
             }
 
-            if (EditorUtility.DisplayDialog("Confirm delete", string.Format("Are you sure you want to delete the item named \"{0}\"?", name), "Yes", "Cancel"))
+            if (EditorUtility.DisplayDialog("Confirm delete", $"Are you sure you want to delete the item named \"{name}\"?", "Yes", "Cancel"))
             {
                 RemoveEntry(entries, index);
             }
@@ -366,7 +361,7 @@ namespace Loxodon.Framework.Editors
 
         protected class TypeMeta
         {
-            private Type type;
+            private readonly Type type;
             private readonly List<string> members = new List<string>();
             public TypeMeta(Type type, string[] members)
             {
@@ -380,8 +375,8 @@ namespace Loxodon.Framework.Editors
                 this.members.AddRange(members);
             }
 
-            public Type Type { get { return this.type; } }
-            public List<string> Members { get { return this.members; } }
+            public Type Type => type;
+            public List<string> Members => members;
         }
     }
 }

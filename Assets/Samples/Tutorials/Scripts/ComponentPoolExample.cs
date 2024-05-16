@@ -38,11 +38,11 @@ namespace Loxodon.Framework.Examples
 
         private void Start()
         {
-            CubeObjectFactory2 factory = new CubeObjectFactory2(this.template, this.transform);
-            this.pool = new ObjectPool<MeshRenderer>(factory, 10, 20);
+            CubeObjectFactory2 factory = new CubeObjectFactory2(template, transform);
+            pool = new ObjectPool<MeshRenderer>(factory, 10, 20);
 
-            this.list = new List<MeshRenderer>();
-            this.colors = new List<Color>()
+            list = new List<MeshRenderer>();
+            colors = new List<Color>()
             {
                 Color.black,
                 Color.blue,
@@ -57,10 +57,10 @@ namespace Loxodon.Framework.Examples
 
         private void OnDestroy()
         {
-            if (this.pool != null)
+            if (pool != null)
             {
-                this.pool.Dispose();
-                this.pool = null;
+                pool.Dispose();
+                pool = null;
             }
         }
 
@@ -88,12 +88,12 @@ namespace Loxodon.Framework.Examples
         {
             for (int i = 0; i < count; i++)
             {
-                MeshRenderer go = this.pool.Allocate();
+                MeshRenderer go = pool.Allocate();
                 go.material.color = GetColor();
                 go.transform.position = GetPosition();
-                go.name = string.Format("Cube {0}", this.list.Count);
+                go.name = $"Cube {list.Count}";
                 go.gameObject.SetActive(true);
-                this.list.Add(go);
+                list.Add(go);
             }
         }
 
@@ -101,12 +101,12 @@ namespace Loxodon.Framework.Examples
         {
             for (int i = 0; i < count; i++)
             {
-                if (this.list.Count <= 0)
+                if (list.Count <= 0)
                     return;
 
-                int index = this.list.Count - 1;
-                MeshRenderer go = this.list[index];
-                this.list.RemoveAt(index);
+                int index = list.Count - 1;
+                MeshRenderer go = list[index];
+                list.RemoveAt(index);
 
                 //this.pool.Free(go);
                 //or

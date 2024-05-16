@@ -22,40 +22,37 @@
  * SOFTWARE.
  */
 
-using Loxodon.Framework.Asynchronous;
 using Loxodon.Framework.Commands;
 using Loxodon.Framework.Interactivity;
 using Loxodon.Framework.Localizations;
 using Loxodon.Framework.Observables;
 using Loxodon.Framework.Prefs;
 using Loxodon.Framework.ViewModels;
-using Loxodon.Log;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Loxodon.Framework.Examples
 {
     public class LoginViewModel : ViewModelBase
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(ViewModelBase));
-
         private const string LAST_USERNAME_KEY = "LAST_USERNAME";
 
-        private ObservableDictionary<string, string> errors = new ObservableDictionary<string, string>();
+        private readonly ObservableDictionary<string, string> errors = new ObservableDictionary<string, string>();
         private string username;
         private string password;
-        private SimpleCommand loginCommand;
-        private SimpleCommand cancelCommand;
+        private readonly SimpleCommand loginCommand;
+        private readonly SimpleCommand cancelCommand;
 
         private Account account;
 
-        private Preferences globalPreferences;
-        private IAccountService accountService;
-        private Localization localization;
+        private readonly Preferences globalPreferences;
+        private readonly IAccountService accountService;
+        private readonly Localization localization;
 
-        private InteractionRequest interactionFinished;
-        private InteractionRequest<ToastNotification> toastRequest;
+        private readonly InteractionRequest interactionFinished;
+        private readonly InteractionRequest<ToastNotification> toastRequest;
 
         public LoginViewModel(IAccountService accountService, Localization localization, Preferences globalPreferences)
         {
@@ -63,145 +60,128 @@ namespace Loxodon.Framework.Examples
             this.accountService = accountService;
             this.globalPreferences = globalPreferences;
 
-            this.interactionFinished = new InteractionRequest(this);
-            this.toastRequest = new InteractionRequest<ToastNotification>(this);
+            interactionFinished = new InteractionRequest(this);
+            toastRequest = new InteractionRequest<ToastNotification>(this);
 
-            if (this.username == null)
+            if (username == null)
             {
-                this.username = globalPreferences.GetString(LAST_USERNAME_KEY, "");
+                username = globalPreferences.GetString(LAST_USERNAME_KEY, "");
             }
 
-            this.loginCommand = new SimpleCommand(this.Login);
-            this.cancelCommand = new SimpleCommand(() =>
+            loginCommand = new SimpleCommand(Login);
+            cancelCommand = new SimpleCommand(() =>
             {
-                this.interactionFinished.Raise();/* Request to close the login window */
+                interactionFinished.Raise();/* Request to close the login window */
             });
         }
 
-        public IInteractionRequest InteractionFinished
-        {
-            get { return this.interactionFinished; }
-        }
+        public IInteractionRequest InteractionFinished => interactionFinished;
 
-        public IInteractionRequest ToastRequest
-        {
-            get { return this.toastRequest; }
-        }
+        public IInteractionRequest ToastRequest => toastRequest;
 
-        public ObservableDictionary<string, string> Errors { get { return this.errors; } }
+        public ObservableDictionary<string, string> Errors => errors;
 
         public string Username
         {
-            get { return this.username; }
+            get => username;
             set
             {
-                if (this.Set(ref this.username, value))
+                if (Set(ref username, value))
                 {
-                    this.ValidateUsername();
+                    ValidateUsername();
                 }
             }
         }
 
         public string Password
         {
-            get { return this.password; }
+            get => password;
             set
             {
-                if (this.Set(ref this.password, value))
+                if (Set(ref password, value))
                 {
-                    this.ValidatePassword();
+                    ValidatePassword();
                 }
             }
         }
 
         private bool ValidateUsername()
         {
-            if (string.IsNullOrEmpty(this.username) || !Regex.IsMatch(this.username, "^[a-zA-Z0-9_-]{4,12}$"))
+            if (string.IsNullOrEmpty(username) || !Regex.IsMatch(username, "^[a-zA-Z0-9_-]{4,12}$"))
             {
-                this.errors["username"] = localization.GetText("login.validation.username.error", "Please enter a valid username.");
+                errors["username"] = localization.GetText("login.validation.username.error", "Please enter a valid username.");
                 return false;
             }
             else
             {
-                this.errors.Remove("username");
+                errors.Remove("username");
                 return true;
             }
         }
 
         private bool ValidatePassword()
         {
-            if (string.IsNullOrEmpty(this.password) || !Regex.IsMatch(this.password, "^[a-zA-Z0-9_-]{4,12}$"))
+            if (string.IsNullOrEmpty(password) || !Regex.IsMatch(password, "^[a-zA-Z0-9_-]{4,12}$"))
             {
-                this.errors["password"] = localization.GetText("login.validation.password.error", "Please enter a valid password.");
+                errors["password"] = localization.GetText("login.validation.password.error", "Please enter a valid password.");
                 return false;
             }
             else
             {
-                this.errors.Remove("password");
+                errors.Remove("password");
                 return true;
             }
         }
 
-        public ICommand LoginCommand
-        {
-            get { return this.loginCommand; }
-        }
+        public ICommand LoginCommand => loginCommand;
 
-        public ICommand CancelCommand
-        {
-            get { return this.cancelCommand; }
-        }
+        public ICommand CancelCommand => cancelCommand;
 
-        public Account Account
-        {
-            get { return this.account; }
-        }
+        public Account Account => account;
 
         public async void Login()
         {
             try
             {
-                if (log.IsDebugEnabled)
-                    log.DebugFormat("login start. username:{0} password:{1}", this.username, this.password);
+                Debug.LogWarning(string.Format("login start. username:{0} password:{1}", username, password));
 
                 this.account = null;
-                this.loginCommand.Enabled = false;/*by databinding, auto set button.interactable = false. */
-                if (!(this.ValidateUsername() && this.ValidatePassword()))
+                loginCommand.Enabled = false;/*by databinding, auto set button.interactable = false. */
+                if (!(ValidateUsername() && ValidatePassword()))
                     return;
 
-                Account account = await this.accountService.Login(this.username, this.password);
+                Account account = await accountService.Login(username, password);
                 if (account != null)
                 {
                     /* login success */
-                    globalPreferences.SetString(LAST_USERNAME_KEY, this.username);
+                    globalPreferences.SetString(LAST_USERNAME_KEY, username);
                     globalPreferences.Save();
                     this.account = account;
-                    this.interactionFinished.Raise();/* Interaction completed, request to close the login window */
+                    interactionFinished.Raise();/* Interaction completed, request to close the login window */
                 }
                 else
                 {
                     /* Login failure */
-                    var tipContent = this.localization.GetText("login.failure.tip", "Login failure.");
-                    this.toastRequest.Raise(new ToastNotification(tipContent, 2f));/* show toast */
+                    var tipContent = localization.GetText("login.failure.tip", "Login failure.");
+                    toastRequest.Raise(new ToastNotification(tipContent, 2f));/* show toast */
                 }
             }
             catch (Exception e)
             {
-                if (log.IsErrorEnabled)
-                    log.ErrorFormat("Exception:{0}", e);
+                Debug.LogWarning(string.Format("Exception:{0}", e));
 
-                var tipContent = this.localization.GetText("login.exception.tip", "Login exception.");
-                this.toastRequest.Raise(new ToastNotification(tipContent, 2f));/* show toast */
+                var tipContent = localization.GetText("login.exception.tip", "Login exception.");
+                toastRequest.Raise(new ToastNotification(tipContent, 2f));/* show toast */
             }
             finally
             {
-                this.loginCommand.Enabled = true;/*by databinding, auto set button.interactable = true. */
+                loginCommand.Enabled = true;/*by databinding, auto set button.interactable = true. */
             }
         }
 
         public Task<Account> GetAccount()
         {
-            return this.accountService.GetAccount(this.Username);
+            return accountService.GetAccount(Username);
         }
     }
 }

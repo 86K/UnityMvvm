@@ -36,8 +36,8 @@ namespace Loxodon.Framework.Editors
     public class EditorExecutors
     {
         private static bool running = false;
-        private static List<Task> pending = new List<Task>();
-        private static List<IEnumerator> routines = new List<IEnumerator>();
+        private static readonly List<Task> pending = new List<Task>();
+        private static readonly List<IEnumerator> routines = new List<IEnumerator>();
 
         static EditorExecutors()
         {
@@ -256,11 +256,11 @@ namespace Loxodon.Framework.Editors
 
     public class Task : IEnumerator
     {
-        private int id;
-        private int delay;
-        private IEnumerator routine;
+        private readonly int id;
+        private readonly int delay;
+        private readonly IEnumerator routine;
 
-        private long startTime;
+        private readonly long startTime;
 
         public Task(int id, IEnumerator routine) : this(id, 0, routine)
         {
@@ -271,19 +271,19 @@ namespace Loxodon.Framework.Editors
             this.id = id;
             this.delay = delay;
             this.routine = routine;
-            this.startTime = System.DateTime.Now.Ticks / 10000;
+            startTime = DateTime.Now.Ticks / 10000;
         }
 
-        public int ID { get { return this.id; } }
+        public int ID => id;
 
-        public int Delay { get { return this.delay; } }
+        public int Delay => delay;
 
         public bool CanExecute()
         {
-            return System.DateTime.Now.Ticks / 10000 - startTime > delay;
+            return DateTime.Now.Ticks / 10000 - startTime > delay;
         }
 
-        public object Current { get { return routine.Current; } }
+        public object Current => routine.Current;
 
         public bool MoveNext()
         {

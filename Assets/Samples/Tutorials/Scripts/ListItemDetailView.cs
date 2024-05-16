@@ -37,8 +37,8 @@ namespace Loxodon.Framework.Tutorials
 
         public ListItemViewModel Item
         {
-            get { return (ListItemViewModel)this.GetDataContext(); }
-            set { this.SetDataContext(value); }
+            get => (ListItemViewModel)this.GetDataContext();
+            set => this.SetDataContext(value);
         }
 
         private void Start()
@@ -47,7 +47,7 @@ namespace Loxodon.Framework.Tutorials
             bindingSet.Bind(panel).For(v => v.activeSelf).To(vm => vm.IsSelected);
             bindingSet.Bind(title).For(v => v.text).To(vm => vm.Title);
             bindingSet.Bind(image).For(v => v.sprite).To(vm => vm.Icon).WithConversion("spriteConverter").OneWay();
-            bindingSet.Bind(this.price).For(v => v.text).ToExpression(vm => string.Format("${0:0.00}", vm.Price)).OneWay();
+            bindingSet.Bind(price).For(v => v.text).ToExpression(vm => $"${vm.Price:0.00}").OneWay();
             bindingSet.Build();
         }
     }

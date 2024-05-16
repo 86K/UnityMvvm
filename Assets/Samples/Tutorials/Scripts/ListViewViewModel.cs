@@ -33,9 +33,9 @@ namespace Loxodon.Framework.Tutorials
     public class ListViewViewModel : ViewModelBase
     {
         private ListItemViewModel selectedItem;
-        private SimpleCommand<ListItemViewModel> itemSelectCommand;
-        private SimpleCommand<ListItemViewModel> itemClickCommand;
-        private AsyncInteractionRequest<VisibilityNotification> itemEditRequest;
+        private readonly SimpleCommand<ListItemViewModel> itemSelectCommand;
+        private readonly SimpleCommand<ListItemViewModel> itemClickCommand;
+        private readonly AsyncInteractionRequest<VisibilityNotification> itemEditRequest;
         private ObservableList<ListItemViewModel> items;
 
         public ListViewViewModel()
@@ -48,20 +48,17 @@ namespace Loxodon.Framework.Tutorials
 
         public ObservableList<ListItemViewModel> Items
         {
-            get { return this.items; }
-            set { this.Set(ref items, value); }
+            get => items;
+            set => Set(ref items, value);
         }
 
         public ListItemViewModel SelectedItem
         {
-            get { return this.selectedItem; }
-            set { Set(ref selectedItem, value); }
+            get => selectedItem;
+            set => Set(ref selectedItem, value);
         }
 
-        public IInteractionRequest ItemEditRequest
-        {
-            get { return this.itemEditRequest; }
-        }
+        public IInteractionRequest ItemEditRequest => itemEditRequest;
 
         public ListItemViewModel SelectItem(int index)
         {
@@ -70,7 +67,7 @@ namespace Loxodon.Framework.Tutorials
 
             var item = items[index];
             item.IsSelected = true;
-            this.SelectedItem = item;
+            SelectedItem = item;
 
             if (items != null && item.IsSelected)
             {
@@ -88,7 +85,7 @@ namespace Loxodon.Framework.Tutorials
         private async void OnItemClick(ListItemViewModel item)
         {
             ListItemEditViewModel editViewModel = new ListItemEditViewModel(item);
-            await this.itemEditRequest.Raise(VisibilityNotification.CreateShowNotification(editViewModel, true));
+            await itemEditRequest.Raise(VisibilityNotification.CreateShowNotification(editViewModel, true));
 
             if (editViewModel.Cancelled)
                 return;
@@ -113,53 +110,53 @@ namespace Loxodon.Framework.Tutorials
             }
 
             if (item.IsSelected)
-                this.SelectedItem = item;
+                SelectedItem = item;
         }
 
         public void AddItem()
         {
-            int i = this.items.Count;
-            this.items.Add(NewItem(i));
+            int i = items.Count;
+            items.Add(NewItem(i));
         }
 
         public void RemoveItem()
         {
-            if (this.items.Count <= 0)
+            if (items.Count <= 0)
                 return;
 
-            int index = Random.Range(0, this.items.Count - 1);
-            var item = this.items[index];
+            int index = Random.Range(0, items.Count - 1);
+            var item = items[index];
             if (item.IsSelected)
-                this.SelectedItem = null;
+                SelectedItem = null;
 
-            this.items.RemoveAt(index);
+            items.RemoveAt(index);
         }
 
         public void ClearItem()
         {
-            if (this.items.Count <= 0)
+            if (items.Count <= 0)
                 return;
 
-            this.items.Clear();
-            this.SelectedItem = null;
+            items.Clear();
+            SelectedItem = null;
         }
 
         public void ChangeItemIcon()
         {
-            if (this.items.Count <= 0)
+            if (items.Count <= 0)
                 return;
 
-            foreach (var item in this.items)
+            foreach (var item in items)
             {
                 int iconIndex = Random.Range(1, 30);
-                item.Icon = string.Format("EquipImages_{0}", iconIndex);
+                item.Icon = $"EquipImages_{iconIndex}";
             }
         }
 
         public void ChangeItems()
         {
-            this.SelectedItem = null;
-            this.Items = CreateList();
+            SelectedItem = null;
+            Items = CreateList();
         }
 
         private ObservableList<ListItemViewModel> CreateList()
@@ -176,7 +173,7 @@ namespace Loxodon.Framework.Tutorials
         {
             int iconIndex = Random.Range(1, 30);
             float price = Random.Range(0f, 100f);
-            return new ListItemViewModel(this.itemSelectCommand, this.itemClickCommand) { Title = "Equip " + id, Icon = string.Format("EquipImages_{0}", iconIndex), Price = price };
+            return new ListItemViewModel(itemSelectCommand, itemClickCommand) { Title = "Equip " + id, Icon = $"EquipImages_{iconIndex}", Price = price };
         }
     }
 }

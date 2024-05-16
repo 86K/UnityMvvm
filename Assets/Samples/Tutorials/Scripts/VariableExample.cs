@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-using System;
 using System.Globalization;
 
 using Loxodon.Framework.Contexts;
@@ -49,37 +48,37 @@ namespace Loxodon.Framework.Tutorials
 
         public string Username
         {
-            get { return this.username; }
-            set { this.Set(ref this.username, value); }
+            get => username;
+            set => Set(ref username, value);
         }
 
         public string Email
         {
-            get { return this.email; }
-            set { this.Set(ref this.email, value); }
+            get => email;
+            set => Set(ref email, value);
         }
 
         public bool Remember
         {
-            get { return this.remember; }
-            set { this.Set(ref this.remember, value); }
+            get => remember;
+            set => Set(ref remember, value);
         }
 
         public Vector3 Vector
         {
-            get { return this.vector; }
-            set { this.Set(ref this.vector, value); }
+            get => vector;
+            set => Set(ref vector, value);
         }
 
         public Color Color
         {
-            get { return this.color; }
-            set { this.Set(ref this.color, value); }
+            get => color;
+            set => Set(ref color, value);
         }
 
         public void OnSubmit()
         {
-            Debug.LogFormat("username:{0} email:{1} remember:{2} vector:{3} color:{4}", this.username, this.email, this.remember, this.vector, this.color);
+            Debug.LogFormat("username:{0} email:{1} remember:{2} vector:{3} color:{4}", username, email, remember, vector, color);
         }
     }
 
@@ -108,18 +107,18 @@ namespace Loxodon.Framework.Tutorials
                 Remember = true
             };
 
-            viewModel.Color = this.variables.Get<Color>("color");
-            viewModel.Vector = this.variables.Get<Vector3>("vector");
+            viewModel.Color = variables.Get<Color>("color");
+            viewModel.Vector = variables.Get<Vector3>("vector");
 
             IBindingContext bindingContext = this.BindingContext();
             bindingContext.DataContext = viewModel;
 
             /* databinding */
             BindingSet<VariableExample, VariableViewModel> bindingSet = this.CreateBindingSet<VariableExample, VariableViewModel>();
-            bindingSet.Bind(this.variables.Get<InputField>("username")).For(v => v.text, v => v.onEndEdit).To(vm => vm.Username).TwoWay();
-            bindingSet.Bind(this.variables.Get<InputField>("email")).For(v => v.text, v => v.onEndEdit).To(vm => vm.Email).TwoWay();
-            bindingSet.Bind(this.variables.Get<Toggle>("remember")).For(v => v.isOn, v => v.onValueChanged).To(vm => vm.Remember).TwoWay();
-            bindingSet.Bind(this.variables.Get<Button>("submit")).For(v => v.onClick).To(vm => vm.OnSubmit);
+            bindingSet.Bind(variables.Get<InputField>("username")).For(v => v.text, v => v.onEndEdit).To(vm => vm.Username).TwoWay();
+            bindingSet.Bind(variables.Get<InputField>("email")).For(v => v.text, v => v.onEndEdit).To(vm => vm.Email).TwoWay();
+            bindingSet.Bind(variables.Get<Toggle>("remember")).For(v => v.isOn, v => v.onValueChanged).To(vm => vm.Remember).TwoWay();
+            bindingSet.Bind(variables.Get<Button>("submit")).For(v => v.onClick).To(vm => vm.OnSubmit);
             bindingSet.Build();
         }
 

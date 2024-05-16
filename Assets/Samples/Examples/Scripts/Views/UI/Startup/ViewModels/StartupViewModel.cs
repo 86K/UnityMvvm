@@ -29,18 +29,15 @@ using Loxodon.Framework.Interactivity;
 using Loxodon.Framework.Localizations;
 using Loxodon.Framework.Messaging;
 using Loxodon.Framework.ViewModels;
-using Loxodon.Log;
 using UnityEngine;
 
 namespace Loxodon.Framework.Examples
 {
     public class StartupViewModel : ViewModelBase
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(StartupViewModel));
-
-        private ProgressBar progressBar = new ProgressBar();
-        private SimpleCommand command;
-        private Localization localization;
+        private readonly ProgressBar progressBar = new ProgressBar();
+        private readonly SimpleCommand command;
+        private readonly Localization localization;
 
         //public InteractionRequest<LoginViewModel> LoginRequest;
         public AsyncInteractionRequest<WindowNotification> LoginRequest { get; private set; }
@@ -55,14 +52,14 @@ namespace Loxodon.Framework.Examples
         public StartupViewModel(IMessenger messenger) : base(messenger)
         {
             ApplicationContext context = Context.GetApplicationContext();
-            this.localization = context.GetService<Localization>();
+            localization = context.GetService<Localization>();
             var accountService = context.GetService<IAccountService>();
             var globalPreferences = context.GetGlobalPreferences();
 
             //this.LoginRequest = new InteractionRequest<LoginViewModel>(this);          
-            this.LoginRequest = new AsyncInteractionRequest<WindowNotification>(this);
-            this.LoadSceneRequest = new AsyncInteractionRequest<ProgressBar>(this);
-            this.DismissRequest = new InteractionRequest(this);
+            LoginRequest = new AsyncInteractionRequest<WindowNotification>(this);
+            LoadSceneRequest = new AsyncInteractionRequest<ProgressBar>(this);
+            DismissRequest = new InteractionRequest(this);
 
             var loginViewModel = new LoginViewModel(accountService, localization, globalPreferences);
             //this.command = new SimpleCommand(() =>
@@ -76,42 +73,31 @@ namespace Loxodon.Framework.Examples
             //    });
             //});
 
-            this.command = new SimpleCommand(async () =>
+            command = new SimpleCommand(async () =>
             {
-                this.command.Enabled = false;
-                await this.LoginRequest.Raise(WindowNotification.CreateShowNotification(loginViewModel, false, true));
-                this.command.Enabled = true;
+                command.Enabled = false;
+                await LoginRequest.Raise(WindowNotification.CreateShowNotification(loginViewModel, false, true));
+                command.Enabled = true;
                 if (loginViewModel.Account != null)
                 {
                     await LoadSceneRequest.Raise(ProgressBar);
-                    this.DismissRequest.Raise();
+                    DismissRequest.Raise();
                 }
             });
         }
 
-        public ProgressBar ProgressBar
-        {
-            get { return this.progressBar; }
-        }
+        public ProgressBar ProgressBar => progressBar;
 
-        public ICommand Click
-        {
-            get { return this.command; }
-        }
-
-        public void OnClick()
-        {
-            log.Debug("onClick");
-        }
+        public ICommand Click => command;
 
         /// <summary>
         /// Simulate a unzip task.
         /// </summary>
         public async void Unzip()
         {
-            this.command.Enabled = false;
-            this.progressBar.Enable = true;
-            this.ProgressBar.Tip = R.startup_progressbar_tip_unziping;
+            command.Enabled = false;
+            progressBar.Enable = true;
+            ProgressBar.Tip = R.startup_progressbar_tip_unziping;
 
             try
             {
@@ -119,16 +105,16 @@ namespace Loxodon.Framework.Examples
                 while (progress < 1f)
                 {
                     progress += 0.01f;
-                    this.ProgressBar.Progress = progress;/* update progress */
+                    ProgressBar.Progress = progress;/* update progress */
                     await new WaitForSecondsRealtime(0.02f);
                 }
             }
             finally
             {
-                this.command.Enabled = true;
-                this.progressBar.Enable = false;
-                this.progressBar.Tip = "";
-                this.command.Execute(null);
+                command.Enabled = true;
+                progressBar.Enable = false;
+                progressBar.Tip = "";
+                command.Execute(null);
             }
         }
     }

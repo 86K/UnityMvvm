@@ -38,8 +38,8 @@ namespace Loxodon.Framework.Examples
     {
         public AccountEventArgs(AccountEventType type, Account account)
         {
-            this.Type = type;
-            this.Account = account;
+            Type = type;
+            Account = account;
         }
 
         public AccountEventType Type { get; private set; }

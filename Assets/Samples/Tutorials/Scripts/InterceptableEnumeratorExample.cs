@@ -34,7 +34,7 @@ namespace Loxodon.Framework.Tutorials
     {
         IEnumerator Start()
         {
-            yield return this.TestInterceptException();
+            yield return TestInterceptException();
 
             //yield return this.TestInterceptMoveNextMethod();
         }
@@ -64,7 +64,7 @@ namespace Loxodon.Framework.Tutorials
             });
 
             /* Start the task */
-            this.StartCoroutine(routine);
+            StartCoroutine(routine);
             yield break;
         }
 
@@ -91,7 +91,7 @@ namespace Loxodon.Framework.Tutorials
             });
 
             /* Start the task */
-            this.StartCoroutine(routine);
+            StartCoroutine(routine);
 
             yield return new WaitForSeconds(0.5f);
             result.Cancel();

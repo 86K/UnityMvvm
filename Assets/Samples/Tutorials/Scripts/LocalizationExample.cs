@@ -23,7 +23,6 @@
  */
 
 using Loxodon.Framework.Localizations;
-using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,36 +36,36 @@ namespace Loxodon.Framework.Tutorials
 
 		void Awake ()
 		{
-            this.localization = Localization.Current;
-            this.localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
+            localization = Localization.Current;
+            localization.CultureInfo = Locale.GetCultureInfoByLanguage(SystemLanguage.English);
 
             //Use files in xml format
-            this.localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
+            localization.AddDataProvider(new DefaultDataProvider("LocalizationTutorials", new XmlDocumentParser()));
 
             //Use files in asset format
             //this.localization.AddDataProvider(new DefaultLocalizationSourceDataProvider("LocalizationTutorials", "LocalizationModule.asset"));
 
-            this.dropdown.onValueChanged.AddListener (OnValueChanged);
+            dropdown.onValueChanged.AddListener (OnValueChanged);
 		}
 
 		void OnValueChanged (int value)
 		{
 			switch (value) {
 			case 0:
-				this.localization.CultureInfo = Locale.GetCultureInfoByLanguage (SystemLanguage.English);
+				localization.CultureInfo = Locale.GetCultureInfoByLanguage (SystemLanguage.English);
 				break;
 			case 1:
-				this.localization.CultureInfo = Locale.GetCultureInfoByLanguage (SystemLanguage.ChineseSimplified);
+				localization.CultureInfo = Locale.GetCultureInfoByLanguage (SystemLanguage.ChineseSimplified);
 				break;
 			default:
-				this.localization.CultureInfo = Locale.GetCultureInfoByLanguage (SystemLanguage.English);
+				localization.CultureInfo = Locale.GetCultureInfoByLanguage (SystemLanguage.English);
 				break;
 			}
 		}
 
 		void OnDestroy ()
 		{
-			this.dropdown.onValueChanged.RemoveListener (OnValueChanged);
+			dropdown.onValueChanged.RemoveListener (OnValueChanged);
 		}
 	}
 }

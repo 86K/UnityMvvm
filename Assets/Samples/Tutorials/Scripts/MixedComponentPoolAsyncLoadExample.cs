@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using Loxodon.Framework.Asynchronous;
+using Object = UnityEngine.Object;
 
 namespace Loxodon.Framework.Examples
 {
@@ -40,17 +41,17 @@ namespace Loxodon.Framework.Examples
             /**
              * This is an example of loading an object using an asynchronous method.
              */
-            CubeMixedObjectFactory factory = new CubeMixedObjectFactory(this.transform);
-            this.pool = new MixedObjectPool<PooledCube>(factory, 5);
-            this.dict = new Dictionary<string, List<PooledCube>>();
+            CubeMixedObjectFactory factory = new CubeMixedObjectFactory(transform);
+            pool = new MixedObjectPool<PooledCube>(factory, 5);
+            dict = new Dictionary<string, List<PooledCube>>();
         }
 
         private void OnDestroy()
         {
-            if (this.pool != null)
+            if (pool != null)
             {
-                this.pool.Dispose();
-                this.pool = null;
+                pool.Dispose();
+                pool = null;
             }
         }
 
@@ -93,20 +94,20 @@ namespace Loxodon.Framework.Examples
         protected async Task Add(string typeName, int count)
         {
             List<PooledCube> list;
-            if (!this.dict.TryGetValue(typeName, out list))
+            if (!dict.TryGetValue(typeName, out list))
             {
                 list = new List<PooledCube>();
-                this.dict.Add(typeName, list);
+                dict.Add(typeName, list);
             }
 
             for (int i = 0; i < count; i++)
             {
-                PooledCube cube = this.pool.Allocate(typeName);
+                PooledCube cube = pool.Allocate(typeName);
                 if (!cube.IsLoaded)
                     await cube.LoadAsync();
 
                 cube.gameObject.transform.position = GetPosition();
-                cube.gameObject.name = string.Format("Cube {0}-{1}", typeName, list.Count);
+                cube.gameObject.name = $"Cube {typeName}-{list.Count}";
                 cube.gameObject.SetActive(true);
                 list.Add(cube);
             }
@@ -115,7 +116,7 @@ namespace Loxodon.Framework.Examples
         protected void Delete(string typeName, int count)
         {
             List<PooledCube> list;
-            if (!this.dict.TryGetValue(typeName, out list) || list.Count <= 0)
+            if (!dict.TryGetValue(typeName, out list) || list.Count <= 0)
                 return;
 
             for (int i = 0; i < count; i++)
@@ -155,9 +156,9 @@ namespace Loxodon.Framework.Examples
                     return child;
 
                 GameObject go = (GameObject)await Resources.LoadAsync<GameObject>("Cube/Cube");
-                child = GameObject.Instantiate(go, this.transform);
+                child = Instantiate(go, transform);
                 child.GetComponent<MeshRenderer>().material.color = color;
-                this.IsLoaded = true;
+                IsLoaded = true;
                 return child;
             }
 
@@ -170,7 +171,7 @@ namespace Loxodon.Framework.Examples
 
         public class CubeMixedObjectFactory : IMixedObjectFactory<PooledCube>
         {
-            private Transform parent;
+            private readonly Transform parent;
             public CubeMixedObjectFactory(Transform parent)
             {
                 this.parent = parent;
@@ -179,7 +180,7 @@ namespace Loxodon.Framework.Examples
             public PooledCube Create(IMixedObjectPool<PooledCube> pool, string typeName)
             {
                 Debug.LogFormat("Create a cube.");
-                GameObject go = new GameObject(string.Format("Cube {0}-Idle", typeName));// GameObject.Instantiate(this.template, parent);
+                GameObject go = new GameObject($"Cube {typeName}-Idle");// GameObject.Instantiate(this.template, parent);
                 go.transform.SetParent(parent);
                 PooledCube cube = go.AddComponent<PooledCube>();
                 cube.pool = pool;
@@ -203,14 +204,14 @@ namespace Loxodon.Framework.Examples
             public virtual void Reset(string typeName, PooledCube obj)
             {
                 obj.gameObject.SetActive(false);
-                obj.gameObject.name = string.Format("Cube {0}-Idle", typeName);
+                obj.gameObject.name = $"Cube {typeName}-Idle";
                 obj.gameObject.transform.position = Vector3.zero;
                 obj.gameObject.transform.rotation = Quaternion.Euler(Vector3.zero);
             }
 
             public virtual void Destroy(string typeName, PooledCube obj)
             {
-                GameObject.Destroy(obj.gameObject);
+                Object.Destroy(obj.gameObject);
                 Debug.LogFormat("Destroy a cube.");
             }
 

@@ -27,7 +27,6 @@ using System.Globalization;
 using System.Collections;
 using Loxodon.Framework.Contexts;
 using Loxodon.Framework.Views;
-using Loxodon.Log;
 using Loxodon.Framework.Binding;
 using Loxodon.Framework.Localizations;
 using Loxodon.Framework.Services;

@@ -29,8 +29,8 @@ namespace Loxodon.Framework.Examples
 {
     public class CubeObjectFactory2 : UnityComponentFactoryBase<MeshRenderer>
     {
-        private GameObject template;
-        private Transform parent;
+        private readonly GameObject template;
+        private readonly Transform parent;
         public CubeObjectFactory2(GameObject template, Transform parent)
         {
             this.template = template;
@@ -40,7 +40,7 @@ namespace Loxodon.Framework.Examples
         protected override MeshRenderer Create()
         {
             Debug.LogFormat("Create a cube.");
-            GameObject go = Object.Instantiate(this.template, parent);
+            GameObject go = Object.Instantiate(template, parent);
             return go.GetComponent<MeshRenderer>();
         }
 

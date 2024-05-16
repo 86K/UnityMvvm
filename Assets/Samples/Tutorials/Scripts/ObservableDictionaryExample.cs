@@ -51,7 +51,7 @@ namespace Loxodon.Framework.Tutorials
 #if UNITY_IOS
             this.dict = new ObservableDictionary<int, Item>(new IntEqualityComparer());
 #else
-            this.dict = new ObservableDictionary<int, Item>();
+            dict = new ObservableDictionary<int, Item>();
 #endif
             dict.CollectionChanged += OnCollectionChanged;
 
@@ -63,10 +63,10 @@ namespace Loxodon.Framework.Tutorials
 
         protected void OnDestroy()
         {
-            if (this.dict != null)
+            if (dict != null)
             {
-                this.dict.CollectionChanged -= OnCollectionChanged;
-                this.dict = null;
+                dict.CollectionChanged -= OnCollectionChanged;
+                dict = null;
             }
         }
 

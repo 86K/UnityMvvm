@@ -37,21 +37,21 @@ namespace Loxodon.Framework.Tutorials
 
 		IEnumerator Start ()
 		{
-			this.executor = new CoroutineExecutor (); 
+			executor = new CoroutineExecutor (); 
 
-			IAsyncResult r1 = this.executor.RunOnCoroutine (Task1 ());
+			IAsyncResult r1 = executor.RunOnCoroutine (Task1 ());
 			yield return r1.WaitForDone ();
 
-			IAsyncResult r2 = this.executor.RunOnCoroutine (promise => Task2 (promise));
+			IAsyncResult r2 = executor.RunOnCoroutine (promise => Task2 (promise));
 			yield return r2.WaitForDone ();
 
-			IAsyncResult<string> r3 = this.executor.RunOnCoroutine<string> (promise => Task3 (promise));
+			IAsyncResult<string> r3 = executor.RunOnCoroutine<string> (promise => Task3 (promise));
 			yield return new WaitForSeconds (0.5f);
 			r3.Cancel ();
 			yield return r3.WaitForDone ();
 			Debug.LogFormat ("Task3 IsCalcelled:{0}", r3.IsCancelled);
 
-			IProgressResult<float,string> r4 = this.executor.RunOnCoroutine<float,string> (promise => Task4 (promise));
+			IProgressResult<float,string> r4 = executor.RunOnCoroutine<float,string> (promise => Task4 (promise));
 			while (!r4.IsDone) {
 				yield return null;
 				Debug.LogFormat ("Task4 Progress:{0}%", Mathf.FloorToInt (r4.Progress * 100));

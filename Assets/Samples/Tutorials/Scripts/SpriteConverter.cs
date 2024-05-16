@@ -31,7 +31,7 @@ namespace Loxodon.Framework.Tutorials
 {
     public class SpriteConverter : IConverter
     {
-        private Dictionary<string, Sprite> sprites;
+        private readonly Dictionary<string, Sprite> sprites;
 
         public SpriteConverter(Dictionary<string, Sprite> sprites)
         {

@@ -39,34 +39,34 @@ namespace Loxodon.Framework.Tutorials
 
         public string SpriteName
         {
-            get { return this.spriteName; }
+            get => spriteName;
             set
             {
-                if (this.spriteName == value)
+                if (spriteName == value)
                     return;
 
-                this.spriteName = value;
-                if (this.target != null)
-                    this.OnSpriteChanged();
+                spriteName = value;
+                if (target != null)
+                    OnSpriteChanged();
             }
         }
 
         protected virtual void OnEnable()
         {
-            this.target = this.GetComponent<Image>();
+            target = GetComponent<Image>();
         }
 
         protected virtual void OnSpriteChanged()
         {
-            if (string.IsNullOrEmpty(this.spriteName))
+            if (string.IsNullOrEmpty(spriteName))
             {
-                this.target.sprite = null;
-                this.target.material = null;
+                target.sprite = null;
+                target.material = null;
                 return;
             }
 
-            this.target.sprite = defaultSprite;
-            this.target.material = defaultMaterial;
+            target.sprite = defaultSprite;
+            target.material = defaultMaterial;
 
             StartCoroutine(LoadSprite());
         }
@@ -79,13 +79,13 @@ namespace Loxodon.Framework.Tutorials
         {
             yield return new WaitForSeconds(1f); 
 
-            Sprite[] sprites = Resources.LoadAll<Sprite>(this.spritePath);
+            Sprite[] sprites = Resources.LoadAll<Sprite>(spritePath);
             foreach(var sprite in sprites)
             {
-                if(sprite.name.Equals(this.spriteName))
+                if(sprite.name.Equals(spriteName))
                 {
-                    this.target.sprite = sprite;
-                    this.target.material = null;
+                    target.sprite = sprite;
+                    target.material = null;
                 }
             }
         }

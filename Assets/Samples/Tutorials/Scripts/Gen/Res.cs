@@ -1,5 +1,4 @@
 using Loxodon.Framework.Localizations;
-using System;
 
 public static partial class Res
 {

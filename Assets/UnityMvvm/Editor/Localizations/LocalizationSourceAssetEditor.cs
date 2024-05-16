@@ -63,15 +63,15 @@ namespace Loxodon.Framework.Editors
                 Application.OpenURL("https://github.com/cocowolf/loxodon-framework/blob/master/docs/LoxodonFramework.md");
             }
             GUILayout.Space(10);
-            this.serializedObject.Update();
-            this.entryList.DoLayoutList();
-            this.serializedObject.ApplyModifiedProperties();
+            serializedObject.Update();
+            entryList.DoLayoutList();
+            serializedObject.ApplyModifiedProperties();
         }
 
         protected virtual float EntryListElementHeight(int index)
         {
-            if (this.foldoutIndex == index)
-                return this.elementHeight;
+            if (foldoutIndex == index)
+                return elementHeight;
             return entryList.elementHeight;
         }
 
@@ -128,8 +128,8 @@ namespace Loxodon.Framework.Editors
             foldout = EditorGUI.Foldout(foldoutRect, foldout, GUIContent.none);
             if (EditorGUI.EndChangeCheck())
             {
-                this.foldoutIndex = foldout ? index : -1;
-                this.entryList.index = foldoutIndex;
+                foldoutIndex = foldout ? index : -1;
+                entryList.index = foldoutIndex;
             }
 
             if (foldoutIndex != index)
@@ -170,7 +170,7 @@ namespace Loxodon.Framework.Editors
 
                 y += valueHeight + VERTICAL_GAP;
 
-                this.elementHeight = y - position.y + 5;
+                elementHeight = y - position.y + 5;
             }
         }
 
@@ -183,7 +183,7 @@ namespace Loxodon.Framework.Editors
         {
             var entries = list.serializedProperty;
             int index = entries.arraySize > 0 ? entries.arraySize : 0;
-            this.DrawContextMenu(entries, index);
+            DrawContextMenu(entries, index);
         }
 
         protected virtual void OnRemove(ReorderableList list)
@@ -261,7 +261,7 @@ namespace Loxodon.Framework.Editors
                 return;
             }
 
-            if (EditorUtility.DisplayDialog("Confirm delete", string.Format("Are you sure you want to delete the item named \"{0}\"?", key), "Yes", "Cancel"))
+            if (EditorUtility.DisplayDialog("Confirm delete", $"Are you sure you want to delete the item named \"{key}\"?", "Yes", "Cancel"))
             {
                 RemoveEntry(entries, index);
             }

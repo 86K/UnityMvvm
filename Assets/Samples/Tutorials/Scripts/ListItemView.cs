@@ -42,12 +42,12 @@ namespace Loxodon.Framework.Tutorials
         protected override void Start()
         {
             BindingSet<ListItemView, ListItemViewModel> bindingSet = this.CreateBindingSet<ListItemView, ListItemViewModel>();
-            bindingSet.Bind(this.title).For(v => v.text).To(vm => vm.Title).OneWay();
-            bindingSet.Bind(this.image).For(v => v.sprite).To(vm => vm.Icon).WithConversion("spriteConverter").OneWay();
-            bindingSet.Bind(this.price).For(v => v.text).ToExpression(vm => string.Format("${0:0.00}", vm.Price)).OneWay();
-            bindingSet.Bind(this.border).For(v => v.activeSelf).To(vm => vm.IsSelected).OneWay();
-            bindingSet.Bind(this.selectButton).For(v => v.onClick).To(vm => vm.SelectCommand).CommandParameter(this.GetDataContext);
-            bindingSet.Bind(this.clickButton).For(v => v.onClick).To(vm => vm.ClickCommand).CommandParameter(this.GetDataContext);
+            bindingSet.Bind(title).For(v => v.text).To(vm => vm.Title).OneWay();
+            bindingSet.Bind(image).For(v => v.sprite).To(vm => vm.Icon).WithConversion("spriteConverter").OneWay();
+            bindingSet.Bind(price).For(v => v.text).ToExpression(vm => $"${vm.Price:0.00}").OneWay();
+            bindingSet.Bind(border).For(v => v.activeSelf).To(vm => vm.IsSelected).OneWay();
+            bindingSet.Bind(selectButton).For(v => v.onClick).To(vm => vm.SelectCommand).CommandParameter(this.GetDataContext);
+            bindingSet.Bind(clickButton).For(v => v.onClick).To(vm => vm.ClickCommand).CommandParameter(this.GetDataContext);
             bindingSet.Build();
         }
     }

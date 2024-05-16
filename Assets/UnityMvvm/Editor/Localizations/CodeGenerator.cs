@@ -63,7 +63,7 @@ namespace Loxodon.Framework.Editors
 			return Regex.Replace (key, "[.]", "_");
 		}
 
-		private string GetTypeName (System.Type type)
+		private string GetTypeName (Type type)
 		{
 			TypeCode typeCode = Type.GetTypeCode (type);
 			switch (typeCode) {

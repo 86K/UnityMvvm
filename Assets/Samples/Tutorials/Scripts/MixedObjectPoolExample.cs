@@ -26,6 +26,7 @@ using Loxodon.Framework.ObjectPool;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Loxodon.Framework.Examples
 {
@@ -39,17 +40,17 @@ namespace Loxodon.Framework.Examples
 
         private void Start()
         {
-            CubeMixedObjectFactory factory = new CubeMixedObjectFactory(this.template, this.transform);
-            this.pool = new MixedObjectPool<GameObject>(factory, 5);
-            this.dict = new Dictionary<string, List<GameObject>>();
+            CubeMixedObjectFactory factory = new CubeMixedObjectFactory(template, transform);
+            pool = new MixedObjectPool<GameObject>(factory, 5);
+            dict = new Dictionary<string, List<GameObject>>();
         }
 
         private void OnDestroy()
         {
-            if (this.pool != null)
+            if (pool != null)
             {
-                this.pool.Dispose();
-                this.pool = null;
+                pool.Dispose();
+                pool = null;
             }
         }
 
@@ -92,17 +93,17 @@ namespace Loxodon.Framework.Examples
         protected void Add(string typeName, int count)
         {
             List<GameObject> list;
-            if (!this.dict.TryGetValue(typeName, out list))
+            if (!dict.TryGetValue(typeName, out list))
             {
                 list = new List<GameObject>();
-                this.dict.Add(typeName, list);
+                dict.Add(typeName, list);
             }
 
             for (int i = 0; i < count; i++)
             {
-                GameObject go = this.pool.Allocate(typeName);
+                GameObject go = pool.Allocate(typeName);
                 go.transform.position = GetPosition();
-                go.name = string.Format("Cube {0}-{1}", typeName, list.Count);
+                go.name = $"Cube {typeName}-{list.Count}";
                 go.SetActive(true);
                 list.Add(go);
             }
@@ -111,7 +112,7 @@ namespace Loxodon.Framework.Examples
         protected void Delete(string typeName, int count)
         {
             List<GameObject> list;
-            if (!this.dict.TryGetValue(typeName, out list) || list.Count <= 0)
+            if (!dict.TryGetValue(typeName, out list) || list.Count <= 0)
                 return;
 
             for (int i = 0; i < count; i++)
@@ -140,8 +141,8 @@ namespace Loxodon.Framework.Examples
 
         public class CubeMixedObjectFactory : UnityMixedGameObjectFactoryBase
         {
-            private GameObject template;
-            private Transform parent;
+            private readonly GameObject template;
+            private readonly Transform parent;
             public CubeMixedObjectFactory(GameObject template, Transform parent)
             {
                 this.template = template;
@@ -151,7 +152,7 @@ namespace Loxodon.Framework.Examples
             protected override GameObject Create(string typeName)
             {
                 Debug.LogFormat("Create a cube.");
-                GameObject go = GameObject.Instantiate(this.template, parent);
+                GameObject go = Instantiate(template, parent);
                 go.GetComponent<MeshRenderer>().material.color = GetColor(typeName);
                 return go;
             }
@@ -171,7 +172,7 @@ namespace Loxodon.Framework.Examples
             public override void Reset(string typeName, GameObject obj)
             {
                 obj.SetActive(false);
-                obj.name = string.Format("Cube {0}-Idle", typeName);
+                obj.name = $"Cube {typeName}-Idle";
                 obj.transform.position = Vector3.zero;
                 obj.transform.rotation = Quaternion.Euler(Vector3.zero);
             }
