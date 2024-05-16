@@ -46,14 +46,6 @@ namespace Fusion.Mvvm
         bool ContainsKey(string key);
 
         /// <summary>
-        /// Gets a collection of all child keys for a given prefix.
-        /// </summary>
-        /// <param name="prefix">The prefix used to select the properties.</param>
-        /// <returns></returns>
-        [Obsolete("This method will be removed in version 3.0")]
-        IEnumerator<string> GetKeys(string prefix);
-
-        /// <summary>
         /// Get a collection of all keys
         /// </summary>
         /// <returns></returns>

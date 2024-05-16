@@ -1,5 +1,6 @@
 
 
+using System;
 using System.Globalization;
 using UnityEngine.UI;
 using UnityEngine;
@@ -49,7 +50,7 @@ namespace Fusion.Mvvm
             Debug.LogFormat("username:{0} email:{1} remember:{2} vector:{3} color:{4}", username, email, remember, vector, color);
         }
     }
-
+    
     public class VariableExample : UIView
     {
         public VariableArray variables;

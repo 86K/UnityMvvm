@@ -41,7 +41,8 @@ namespace Fusion.Mvvm
 
         public override IEnumerator<string> GetKeys()
         {
-            return new TransformEnumerator<string, string>(parent.GetKeys(prefix), (key) => GetChildKey(key));
+            // return new TransformEnumerator<string, string>(parent.GetKeys(prefix), (key) => GetChildKey(key));
+            return null;
         }
 
         public override object GetProperty(string key)

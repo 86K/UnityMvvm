@@ -177,43 +177,5 @@ namespace Fusion.Mvvm
             RaisePropertyChanged(eventArgs);
             return true;
         }
-
-        /// <summary>
-        ///  Set the specified propertyName, field, newValue.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="field"></param>
-        /// <param name="newValue"></param>
-        /// <param name="propertyName"></param>
-        /// <returns></returns>
-        [Obsolete]
-        protected bool SetValue<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null) where T : IEquatable<T>
-        {
-            if ((field != null && field.Equals(newValue)) || (field == null && newValue == null))
-                return false;
-
-            field = newValue;
-            RaisePropertyChanged(propertyName);
-            return true;
-        }
-
-        /// <summary>
-        ///  Set the specified propertyName, field, newValue.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="field"></param>
-        /// <param name="newValue"></param>
-        /// <param name="eventArgs"></param>
-        /// <returns></returns>
-        [Obsolete]
-        protected bool SetValue<T>(ref T field, T newValue, PropertyChangedEventArgs eventArgs) where T : IEquatable<T>
-        {
-            if ((field != null && field.Equals(newValue)) || (field == null && newValue == null))
-                return false;
-
-            field = newValue;
-            RaisePropertyChanged(eventArgs);
-            return true;
-        }
     }
 }
