@@ -60,12 +60,6 @@ namespace Fusion.Mvvm
             return new BindingSet<TBehaviour>(context, behaviour);
         }
 
-        public static BindingSet CreateSimpleBindingSet(this Behaviour behaviour)
-        {
-            IBindingContext context = behaviour.BindingContext();
-            return new BindingSet(context, behaviour);
-        }
-
         public static void SetDataContext(this Behaviour behaviour, object dataContext)
         {
             behaviour.BindingContext().DataContext = dataContext;

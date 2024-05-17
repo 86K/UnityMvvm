@@ -1,8 +1,5 @@
 using System;
 using System.Linq.Expressions;
-#if UNITY_2019_1_OR_NEWER
-using UnityEngine.UIElements;
-#endif
 
 namespace Fusion.Mvvm
 {
@@ -47,24 +44,6 @@ namespace Fusion.Mvvm
             
             return ForInternal(targetName);
         }
-
-#if UNITY_2019_1_OR_NEWER
-        public BindingBuilder<TTarget, TSource> For<TResult>(Expression<Func<TTarget, TResult>> memberExpression, Expression<Func<TTarget, Func<EventCallback<ChangeEvent<TResult>>, bool>>> updateTriggerExpression)
-        {
-            string targetName = PathParser.ParseMemberName(memberExpression);
-            string updateTrigger = PathParser.ParseMemberName(updateTriggerExpression);
-            
-            return ForInternal(targetName, updateTrigger);
-        }
-
-        public BindingBuilder<TTarget, TSource> For<TResult>(Expression<Func<TTarget, Func<EventCallback<ChangeEvent<TResult>>, bool>>> memberExpression)
-        {
-            string targetName = PathParser.ParseMemberName(memberExpression);
-            OneWayToSource();
-            
-            return ForInternal(targetName);
-        }
-#endif
 
         public BindingBuilder<TTarget, TSource> To(string path)
         {
@@ -192,22 +171,6 @@ namespace Fusion.Mvvm
             return ForInternal(targetName);
         }
 
-#if UNITY_2019_1_OR_NEWER
-        public BindingBuilder<TTarget> For<TResult>(Expression<Func<TTarget, TResult>> memberExpression, Expression<Func<TTarget, Func<EventCallback<ChangeEvent<TResult>>, bool>>> updateTriggerExpression)
-        {
-            string targetName = PathParser.ParseMemberName(memberExpression);
-            string updateTrigger = PathParser.ParseMemberName(updateTriggerExpression);
-            return ForInternal(targetName, updateTrigger);
-        }
-
-        public BindingBuilder<TTarget> For<TResult>(Expression<Func<TTarget, Func<EventCallback<ChangeEvent<TResult>>, bool>>> memberExpression)
-        {
-            string targetName = PathParser.ParseMemberName(memberExpression);
-            OneWayToSource();
-            return ForInternal(targetName);
-        }
-#endif
-
         public BindingBuilder<TTarget> To(string path)
         {
             SetStaticMemberPath(path);
@@ -296,87 +259,6 @@ namespace Fusion.Mvvm
         }
 
         public BindingBuilder<TTarget> WithScopeKey(object scopeKey)
-        {
-            SetScopeKey(scopeKey);
-            return this;
-        }
-    }
-
-    [Obsolete]
-    public class BindingBuilder : BindingBuilderBase
-    {
-        public BindingBuilder(IBindingContext context, object target) : base(context, target)
-        {
-        }
-
-        public BindingBuilder For(string targetName, string updateTrigger = null)
-        {
-            description.TargetName = targetName;
-            description.UpdateTrigger = updateTrigger;
-            return this;
-        }
-
-        public BindingBuilder To(string path)
-        {
-            SetMemberPath(path);
-            return this;
-        }
-
-        public BindingBuilder ToStatic(string path)
-        {
-            SetStaticMemberPath(path);
-            return this;
-        }
-
-        public BindingBuilder ToValue(object value)
-        {
-            SetLiteral(value);
-            return this;
-        }
-
-        public BindingBuilder TwoWay()
-        {
-            SetMode(BindingMode.TwoWay);
-            return this;
-        }
-
-        public BindingBuilder OneWay()
-        {
-            SetMode(BindingMode.OneWay);
-            return this;
-        }
-
-        public BindingBuilder OneWayToSource()
-        {
-            SetMode(BindingMode.OneWayToSource);
-            return this;
-        }
-
-        public BindingBuilder OneTime()
-        {
-            SetMode(BindingMode.OneTime);
-            return this;
-        }
-
-        public BindingBuilder CommandParameter(object parameter)
-        {
-            SetCommandParameter(parameter);
-            return this;
-        }
-
-        public BindingBuilder WithConversion(string converterName)
-        {
-            var converter = ConverterByName(converterName);
-            return WithConversion(converter);
-        }
-
-        public BindingBuilder WithConversion(IConverter converter)
-        {
-            description.Converter = converter;
-            return this;
-        }
-
-        public BindingBuilder WithScopeKey(object scopeKey)
         {
             SetScopeKey(scopeKey);
             return this;

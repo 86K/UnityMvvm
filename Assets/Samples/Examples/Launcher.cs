@@ -8,9 +8,6 @@ namespace Fusion.Mvvm
 {
     public class Launcher : MonoBehaviour
     {
-
-        //private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         private ApplicationContext context;
         ISubscription<WindowStateEventArgs> subscription;
         void Awake()

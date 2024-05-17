@@ -23,9 +23,6 @@ namespace Fusion.Mvvm
             TargetProxyFactory targetFactory = new TargetProxyFactory();
             targetFactory.Register(new UniversalTargetProxyFactory(pathParser), 0);
             targetFactory.Register(new UnityTargetProxyFactory(), 10);
-#if UNITY_2019_1_OR_NEWER
-            targetFactory.Register(new VisualElementProxyFactory(), 30);
-#endif
             
             Binder binder = new Binder(sourceFactory, targetFactory);
             container.Register<IBinder>(binder);
