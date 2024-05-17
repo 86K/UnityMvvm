@@ -2,71 +2,72 @@ using System;
 
 namespace Fusion.Mvvm
 {
-    public class ObservableNodeProxy : NotifiableSourceProxyBase, IObtainable, IModifiable, INotifiable
+    public class ObservableNodeProxy : NotifiableSourceProxyBase, IObtainable, IModifiable
     {
-        protected IObservableProperty property;
+        private readonly IObservableProperty _property;
 
         public ObservableNodeProxy(IObservableProperty property) : this(null, property)
         {
         }
+
         public ObservableNodeProxy(object source, IObservableProperty property) : base(source)
         {
-            this.property = property;
-            this.property.ValueChanged += OnValueChanged;
+            _property = property;
+            _property.ValueChanged += OnValueChanged;
         }
 
-        public override Type Type => property.Type;
+        public override Type Type => _property.Type;
 
-        protected virtual void OnValueChanged(object sender, EventArgs e)
+        private void OnValueChanged(object sender, EventArgs e)
         {
             RaiseValueChanged();
         }
 
-        public virtual object GetValue()
+        public object GetValue()
         {
-            return property.Value;
+            return _property.Value;
         }
 
-        public virtual TValue GetValue<TValue>()
+        public TValue GetValue<TValue>()
         {
-            var observableProperty = property as IObservableProperty<TValue>;
-            if (observableProperty != null)
+            if (_property is IObservableProperty<TValue> observableProperty)
                 return observableProperty.Value;
 
-            return (TValue)property.Value;
+            return (TValue)_property.Value;
         }
 
-        public virtual void SetValue(object value)
+        public void SetValue(object value)
         {
-            property.Value = value;
+            _property.Value = value;
         }
 
-        public virtual void SetValue<TValue>(TValue value)
+        public void SetValue<TValue>(TValue value)
         {
-            var observableProperty = property as IObservableProperty<TValue>;
-            if (observableProperty != null)
+            if (_property is IObservableProperty<TValue> observableProperty)
             {
                 observableProperty.Value = value;
                 return;
             }
 
-            property.Value = value;
+            _property.Value = value;
         }
 
-        #region IDisposable Support    
+        #region IDisposable Support
+
         private bool disposedValue;
 
         protected override void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
-                if (property != null)
-                    property.ValueChanged -= OnValueChanged;
+                if (_property != null)
+                    _property.ValueChanged -= OnValueChanged;
 
                 disposedValue = true;
                 base.Dispose(disposing);
             }
         }
+
         #endregion
     }
 }

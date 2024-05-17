@@ -4,7 +4,7 @@ namespace Fusion.Mvvm
 {
     public class FieldNodeProxy : SourceProxyBase, IObtainable, IModifiable
     {
-        protected IProxyFieldInfo fieldInfo;
+        private readonly IProxyFieldInfo fieldInfo;
 
         public FieldNodeProxy(IProxyFieldInfo fieldInfo) : this(null, fieldInfo)
         {
@@ -19,35 +19,33 @@ namespace Fusion.Mvvm
 
         public override TypeCode TypeCode => fieldInfo.ValueTypeCode;
 
-        public virtual object GetValue()
+        public object GetValue()
         {
-            return fieldInfo.GetValue(source);
+            return fieldInfo.GetValue(Source);
         }
 
-        public virtual TValue GetValue<TValue>()
+        public TValue GetValue<TValue>()
         {
-            var proxy = fieldInfo as IProxyFieldInfo<TValue>;
-            if (proxy != null)
-                return proxy.GetValue(source);
+            if (fieldInfo is IProxyFieldInfo<TValue> proxy)
+                return proxy.GetValue(Source);
 
-            return (TValue)fieldInfo.GetValue(source);
+            return (TValue)fieldInfo.GetValue(Source);
         }
 
-        public virtual void SetValue(object value)
+        public void SetValue(object value)
         {
-            fieldInfo.SetValue(source, value);
+            fieldInfo.SetValue(Source, value);
         }
 
-        public virtual void SetValue<TValue>(TValue value)
+        public void SetValue<TValue>(TValue value)
         {
-            var proxy = fieldInfo as IProxyFieldInfo<TValue>;
-            if (proxy != null)
+            if (fieldInfo is IProxyFieldInfo<TValue> proxy)
             {
-                proxy.SetValue(source, value);
+                proxy.SetValue(Source, value);
                 return;
             }
 
-            fieldInfo.SetValue(source, value);
+            fieldInfo.SetValue(Source, value);
         }
     }
 }

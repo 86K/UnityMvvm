@@ -34,10 +34,8 @@ namespace Fusion.Mvvm
                 }
                 return Task.CompletedTask;
             }
-            else
-            {
-                return Show(context);
-            }
+
+            return Show(context);
         }
 
         protected async Task Create(object viewModel)
@@ -48,11 +46,11 @@ namespace Fusion.Mvvm
                 if (window == null)
                     throw new NotFoundException($"Not found the dialog window named \"{ViewName}\".");
 
-                if (window is AlertDialogWindowBase && viewModel is AlertDialogViewModel)
+                if (window is AlertDialogWindowBase @base && viewModel is AlertDialogViewModel model)
                 {
-                    (window as AlertDialogWindowBase).ViewModel = viewModel as AlertDialogViewModel;
+                    @base.ViewModel = model;
                 }
-                else if (window is AlertDialogWindowBase && viewModel is DialogNotification notification)
+                else if (window is AlertDialogWindowBase windowBase && viewModel is DialogNotification notification)
                 {
                     AlertDialogViewModel dialogViewModel = new AlertDialogViewModel();
                     dialogViewModel.Message = notification.Message;
@@ -62,7 +60,7 @@ namespace Fusion.Mvvm
                     dialogViewModel.CancelButtonText = notification.CancelButtonText;
                     dialogViewModel.CanceledOnTouchOutside = notification.CanceledOnTouchOutside;
                     dialogViewModel.Click = (result) => notification.DialogResult = result;
-                    (window as AlertDialogWindowBase).ViewModel = dialogViewModel;
+                    windowBase.ViewModel = dialogViewModel;
                 }
                 else
                 {

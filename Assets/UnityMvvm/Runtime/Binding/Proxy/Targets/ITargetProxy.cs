@@ -1,5 +1,3 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
@@ -9,8 +7,6 @@ namespace Fusion.Mvvm
         Type Type { get; }
 
         TypeCode TypeCode { get; }
-
-        object Target { get; }
 
         BindingMode DefaultMode { get; }
     }

@@ -63,8 +63,7 @@ namespace Fusion.Mvvm
 
             if (monitorCommandActivity)
             {
-                var activeAwareCommand = command as IActiveAware;
-                if (activeAwareCommand != null)
+                if (command is IActiveAware activeAwareCommand)
                     activeAwareCommand.IsActiveChanged += OnIsActiveChanged;
             }
         }
@@ -89,8 +88,7 @@ namespace Fusion.Mvvm
 
             if (monitorCommandActivity)
             {
-                var activeAwareCommand = command as IActiveAware;
-                if (activeAwareCommand != null)
+                if (command is IActiveAware activeAwareCommand)
                     activeAwareCommand.IsActiveChanged -= OnIsActiveChanged;
             }
         }
@@ -180,8 +178,7 @@ namespace Fusion.Mvvm
             if (!monitorCommandActivity)
                 return true;
 
-            var activeAwareCommand = command as IActiveAware;
-            if (activeAwareCommand == null)
+            if (!(command is IActiveAware activeAwareCommand))
                 return true;
 
             return activeAwareCommand.IsActive;

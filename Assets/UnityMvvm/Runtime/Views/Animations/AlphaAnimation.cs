@@ -28,12 +28,12 @@ namespace Fusion.Mvvm
                     view.ExitAnimation = this;
                     break;
                 case AnimationType.ActivationAnimation:
-                    if (view is IWindowView)
-                        (view as IWindowView).ActivationAnimation = this;
+                    if (view is IWindowView windowView)
+                        windowView.ActivationAnimation = this;
                     break;
                 case AnimationType.PassivationAnimation:
-                    if (view is IWindowView)
-                        (view as IWindowView).PassivationAnimation = this;
+                    if (view is IWindowView view1)
+                        view1.PassivationAnimation = this;
                     break;
             }
 

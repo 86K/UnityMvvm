@@ -18,36 +18,33 @@ namespace Fusion.Mvvm
             return CreateProxy(source, node);
         }
 
-        protected virtual ISourceProxy CreateProxy(object source, IPathNode node)
+        private ISourceProxy CreateProxy(object source, IPathNode node)
         {
             Type type = source.GetType();
             if (node is IndexedNode)
             {
                 IProxyType proxyType = type.AsProxy();
-                if (!(source is ICollection))
-                    throw new ProxyException("Type \"{0}\" is not a collection and cannot be accessed by index \"{1}\".", type.Name, node.ToString());
+                if (!(source is ICollection collection))
+                    throw new Exception($"Type \"{type.Name}\" is not a collection and cannot be accessed by index \"{node}\".");
 
                 var itemInfo = proxyType.GetItem();
                 if (itemInfo == null)
                     throw new MissingMemberException(type.FullName, "Item");
 
-                var intIndexedNode = node as IntegerIndexedNode;
-                if (intIndexedNode != null)
-                    return new IntItemNodeProxy((ICollection)source, intIndexedNode.Value, itemInfo);
+                if (node is IntegerIndexedNode intIndexedNode)
+                    return new IntItemNodeProxy(collection, intIndexedNode.Value, itemInfo);
 
-                var stringIndexedNode = node as StringIndexedNode;
-                if (stringIndexedNode != null)
-                    return new StringItemNodeProxy((ICollection)source, stringIndexedNode.Value, itemInfo);
+                if (node is StringIndexedNode stringIndexedNode)
+                    return new StringItemNodeProxy(collection, stringIndexedNode.Value, itemInfo);
 
                 return null;
             }
 
-            var memberNode = node as MemberNode;
-            if (memberNode == null)
+            if (!(node is MemberNode memberNode))
                 return null;
 
             var memberInfo = memberNode.MemberInfo;
-            if (memberInfo != null && !memberInfo.DeclaringType.IsAssignableFrom(type))
+            if (memberInfo != null && memberInfo.DeclaringType != null && !memberInfo.DeclaringType.IsAssignableFrom(type))
                 return null;
 
             if (memberInfo == null)
@@ -69,7 +66,8 @@ namespace Fusion.Mvvm
 
                     return new ObservableNodeProxy(source, (IObservableProperty)observableValue);
                 }
-                else if (typeof(IInteractionRequest).IsAssignableFrom(valueType))
+
+                if (typeof(IInteractionRequest).IsAssignableFrom(valueType))
                 {
                     object request = proxyPropertyInfo.GetValue(source);
                     if (request == null)
@@ -77,10 +75,8 @@ namespace Fusion.Mvvm
 
                     return new InteractionNodeProxy(source, (IInteractionRequest)request);
                 }
-                else
-                {
-                    return new PropertyNodeProxy(source, proxyPropertyInfo);
-                }
+
+                return new PropertyNodeProxy(source, proxyPropertyInfo);
             }
 
             var fieldInfo = memberInfo as FieldInfo;
@@ -96,7 +92,8 @@ namespace Fusion.Mvvm
 
                     return new ObservableNodeProxy(source, (IObservableProperty)observableValue);
                 }
-                else if (typeof(IInteractionRequest).IsAssignableFrom(valueType))
+
+                if (typeof(IInteractionRequest).IsAssignableFrom(valueType))
                 {
                     object request = proxyFieldInfo.GetValue(source);
                     if (request == null)
@@ -104,14 +101,12 @@ namespace Fusion.Mvvm
 
                     return new InteractionNodeProxy(source, (IInteractionRequest)request);
                 }
-                else
-                {
-                    return new FieldNodeProxy(source, proxyFieldInfo);
-                }
+
+                return new FieldNodeProxy(source, proxyFieldInfo);
             }
 
             var methodInfo = memberInfo as MethodInfo;
-            if (methodInfo != null && methodInfo.ReturnType.Equals(typeof(void)))
+            if (methodInfo != null && methodInfo.ReturnType == typeof(void))
                 return new MethodNodeProxy(source, methodInfo.AsProxy());
 
             var eventInfo = memberInfo as EventInfo;
@@ -121,10 +116,9 @@ namespace Fusion.Mvvm
             return null;
         }
 
-        protected virtual ISourceProxy CreateStaticProxy(IPathNode node)
+        private ISourceProxy CreateStaticProxy(IPathNode node)
         {
-            var memberNode = node as MemberNode;
-            if (memberNode == null)
+            if (!(node is MemberNode memberNode))
                 return null;
 
             Type type = memberNode.Type;
@@ -148,7 +142,8 @@ namespace Fusion.Mvvm
 
                     return new ObservableNodeProxy((IObservableProperty)observableValue);
                 }
-                else if (typeof(IInteractionRequest).IsAssignableFrom(valueType))
+
+                if (typeof(IInteractionRequest).IsAssignableFrom(valueType))
                 {
                     object request = proxyPropertyInfo.GetValue(null);
                     if (request == null)
@@ -156,10 +151,8 @@ namespace Fusion.Mvvm
 
                     return new InteractionNodeProxy((IInteractionRequest)request);
                 }
-                else
-                {
-                    return new PropertyNodeProxy(proxyPropertyInfo);
-                }
+
+                return new PropertyNodeProxy(proxyPropertyInfo);
             }
 
             var fieldInfo = memberInfo as FieldInfo;
@@ -175,7 +168,8 @@ namespace Fusion.Mvvm
 
                     return new ObservableNodeProxy((IObservableProperty)observableValue);
                 }
-                else if (typeof(IInteractionRequest).IsAssignableFrom(valueType))
+
+                if (typeof(IInteractionRequest).IsAssignableFrom(valueType))
                 {
                     object request = proxyFieldInfo.GetValue(null);
                     if (request == null)
@@ -183,14 +177,12 @@ namespace Fusion.Mvvm
 
                     return new InteractionNodeProxy((IInteractionRequest)request);
                 }
-                else
-                {
-                    return new FieldNodeProxy(proxyFieldInfo);
-                }
+
+                return new FieldNodeProxy(proxyFieldInfo);
             }
 
             var methodInfo = memberInfo as MethodInfo;
-            if (methodInfo != null && methodInfo.ReturnType.Equals(typeof(void)))
+            if (methodInfo != null && methodInfo.ReturnType == typeof(void))
                 return new MethodNodeProxy(methodInfo.AsProxy());
 
             var eventInfo = memberInfo as EventInfo;

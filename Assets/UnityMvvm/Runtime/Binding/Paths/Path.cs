@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Reflection;
 using System.Collections;
@@ -8,41 +6,24 @@ using System.Text;
 
 namespace Fusion.Mvvm
 {
-    [Serializable]
     public class Path : IEnumerator<IPathNode>
     {
-        private readonly List<IPathNode> nodes = new List<IPathNode>();
-        public Path() : this(null)
-        {
-        }
+        private readonly List<IPathNode> _pathNodes = new List<IPathNode>();
 
-        public Path(IPathNode root)
-        {
-            if (root != null)
-                Prepend(root);
-        }
+        public IPathNode this[int index] => _pathNodes[index];
+        
+        public int Count => _pathNodes.Count;
 
-        public IPathNode this[int index] => nodes[index];
-
-        public bool IsEmpty => nodes.Count == 0;
-
-        public int Count => nodes.Count;
-
-        public bool IsStatic { get { return nodes.Exists(n => n.IsStatic); } }
-
-        public List<IPathNode> ToList()
-        {
-            return new List<IPathNode>(nodes);
-        }
+        public bool IsStatic { get { return _pathNodes.Exists(n => n.IsStatic); } }
 
         public void Append(IPathNode node)
         {
-            nodes.Add(node);
+            _pathNodes.Add(node);
         }
 
         public void Prepend(IPathNode node)
         {
-            nodes.Insert(0, node);
+            _pathNodes.Insert(0, node);
         }
 
         public void PrependIndexed(string indexValue)
@@ -67,7 +48,7 @@ namespace Fusion.Mvvm
 
         public PathToken AsPathToken()
         {
-            if (nodes.Count <= 0)
+            if (_pathNodes.Count <= 0)
                 throw new InvalidOperationException("The path node is empty");
             return new PathToken(this, 0);
         }
@@ -75,7 +56,7 @@ namespace Fusion.Mvvm
         public override string ToString()
         {
             StringBuilder buf = new StringBuilder();
-            foreach (var node in nodes)
+            foreach (var node in _pathNodes)
             {
                 node.AppendTo(buf);
             }
@@ -83,34 +64,34 @@ namespace Fusion.Mvvm
         }
 
         #region IEnumerator<IPathNode> Support
-        private int index = -1;
-        public IPathNode Current => nodes[index];
+        private int _index = -1;
+        public IPathNode Current => _pathNodes[_index];
 
-        object IEnumerator.Current => nodes[index];
+        object IEnumerator.Current => _pathNodes[_index];
 
         public bool MoveNext()
         {
-            index++;
-            return index >= 0 && index < nodes.Count;
+            _index++;
+            return _index >= 0 && _index < _pathNodes.Count;
         }
 
         public void Reset()
         {
-            index = -1;
+            _index = -1;
         }
         #endregion
 
         #region IDisposable Support
         private bool disposed;
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposed)
             {
                 if (disposing)
                 {
-                    nodes.Clear();
-                    index = -1;
+                    _pathNodes.Clear();
+                    _index = -1;
                 }
                 disposed = true;
             }
@@ -181,7 +162,7 @@ namespace Fusion.Mvvm
 
         public override string ToString()
         {
-            return "MemberNode:" + (Name == null ? "null" : Name);
+            return "MemberNode:" + (Name ?? "null");
         }
     }
 
@@ -189,7 +170,8 @@ namespace Fusion.Mvvm
     public abstract class IndexedNode : IPathNode
     {
         private object _value;
-        public IndexedNode(object value)
+
+        protected IndexedNode(object value)
         {
             _value = value;
         }
@@ -211,9 +193,9 @@ namespace Fusion.Mvvm
     }
 
     [Serializable]
-    public abstract class IndexedNode<T> : IndexedNode, IPathNode
+    public abstract class IndexedNode<T> : IndexedNode
     {
-        public IndexedNode(T value) : base(value)
+        protected IndexedNode(T value) : base(value)
         {
         }
 

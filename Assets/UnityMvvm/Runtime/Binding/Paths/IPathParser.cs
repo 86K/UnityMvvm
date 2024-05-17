@@ -1,5 +1,3 @@
-
-
 using System.Linq.Expressions;
 
 namespace Fusion.Mvvm
@@ -19,20 +17,6 @@ namespace Fusion.Mvvm
         /// <param name="pathText"></param>
         /// <returns></returns>
         Path Parse(string pathText);
-
-        /// <summary>
-        /// Parser static type path.
-        /// </summary>
-        /// <param name="pathText"></param>
-        /// <returns></returns>
-        Path ParseStaticPath(string pathText);
-
-        /// <summary>
-        /// Parser static type path.eg:System.Int32.MaxValue
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        Path ParseStaticPath(LambdaExpression expression);
 
         /// <summary>
         /// Parser target name.eg:vm => vm.User

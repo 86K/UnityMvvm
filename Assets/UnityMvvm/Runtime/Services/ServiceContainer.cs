@@ -21,7 +21,7 @@ namespace Fusion.Mvvm
         {
             if (typeServiceMappings.TryGetValue(typeof(T), out var entry))
                 return (T)entry.Factory.Create();
-            return default(T);
+            return default;
         }
 
         public virtual object Resolve(string name)
@@ -35,7 +35,7 @@ namespace Fusion.Mvvm
         {
             if (nameServiceMappings.TryGetValue(name, out var entry))
                 return (T)entry.Factory.Create();
-            return default(T);
+            return default;
         }
 
         public virtual void Register<T>(Func<T> factory)
@@ -259,8 +259,7 @@ namespace Fusion.Mvvm
                 {
                     if (disposing)
                     {
-                        var disposable = target as IDisposable;
-                        if (disposable != null)
+                        if (target is IDisposable disposable)
                             disposable.Dispose();
                         target = null;
                     }

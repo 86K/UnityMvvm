@@ -73,7 +73,7 @@ namespace Fusion.Mvvm
             }
 
             if (viewTemplateGo == null || viewTemplateGo.GetComponent<T>() == null)
-                return default(T);
+                return default;
 
             GameObject go = Object.Instantiate(viewTemplateGo);
             go.name = viewTemplateGo.name;
@@ -147,8 +147,8 @@ namespace Fusion.Mvvm
             }
             else
             {
-                if (windowManager != null && view is IWindow)
-                    (view as IWindow).WindowManager = windowManager;
+                if (windowManager != null && view is IWindow window)
+                    window.WindowManager = windowManager;
 
                 promise.UpdateProgress(1f);
                 promise.SetResult(view);

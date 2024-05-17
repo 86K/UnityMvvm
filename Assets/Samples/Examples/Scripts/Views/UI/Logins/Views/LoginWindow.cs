@@ -36,8 +36,7 @@ namespace Fusion.Mvvm
 
         public virtual void OnToastShow(object sender, InteractionEventArgs args)
         {
-            ToastNotification notification = args.Context as ToastNotification;
-            if (notification == null)
+            if (!(args.Context is ToastNotification notification))
                 return;
 
             Toast.Show(this, notification.Message, notification.Duration);

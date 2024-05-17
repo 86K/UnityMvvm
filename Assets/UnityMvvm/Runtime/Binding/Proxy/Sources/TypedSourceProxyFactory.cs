@@ -1,10 +1,8 @@
-
-
 namespace Fusion.Mvvm
 {
     public abstract class TypedSourceProxyFactory<T> : ISourceProxyFactory where T : SourceDescription
     {
-        public virtual bool IsSupported(SourceDescription description)
+        private bool IsSupported(SourceDescription description)
         {
             if (!(description is T))
                 return false;

@@ -1,5 +1,3 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
@@ -9,7 +7,5 @@ namespace Fusion.Mvvm
         Type Type { get; }
 
         TypeCode TypeCode { get; }
-
-        object Source { get; }
     }
 }

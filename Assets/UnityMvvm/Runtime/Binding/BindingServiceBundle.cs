@@ -31,13 +31,8 @@ namespace Fusion.Mvvm
             container.Register<IPathParser>(pathParser);
 
             container.Register<INodeProxyFactory>(objectSourceProxyFactory);
-            container.Register<INodeProxyFactoryRegister>(objectSourceProxyFactory);
-
             container.Register<ISourceProxyFactory>(sourceFactory);
-            container.Register<ISourceProxyFactoryRegistry>(sourceFactory);
-
             container.Register<ITargetProxyFactory>(targetFactory);
-            container.Register<ITargetProxyFactoryRegister>(targetFactory);
         }
 
         protected override void OnStop(IServiceContainer container)
@@ -47,13 +42,8 @@ namespace Fusion.Mvvm
             container.Unregister<IPathParser>();
 
             container.Unregister<INodeProxyFactory>();
-            container.Unregister<INodeProxyFactoryRegister>();
-
             container.Unregister<ISourceProxyFactory>();
-            container.Unregister<ISourceProxyFactoryRegistry>();
-
             container.Unregister<ITargetProxyFactory>();
-            container.Unregister<ITargetProxyFactoryRegister>();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Fusion.Mvvm
             remove { lock (_lock) { valueChanged -= value; } }
         }
 
-        public ObservablePropertyBase() : this(default(T))
+        public ObservablePropertyBase() : this(default)
         {
         }
 
@@ -90,7 +90,7 @@ namespace Fusion.Mvvm
     [Serializable]
     public class ObservableProperty<T> : ObservablePropertyBase<T>, IObservableProperty<T>
     {
-        public ObservableProperty() : this(default(T))
+        public ObservableProperty() : this(default)
         {
         }
         public ObservableProperty(T value) : base(value)

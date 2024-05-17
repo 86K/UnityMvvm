@@ -1,95 +1,93 @@
 using System;
 using System.Collections;
 using System.Text.RegularExpressions;
-
 using INotifyCollectionChanged = System.Collections.Specialized.INotifyCollectionChanged;
 using NotifyCollectionChangedAction = System.Collections.Specialized.NotifyCollectionChangedAction;
 using NotifyCollectionChangedEventArgs = System.Collections.Specialized.NotifyCollectionChangedEventArgs;
 
 namespace Fusion.Mvvm
 {
-    public abstract class ItemNodeProxy<TKey> : NotifiableSourceProxyBase, IObtainable, IModifiable, INotifiable
+    public abstract class ItemNodeProxy<TKey> : NotifiableSourceProxyBase, IObtainable, IModifiable
     {
-        protected TKey key;
-        protected IProxyItemInfo itemInfo;
-        protected bool isList;
-        protected Regex regex;
+        protected readonly TKey _key;
+        private readonly IProxyItemInfo _itemInfo;
+        protected readonly bool _isList;
+        protected readonly Regex _regex;
 
-        public ItemNodeProxy(ICollection source, TKey key, IProxyItemInfo itemInfo) : base(source)
+        protected ItemNodeProxy(ICollection source, TKey key, IProxyItemInfo itemInfo) : base(source)
         {
-            this.key = key;
-            isList = (source is IList);
+            _key = key;
+            _isList = source is IList;
 
-            this.itemInfo = itemInfo;
+            _itemInfo = itemInfo;
 
-            if (this.source != null && this.source is INotifyCollectionChanged)
+            if (Source != null && Source is INotifyCollectionChanged sourceCollection)
             {
-                var sourceCollection = this.source as INotifyCollectionChanged;
                 sourceCollection.CollectionChanged += OnCollectionChanged;
             }
 
-            if (!isList)
+            if (!_isList)
             {
-                regex = new Regex(@"\[" + this.key + ",", RegexOptions.IgnorePatternWhitespace);
+                _regex = new Regex(@"\[" + _key + ",", RegexOptions.IgnorePatternWhitespace);
             }
         }
 
-        public override Type Type => itemInfo.ValueType;
+        public override Type Type => _itemInfo.ValueType;
 
-        public override TypeCode TypeCode => itemInfo.ValueTypeCode;
+        public override TypeCode TypeCode => _itemInfo.ValueTypeCode;
 
         protected abstract void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
 
         public virtual object GetValue()
         {
-            return itemInfo.GetValue(source, key);
+            return _itemInfo.GetValue(Source, _key);
         }
 
         public virtual TValue GetValue<TValue>()
         {
-            if (!typeof(TValue).IsAssignableFrom(itemInfo.ValueType))
+            if (!typeof(TValue).IsAssignableFrom(_itemInfo.ValueType))
                 throw new InvalidCastException();
 
-            var proxy = itemInfo as IProxyItemInfo<TKey, TValue>;
-            if (proxy != null)
-                return proxy.GetValue(source, key);
+            if (_itemInfo is IProxyItemInfo<TKey, TValue> proxy)
+                return proxy.GetValue(Source, _key);
 
-            return (TValue)itemInfo.GetValue(source, key);
+            return (TValue)_itemInfo.GetValue(Source, _key);
         }
 
         public virtual void SetValue(object value)
         {
-            itemInfo.SetValue(source, key, value);
+            _itemInfo.SetValue(Source, _key, value);
         }
 
         public virtual void SetValue<TValue>(TValue value)
         {
-            var proxy = itemInfo as IProxyItemInfo<TKey, TValue>;
-            if (proxy != null)
+            if (_itemInfo is IProxyItemInfo<TKey, TValue> proxy)
             {
-                proxy.SetValue(source, key, value);
+                proxy.SetValue(Source, _key, value);
                 return;
             }
 
-            itemInfo.SetValue(source, key, value);
+            _itemInfo.SetValue(Source, _key, value);
         }
 
-        #region IDisposable Support    
+        #region IDisposable Support
+
         private bool disposedValue;
 
         protected override void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
-                if (source != null && source is INotifyCollectionChanged)
+                if (Source != null && Source is INotifyCollectionChanged sourceCollection)
                 {
-                    var sourceCollection = source as INotifyCollectionChanged;
                     sourceCollection.CollectionChanged -= OnCollectionChanged;
                 }
+
                 disposedValue = true;
                 base.Dispose(disposing);
             }
         }
+
         #endregion
     }
 
@@ -101,7 +99,7 @@ namespace Fusion.Mvvm
 
         protected override void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (isList)
+            if (_isList)
             {
                 //IList or Array
                 switch (e.Action)
@@ -111,16 +109,16 @@ namespace Fusion.Mvvm
                         break;
                     case NotifyCollectionChangedAction.Remove:
                     case NotifyCollectionChangedAction.Replace:
-                        if (key == e.OldStartingIndex || key == e.NewStartingIndex)
+                        if (_key == e.OldStartingIndex || _key == e.NewStartingIndex)
                             RaiseValueChanged();
                         break;
                     case NotifyCollectionChangedAction.Move:
-                        if (key == e.OldStartingIndex || key == e.NewStartingIndex)
+                        if (_key == e.OldStartingIndex || _key == e.NewStartingIndex)
                             RaiseValueChanged();
                         break;
                     case NotifyCollectionChangedAction.Add:
                         int endIndex = e.NewItems != null ? e.NewStartingIndex + e.NewItems.Count : e.NewStartingIndex + 1;
-                        if (key >= e.NewStartingIndex && key < endIndex)
+                        if (_key >= e.NewStartingIndex && _key < endIndex)
                             RaiseValueChanged();
                         break;
                     default:
@@ -140,7 +138,7 @@ namespace Fusion.Mvvm
                 {
                     foreach (var item in e.NewItems)
                     {
-                        if (regex.IsMatch(item.ToString()))
+                        if (_regex.IsMatch(item.ToString()))
                         {
                             RaiseValueChanged();
                             return;
@@ -152,7 +150,7 @@ namespace Fusion.Mvvm
                 {
                     foreach (var item in e.OldItems)
                     {
-                        if (regex.IsMatch(item.ToString()))
+                        if (_regex.IsMatch(item.ToString()))
                         {
                             RaiseValueChanged();
                             return;
@@ -161,8 +159,6 @@ namespace Fusion.Mvvm
                 }
             }
         }
-
-
     }
 
     public class StringItemNodeProxy : ItemNodeProxy<string>
@@ -184,7 +180,7 @@ namespace Fusion.Mvvm
             {
                 foreach (var item in e.NewItems)
                 {
-                    if (regex.IsMatch(item.ToString()))
+                    if (_regex.IsMatch(item.ToString()))
                     {
                         RaiseValueChanged();
                         return;
@@ -196,7 +192,7 @@ namespace Fusion.Mvvm
             {
                 foreach (var item in e.OldItems)
                 {
-                    if (regex.IsMatch(item.ToString()))
+                    if (_regex.IsMatch(item.ToString()))
                     {
                         RaiseValueChanged();
                         return;

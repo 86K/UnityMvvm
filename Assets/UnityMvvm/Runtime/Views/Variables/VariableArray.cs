@@ -29,10 +29,10 @@ namespace Fusion.Mvvm
         public T Get<T>(string name)
         {
             if (variables == null || variables.Count <= 0)
-                return default(T);
+                return default;
             var variable = variables.Find(v => v.Name.Equals(name));
             if (variable == null)
-                return default(T);
+                return default;
             return variable.GetValue<T>();
         }
 

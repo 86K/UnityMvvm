@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Linq;
 
@@ -16,7 +14,7 @@ namespace Fusion.Mvvm
         private readonly int total;
         private int pos;
 
-        public TextPathParser(string text)
+        private TextPathParser(string text)
         {
             if (string.IsNullOrEmpty(text))
                 throw new ArgumentException("Invalid argument", "text");
@@ -29,9 +27,9 @@ namespace Fusion.Mvvm
             pos = -1;
         }
 
-        public char Current => text[pos];
+        private char Current => text[pos];
 
-        public bool MoveNext()
+        private bool MoveNext()
         {
             if (pos++ < total - 1)
                 return true;
@@ -43,7 +41,7 @@ namespace Fusion.Mvvm
             return pos >= total;
         }
 
-        public Path Parse()
+        private Path Parse()
         {
             Path path = new Path();
             MoveNext();

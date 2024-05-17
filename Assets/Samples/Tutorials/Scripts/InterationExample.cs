@@ -163,8 +163,7 @@ namespace Fusion.Mvvm
 
         private void OnShowToast(object sender, InteractionEventArgs args)
         {
-            ToastNotification notification = args.Context as ToastNotification;
-            if (notification == null)
+            if (!(args.Context is ToastNotification notification))
                 return;
 
             Toast.Show(this, notification.Message, notification.Duration);
@@ -172,8 +171,7 @@ namespace Fusion.Mvvm
 
         private void OnShowOrHideLoading(object sender, InteractionEventArgs args)
         {
-            VisibilityNotification notification = args.Context as VisibilityNotification;
-            if (notification == null)
+            if (!(args.Context is VisibilityNotification notification))
                 return;
 
             if (notification.Visible)

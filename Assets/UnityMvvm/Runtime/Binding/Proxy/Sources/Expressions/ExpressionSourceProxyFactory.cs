@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 
@@ -7,12 +5,13 @@ namespace Fusion.Mvvm
 {
     public class ExpressionSourceProxyFactory : TypedSourceProxyFactory<ExpressionSourceDescription>
     {
-        private readonly ISourceProxyFactory factory;
-        private readonly IExpressionPathFinder pathFinder;
+        private readonly ISourceProxyFactory _factory;
+        private readonly IExpressionPathFinder _pathFinder;
+
         public ExpressionSourceProxyFactory(ISourceProxyFactory factory, IExpressionPathFinder pathFinder)
         {
-            this.factory = factory;
-            this.pathFinder = pathFinder;
+            _factory = factory;
+            _pathFinder = pathFinder;
         }
 
         protected override bool TryCreateProxy(object source, ExpressionSourceDescription description, out ISourceProxy proxy)
@@ -20,20 +19,25 @@ namespace Fusion.Mvvm
             proxy = null;
             var expression = description.Expression;
             List<ISourceProxy> list = new List<ISourceProxy>();
-            List<Path> paths = pathFinder.FindPaths(expression);
+            List<Path> paths = _pathFinder.FindPaths(expression);
             foreach (Path path in paths)
             {
                 if (!path.IsStatic)
                 {
                     if (source == null)
-                        continue;//ignore the path
+                        continue; //ignore the path
 
-                    MemberNode memberNode = path[0] as MemberNode;
-                    if (memberNode != null && memberNode.MemberInfo != null && !memberNode.MemberInfo.DeclaringType.IsAssignableFrom(source.GetType()))
-                        continue;//ignore the path
+                    if (path[0] is MemberNode memberNode)
+                    {
+                        if(memberNode.MemberInfo != null && memberNode.MemberInfo.DeclaringType != null &&
+                            !memberNode.MemberInfo.DeclaringType.IsInstanceOfType(source))
+                        {
+                            continue; //ignore the path
+                        }
+                    }
                 }
 
-                ISourceProxy innerProxy = factory.CreateProxy(source, new ObjectSourceDescription() { Path = path });
+                ISourceProxy innerProxy = _factory.CreateProxy(source, new ObjectSourceDescription() { Path = path });
                 if (innerProxy != null)
                     list.Add(innerProxy);
             }
@@ -49,7 +53,8 @@ namespace Fusion.Mvvm
                 Type parameterType = del.ParameterType();
                 if (parameterType != null)
                 {
-                    proxy = (ISourceProxy)Activator.CreateInstance(typeof(ExpressionSourceProxy<,>).MakeGenericType(parameterType, returnType), source, del, list);
+                    proxy = (ISourceProxy)Activator.CreateInstance(typeof(ExpressionSourceProxy<,>).MakeGenericType(parameterType, returnType),
+                        source, del, list);
                 }
                 else
                 {

@@ -148,17 +148,18 @@ namespace Fusion.Mvvm
                     ReadStructString(buf, '(', ')');
                     continue;
                 }
-                else if (ch == '[')
+
+                if (ch == '[')
                 {
                     ReadStructString(buf, '[', ']');
                     continue;
                 }
-                else if (ch == '{')
+                if (ch == '{')
                 {
                     ReadStructString(buf, '{', '}');
                     continue;
                 }
-                else if (ch == '<')
+                if (ch == '<')
                 {
                     ReadStructString(buf, '<', '>');
                     continue;

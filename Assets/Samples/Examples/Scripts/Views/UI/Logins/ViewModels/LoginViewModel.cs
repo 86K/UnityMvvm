@@ -73,11 +73,9 @@ namespace Fusion.Mvvm
                 // errors["username"] = localization.GetText("login.validation.username.error", "Please enter a valid username.");
                 return false;
             }
-            else
-            {
-                errors.Remove("username");
-                return true;
-            }
+
+            errors.Remove("username");
+            return true;
         }
 
         private bool ValidatePassword()
@@ -87,11 +85,9 @@ namespace Fusion.Mvvm
                 // errors["password"] = localization.GetText("login.validation.password.error", "Please enter a valid password.");
                 return false;
             }
-            else
-            {
-                errors.Remove("password");
-                return true;
-            }
+
+            errors.Remove("password");
+            return true;
         }
 
         public ICommand LoginCommand => loginCommand;

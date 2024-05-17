@@ -1,5 +1,3 @@
-
-
 namespace Fusion.Mvvm
 {
     public interface INodeProxyFactory

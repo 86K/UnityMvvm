@@ -213,8 +213,7 @@ namespace Fusion.Mvvm
             {
                 if (syncRoot == null)
                 {
-                    ICollection c = items as ICollection;
-                    if (c != null)
+                    if (items is ICollection c)
                     {
                         syncRoot = c.SyncRoot;
                     }
@@ -248,8 +247,7 @@ namespace Fusion.Mvvm
             if (array.Length - index < Count)
                 throw new ArgumentException("ArrayPlusOffTooSmall");
 
-            T[] tArray = array as T[];
-            if (tArray != null)
+            if (array is T[] tArray)
             {
                 items.CopyTo(tArray, index);
             }
@@ -260,8 +258,7 @@ namespace Fusion.Mvvm
                 if (!(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType)))
                     throw new ArgumentException("InvalidArrayType");
 
-                object[] objects = array as object[];
-                if (objects == null)
+                if (!(array is object[] objects))
                     throw new ArgumentException("InvalidArrayType");
 
                 int count = items.Count;
@@ -304,8 +301,7 @@ namespace Fusion.Mvvm
         {
             get
             {
-                IList list = items as IList;
-                if (list != null)
+                if (items is IList list)
                 {
                     return list.IsFixedSize;
                 }
@@ -498,8 +494,8 @@ namespace Fusion.Mvvm
 
         private IList ToList(IEnumerable<T> collection)
         {
-            if (collection is IList)
-                return (IList)collection;
+            if (collection is IList list1)
+                return list1;
 
             List<T> list = new List<T>();
             list.AddRange(collection);

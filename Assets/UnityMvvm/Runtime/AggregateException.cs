@@ -40,7 +40,7 @@ namespace Fusion.Mvvm
             for (int i = 0; i < innerExceptions.Count; i++)
             {
                 buf.Append(Environment.NewLine)
-                    .Append(innerExceptions[i].ToString())
+                    .Append(innerExceptions[i])
                     .Append(Environment.NewLine);
             }
             return buf.ToString();

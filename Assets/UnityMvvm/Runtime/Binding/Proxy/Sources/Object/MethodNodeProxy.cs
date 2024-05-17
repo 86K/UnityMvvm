@@ -4,8 +4,7 @@ namespace Fusion.Mvvm
 {
     public class MethodNodeProxy : SourceProxyBase, IObtainable
     {
-        protected IProxyMethodInfo methodInfo;
-        protected IProxyInvoker invoker;
+        private readonly IProxyInvoker _invoker;
 
         public MethodNodeProxy(IProxyMethodInfo methodInfo) : this(null, methodInfo)
         {
@@ -13,20 +12,20 @@ namespace Fusion.Mvvm
 
         public MethodNodeProxy(object source, IProxyMethodInfo methodInfo) : base(source)
         {
-            this.methodInfo = methodInfo;
-            invoker = new ProxyInvoker(this.source, this.methodInfo);
+            IProxyMethodInfo info = methodInfo;
+            _invoker = new ProxyInvoker(Source, info);
         }
 
         public override Type Type => typeof(IProxyInvoker);
 
         public object GetValue()
         {
-            return invoker;
+            return _invoker;
         }
 
         public TValue GetValue<TValue>()
         {
-            return (TValue)invoker;
+            return (TValue)_invoker;
         }
     }
 }

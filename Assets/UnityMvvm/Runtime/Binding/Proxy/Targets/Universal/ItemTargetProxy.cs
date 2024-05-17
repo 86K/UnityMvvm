@@ -1,22 +1,21 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
 {
     public class ItemTargetProxy<TKey> : ValueTargetProxyBase
     {
-        protected readonly IProxyItemInfo itemInfo;
-        protected readonly TKey key;
+        private readonly IProxyItemInfo _itemInfo;
+        private readonly TKey _key;
+
         public ItemTargetProxy(object target, TKey key, IProxyItemInfo itemInfo) : base(target)
         {
-            this.key = key;
-            this.itemInfo = itemInfo;
+            _key = key;
+            _itemInfo = itemInfo;
         }
 
-        public override Type Type => itemInfo.ValueType;
+        public override Type Type => _itemInfo.ValueType;
 
-        public override TypeCode TypeCode => itemInfo.ValueTypeCode;
+        public override TypeCode TypeCode => _itemInfo.ValueTypeCode;
 
         public override BindingMode DefaultMode => BindingMode.OneWay;
 
@@ -26,23 +25,22 @@ namespace Fusion.Mvvm
             if (target == null)
                 return null;
 
-            return itemInfo.GetValue(target, key);
+            return _itemInfo.GetValue(target, _key);
         }
 
         public override TValue GetValue<TValue>()
         {
             var target = Target;
             if (target == null)
-                return default(TValue);
+                return default;
 
-            if (!typeof(TValue).IsAssignableFrom(itemInfo.ValueType))
+            if (!typeof(TValue).IsAssignableFrom(_itemInfo.ValueType))
                 throw new InvalidCastException();
 
-            var proxy = itemInfo as IProxyItemInfo<TKey, TValue>;
-            if (proxy != null)
-                return proxy.GetValue(target, key);
+            if (_itemInfo is IProxyItemInfo<TKey, TValue> proxy)
+                return proxy.GetValue(target, _key);
 
-            return (TValue)itemInfo.GetValue(target, key);
+            return (TValue)_itemInfo.GetValue(target, _key);
         }
 
         public override void SetValue(object value)
@@ -51,7 +49,7 @@ namespace Fusion.Mvvm
             if (target == null)
                 return;
 
-            itemInfo.SetValue(target, key, value);
+            _itemInfo.SetValue(target, _key, value);
         }
 
         public override void SetValue<TValue>(TValue value)
@@ -60,14 +58,13 @@ namespace Fusion.Mvvm
             if (target == null)
                 return;
 
-            var proxy = itemInfo as IProxyItemInfo<TKey, TValue>;
-            if (proxy != null)
+            if (_itemInfo is IProxyItemInfo<TKey, TValue> proxy)
             {
-                proxy.SetValue(target, key, value);
+                proxy.SetValue(target, _key, value);
                 return;
             }
 
-            itemInfo.SetValue(target, key, value);
+            _itemInfo.SetValue(target, _key, value);
         }
     }
 }

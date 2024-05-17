@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -9,9 +7,9 @@ namespace Fusion.Mvvm
 {
     public class UnityTargetProxyFactory : ITargetProxyFactory
     {
-        [ThreadStatic]
-        private static readonly List<Type> TYPES = new List<Type>();
-        private static readonly Type[] EMPTY_TYPES = new Type[0];
+        [ThreadStatic] private static readonly List<Type> TYPES = new List<Type>();
+        private static readonly Type[] EMPTY_TYPES = Type.EmptyTypes;
+
         public ITargetProxy CreateProxy(object target, TargetDescription description)
         {
             if (TargetNameUtil.IsCollection(description.TargetName))
@@ -40,12 +38,11 @@ namespace Fusion.Mvvm
                     throw new MissingMemberException(type.Type.FullName, description.UpdateTrigger);
 
                 //Other Property Type
-                if (updateTrigger == null) 
+                if (updateTrigger == null)
                     return null;
             }
 
-            var propertyInfo = memberInfo as IProxyPropertyInfo;
-            if (propertyInfo != null)
+            if (memberInfo is IProxyPropertyInfo propertyInfo)
             {
                 if (typeof(IObservableProperty).IsAssignableFrom(propertyInfo.ValueType))
                     return null;
@@ -65,8 +62,7 @@ namespace Fusion.Mvvm
                 return CreateUnityPropertyProxy(target, propertyInfo, updateTrigger);
             }
 
-            var fieldInfo = memberInfo as IProxyFieldInfo;
-            if (fieldInfo != null)
+            if (memberInfo is IProxyFieldInfo fieldInfo)
             {
                 if (typeof(IObservableProperty).IsAssignableFrom(fieldInfo.ValueType))
                     return null;
@@ -109,7 +105,9 @@ namespace Fusion.Mvvm
                 case TypeCode.Double: return new UnityPropertyProxy<double>(target, propertyInfo, (UnityEvent<double>)updateTrigger);
                 case TypeCode.Decimal: return new UnityPropertyProxy<decimal>(target, propertyInfo, (UnityEvent<decimal>)updateTrigger);
                 case TypeCode.DateTime: return new UnityPropertyProxy<DateTime>(target, propertyInfo, (UnityEvent<DateTime>)updateTrigger);
-                default: return (ITargetProxy)Activator.CreateInstance(typeof(UnityPropertyProxy<>).MakeGenericType(propertyInfo.ValueType), target, propertyInfo, updateTrigger);
+                default:
+                    return (ITargetProxy)Activator.CreateInstance(typeof(UnityPropertyProxy<>).MakeGenericType(propertyInfo.ValueType), target,
+                        propertyInfo, updateTrigger);
             }
         }
 
@@ -133,7 +131,9 @@ namespace Fusion.Mvvm
                 case TypeCode.Double: return new UnityFieldProxy<double>(target, fieldInfo, (UnityEvent<double>)updateTrigger);
                 case TypeCode.Decimal: return new UnityFieldProxy<decimal>(target, fieldInfo, (UnityEvent<decimal>)updateTrigger);
                 case TypeCode.DateTime: return new UnityFieldProxy<DateTime>(target, fieldInfo, (UnityEvent<DateTime>)updateTrigger);
-                default: return (ITargetProxy)Activator.CreateInstance(typeof(UnityFieldProxy<>).MakeGenericType(fieldInfo.ValueType), target, fieldInfo, updateTrigger);
+                default:
+                    return (ITargetProxy)Activator.CreateInstance(typeof(UnityFieldProxy<>).MakeGenericType(fieldInfo.ValueType), target, fieldInfo,
+                        updateTrigger);
             }
         }
 
@@ -144,11 +144,7 @@ namespace Fusion.Mvvm
                 case 0:
                     return new UnityEventProxy(target, (UnityEvent)unityEvent);
                 case 1:
-#if NETFX_CORE
-                    TypeCode typeCode = WinRTLegacy.TypeExtensions.GetTypeCode(paramTypes[0]);
-#else
                     TypeCode typeCode = Type.GetTypeCode(paramTypes[0]);
-#endif
                     switch (typeCode)
                     {
                         case TypeCode.String: return new UnityEventProxy<string>(target, (UnityEvent<string>)unityEvent);
@@ -166,7 +162,9 @@ namespace Fusion.Mvvm
                         case TypeCode.Double: return new UnityEventProxy<double>(target, (UnityEvent<double>)unityEvent);
                         case TypeCode.Decimal: return new UnityEventProxy<decimal>(target, (UnityEvent<decimal>)unityEvent);
                         case TypeCode.DateTime: return new UnityEventProxy<DateTime>(target, (UnityEvent<DateTime>)unityEvent);
-                        default: return (ITargetProxy)Activator.CreateInstance(typeof(UnityEventProxy<>).MakeGenericType(paramTypes[0]), target, unityEvent);
+                        default:
+                            return (ITargetProxy)Activator.CreateInstance(typeof(UnityEventProxy<>).MakeGenericType(paramTypes[0]), target,
+                                unityEvent);
                     }
                 //case 2:
                 //    return (ITargetProxy)Activator.CreateInstance(typeof(UnityEventProxy<,>).MakeGenericType(paramTypes), target, unityEvent);
@@ -179,14 +177,15 @@ namespace Fusion.Mvvm
             }
         }
 
-        protected Type[] GetUnityEventParametersType(Type type)
+        private Type[] GetUnityEventParametersType(Type type)
         {
             MethodInfo info = type.GetMethod("Invoke");
             if (info == null)
-                throw new MemberAccessException($"{type.Name}.Invoke() method has been stripped, please declare to preserve this method in the link.xml file");
+                throw new MemberAccessException(
+                    $"{type.Name}.Invoke() method has been stripped, please declare to preserve this method in the link.xml file");
 
             ParameterInfo[] parameters = info.GetParameters();
-            if (parameters == null || parameters.Length <= 0)
+            if (parameters.Length <= 0)
                 return EMPTY_TYPES;
 
             TYPES.Clear();

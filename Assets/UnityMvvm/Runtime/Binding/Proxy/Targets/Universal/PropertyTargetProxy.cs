@@ -1,5 +1,4 @@
 using System;
-
 using INotifyPropertyChanged = System.ComponentModel.INotifyPropertyChanged;
 using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 
@@ -7,16 +6,16 @@ namespace Fusion.Mvvm
 {
     public class PropertyTargetProxy : ValueTargetProxyBase
     {
-        protected readonly IProxyPropertyInfo propertyInfo;
+        private readonly IProxyPropertyInfo _propertyInfo;
 
         public PropertyTargetProxy(object target, IProxyPropertyInfo propertyInfo) : base(target)
         {
-            this.propertyInfo = propertyInfo;
+            _propertyInfo = propertyInfo;
         }
 
-        public override Type Type => propertyInfo.ValueType;
+        public override Type Type => _propertyInfo.ValueType;
 
-        public override TypeCode TypeCode => propertyInfo.ValueTypeCode;
+        public override TypeCode TypeCode => _propertyInfo.ValueTypeCode;
 
         public override BindingMode DefaultMode => BindingMode.TwoWay;
 
@@ -26,19 +25,19 @@ namespace Fusion.Mvvm
             if (target == null)
                 return null;
 
-            return propertyInfo.GetValue(target);
+            return _propertyInfo.GetValue(target);
         }
 
         public override TValue GetValue<TValue>()
         {
             var target = Target;
             if (target == null)
-                return default(TValue);
+                return default;
 
-            if (propertyInfo is IProxyPropertyInfo<TValue>)
-                return ((IProxyPropertyInfo<TValue>)propertyInfo).GetValue(target);
+            if (_propertyInfo is IProxyPropertyInfo<TValue> info)
+                return info.GetValue(target);
 
-            return (TValue)propertyInfo.GetValue(target);
+            return (TValue)_propertyInfo.GetValue(target);
         }
 
         public override void SetValue(object value)
@@ -47,7 +46,7 @@ namespace Fusion.Mvvm
             if (target == null)
                 return;
 
-            propertyInfo.SetValue(target, value);
+            _propertyInfo.SetValue(target, value);
         }
 
         public override void SetValue<TValue>(TValue value)
@@ -56,37 +55,35 @@ namespace Fusion.Mvvm
             if (target == null)
                 return;
 
-            if (propertyInfo is IProxyPropertyInfo<TValue>)
+            if (_propertyInfo is IProxyPropertyInfo<TValue> info)
             {
-                ((IProxyPropertyInfo<TValue>)propertyInfo).SetValue(target, value);
+                info.SetValue(target, value);
                 return;
             }
 
-            propertyInfo.SetValue(target, value);
+            _propertyInfo.SetValue(target, value);
         }
 
         protected override void DoSubscribeForValueChange(object target)
         {
-            if (target is INotifyPropertyChanged)
+            if (target is INotifyPropertyChanged targetNotify)
             {
-                var targetNotify = target as INotifyPropertyChanged;
                 targetNotify.PropertyChanged += OnPropertyChanged;
             }
         }
 
         protected override void DoUnsubscribeForValueChange(object target)
         {
-            if (target is INotifyPropertyChanged)
+            if (target is INotifyPropertyChanged targetNotify)
             {
-                var targetNotify = target as INotifyPropertyChanged;
                 targetNotify.PropertyChanged -= OnPropertyChanged;
             }
         }
 
-        protected virtual void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var name = e.PropertyName;
-            if (string.IsNullOrEmpty(name) || name.Equals(propertyInfo.Name))
+            if (string.IsNullOrEmpty(name) || name.Equals(_propertyInfo.Name))
             {
                 var target = Target;
                 if (target == null)

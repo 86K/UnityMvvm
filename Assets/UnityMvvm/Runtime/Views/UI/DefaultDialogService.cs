@@ -65,8 +65,8 @@ namespace Fusion.Mvvm
                     throw new NotFoundException($"Not found the dialog window named \"{viewName}\".");
                 }
 
-                if (window is AlertDialogWindowBase && viewModel is AlertDialogViewModel)
-                    (window as AlertDialogWindowBase).ViewModel = viewModel as AlertDialogViewModel;
+                if (window is AlertDialogWindowBase @base && viewModel is AlertDialogViewModel model)
+                    @base.ViewModel = model;
                 else
                     window.SetDataContext(viewModel);
 

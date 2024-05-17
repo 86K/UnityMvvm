@@ -284,8 +284,8 @@ namespace Fusion.Mvvm
             List<T> list = new List<T>();
             foreach (IWindow window in windows)
             {
-                if (window is T)
-                    list.Add((T)window);
+                if (window is T window1)
+                    list.Add(window1);
             }
             return list;
         }
@@ -297,15 +297,15 @@ namespace Fusion.Mvvm
                 if (window == null)
                     return null;
 
-                if (window is UIView)
-                    return (window as UIView).Transform;
+                if (window is UIView view)
+                    return view.Transform;
 
                 var propertyInfo = window.GetType().GetProperty("Transform");
                 if (propertyInfo != null)
                     return (Transform)propertyInfo.GetGetMethod().Invoke(window, null);
 
-                if (window is Component)
-                    return (window as Component).transform;
+                if (window is Component component)
+                    return component.transform;
                 return null;
             }
             catch (Exception)

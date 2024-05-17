@@ -17,7 +17,7 @@ namespace Fusion.Mvvm
         public virtual TResult Execute()
         {
             if (!IsAlive)
-                return default(TResult);
+                return default;
 
             if (del != null)
                 return del();
@@ -45,7 +45,7 @@ namespace Fusion.Mvvm
         public virtual TResult Execute(T parameter)
         {
             if (!IsAlive)
-                return default(TResult);
+                return default;
 
             if (del != null)
                 return del(parameter);
@@ -73,7 +73,7 @@ namespace Fusion.Mvvm
         public virtual TResult Execute(T1 t1, T2 t2)
         {
             if (!IsAlive)
-                return default(TResult);
+                return default;
 
             if (del != null)
                 return del(t1, t2);
@@ -101,7 +101,7 @@ namespace Fusion.Mvvm
         public virtual TResult Execute(T1 t1, T2 t2, T3 t3)
         {
             if (!IsAlive)
-                return default(TResult);
+                return default;
 
             if (del != null)
                 return del(t1, t2, t3);
@@ -129,7 +129,7 @@ namespace Fusion.Mvvm
         public virtual TResult Execute(T1 t1, T2 t2, T3 t3, T4 t4)
         {
             if (!IsAlive)
-                return default(TResult);
+                return default;
 
             if (del != null)
                 return del(t1, t2, t3, t4);

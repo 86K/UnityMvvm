@@ -1,14 +1,12 @@
-
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Fusion.Mvvm
 {
-    public class TargetProxyFactory : ITargetProxyFactory, ITargetProxyFactoryRegister
+    public class TargetProxyFactory : ITargetProxyFactory, IRegistry<ITargetProxyFactory>
     {
-        private readonly List<PriorityFactoryPair> factories = new List<PriorityFactoryPair>();
+        private readonly List<FactoryPriorityPair<ITargetProxyFactory>> _factories = new List<FactoryPriorityPair<ITargetProxyFactory>>();
 
         public ITargetProxy CreateProxy(object target, TargetDescription description)
         {
@@ -21,14 +19,15 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                throw new ProxyException(e, "Unable to bind the \"{0}\".An exception occurred while creating a proxy for the \"{1}\" property of class \"{2}\".", description.ToString(), description.TargetName, target.GetType().Name);
+                throw new Exception(
+                    $"Unable to bind the \"{description}\".An exception occurred while creating a proxy for the \"{description.TargetName}\" property of class \"{target.GetType().Name}\".\n{e}");
             }
         }
 
-        protected virtual bool TryCreateProxy(object target, TargetDescription description, out ITargetProxy proxy)
+        private bool TryCreateProxy(object target, TargetDescription description, out ITargetProxy proxy)
         {
             proxy = null;
-            foreach (PriorityFactoryPair pair in factories)
+            foreach (var pair in _factories)
             {
                 var factory = pair.factory;
                 if (factory == null)
@@ -39,7 +38,6 @@ namespace Fusion.Mvvm
                     proxy = factory.CreateProxy(target, description);
                     if (proxy != null)
                         return true;
-
                 }
                 catch (MissingMemberException e)
                 {
@@ -65,8 +63,8 @@ namespace Fusion.Mvvm
             if (factory == null)
                 return;
 
-            factories.Add(new PriorityFactoryPair(factory, priority));
-            factories.Sort((x, y) => y.priority.CompareTo(x.priority));
+            _factories.Add(new FactoryPriorityPair<ITargetProxyFactory>(factory, priority));
+            _factories.Sort((x, y) => y.priority.CompareTo(x.priority));
         }
 
         public void Unregister(ITargetProxyFactory factory)
@@ -74,19 +72,7 @@ namespace Fusion.Mvvm
             if (factory == null)
                 return;
 
-            factories.RemoveAll(pair => pair.factory == factory);
-        }
-
-        struct PriorityFactoryPair
-        {
-            public PriorityFactoryPair(ITargetProxyFactory factory, int priority)
-            {
-                this.factory = factory;
-                this.priority = priority;
-            }
-
-            public readonly int priority;
-            public readonly ITargetProxyFactory factory;
+            _factories.RemoveAll(pair => pair.factory == factory);
         }
     }
 }

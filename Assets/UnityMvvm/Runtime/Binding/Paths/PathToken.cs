@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Text;
 
@@ -39,8 +37,7 @@ namespace Fusion.Mvvm
         public override string ToString()
         {
             StringBuilder buf = new StringBuilder();
-            Current.ToString();
-            buf.Append(Current.ToString()).Append(" Index:").Append(index);
+            buf.Append(Current).Append(" Index:").Append(index);
             return buf.ToString();
         }
     }

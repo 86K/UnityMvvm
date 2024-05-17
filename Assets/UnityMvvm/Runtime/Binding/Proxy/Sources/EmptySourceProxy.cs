@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Diagnostics;
 
@@ -7,7 +5,6 @@ namespace Fusion.Mvvm
 {
     public class EmptSourceProxy : SourceProxyBase, IObtainable, IModifiable
     {
-       
         private readonly SourceDescription description;
 
         public EmptSourceProxy(SourceDescription description) : base(null)
@@ -17,24 +14,24 @@ namespace Fusion.Mvvm
 
         public override Type Type => typeof(object);
 
-        public virtual object GetValue()
+        public object GetValue()
         {
             DebugWarning();
             return null;
         }
 
-        public virtual TValue GetValue<TValue>()
+        public TValue GetValue<TValue>()
         {
             DebugWarning();
-            return default(TValue);
+            return default;
         }
 
-        public virtual void SetValue(object value)
+        public void SetValue(object value)
         {
             DebugWarning();
         }
 
-        public virtual void SetValue<TValue>(TValue value)
+        public void SetValue<TValue>(TValue value)
         {
             DebugWarning();
         }
@@ -43,7 +40,7 @@ namespace Fusion.Mvvm
         private void DebugWarning()
         {
             UnityEngine.Debug.LogWarning(
-                $"this is an empty source proxy,If you see this, then the DataContext is null.The SourceDescription is \"{description.ToString()}\"");
+                $"this is an empty source proxy,If you see this, then the DataContext is null.The SourceDescription is \"{description}\"");
         }
     }
 }

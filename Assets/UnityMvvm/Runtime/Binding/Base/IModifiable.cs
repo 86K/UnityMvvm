@@ -1,5 +1,3 @@
-
-
 namespace Fusion.Mvvm
 {
     public interface IModifiable
@@ -7,10 +5,5 @@ namespace Fusion.Mvvm
         void SetValue(object value);
 
         void SetValue<TValue>(TValue value);
-    }
-
-    public interface IModifiable<TValue> 
-    {
-        void SetValue(TValue value);
     }
 }

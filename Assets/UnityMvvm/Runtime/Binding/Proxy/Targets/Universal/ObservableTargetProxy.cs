@@ -4,54 +4,54 @@ namespace Fusion.Mvvm
 {
     public class ObservableTargetProxy : ValueTargetProxyBase
     {
-        protected readonly IObservableProperty observableProperty;
+        private readonly IObservableProperty _observableProperty;
 
         public ObservableTargetProxy(object target, IObservableProperty observableProperty) : base(target)
         {
-            this.observableProperty = observableProperty;
+            _observableProperty = observableProperty;
         }
 
-        public override Type Type => observableProperty.Type;
+        public override Type Type => _observableProperty.Type;
 
         public override BindingMode DefaultMode => BindingMode.TwoWay;
 
         public override object GetValue()
         {
-            return observableProperty.Value;
+            return _observableProperty.Value;
         }
 
         public override TValue GetValue<TValue>()
         {
-            if (observableProperty is IObservableProperty<TValue>)
-                return ((IObservableProperty<TValue>)observableProperty).Value;
+            if (_observableProperty is IObservableProperty<TValue> property)
+                return property.Value;
 
-            return (TValue)observableProperty.Value;
+            return (TValue)_observableProperty.Value;
         }
 
         public override void SetValue(object value)
         {
-            observableProperty.Value = value;
+            _observableProperty.Value = value;
         }
 
         public override void SetValue<TValue>(TValue value)
         {
-            if (observableProperty is IObservableProperty<TValue>)
+            if (_observableProperty is IObservableProperty<TValue> property)
             {
-                ((IObservableProperty<TValue>)observableProperty).Value = value;
+                property.Value = value;
                 return;
             }
 
-            observableProperty.Value = value;
+            _observableProperty.Value = value;
         }
 
         protected override void DoSubscribeForValueChange(object target)
         {
-            observableProperty.ValueChanged += OnValueChanged;
+            _observableProperty.ValueChanged += OnValueChanged;
         }
 
         protected override void DoUnsubscribeForValueChange(object target)
         {
-            observableProperty.ValueChanged -= OnValueChanged;
+            _observableProperty.ValueChanged -= OnValueChanged;
         }
 
         private void OnValueChanged(object sender, EventArgs e)

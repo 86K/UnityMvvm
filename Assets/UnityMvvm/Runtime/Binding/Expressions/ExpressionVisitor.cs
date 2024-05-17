@@ -116,8 +116,7 @@ namespace Fusion.Mvvm
             {
                 if (expr.NodeType == ExpressionType.Coalesce && expr.Conversion != null)
                     return Expression.Coalesce(left, right, conversion as LambdaExpression);
-                else
-                    return Expression.MakeBinary(expr.NodeType, left, right, expr.IsLiftedToNull, expr.Method);
+                return Expression.MakeBinary(expr.NodeType, left, right, expr.IsLiftedToNull, expr.Method);
             }
             return expr;
         }

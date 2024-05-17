@@ -405,7 +405,7 @@ namespace Fusion.Mvvm
         {
             if (key == null) throw new ArgumentNullException("key");
 
-            return TryRemoveInternal(key, out value, false, default(TValue));
+            return TryRemoveInternal(key, out value, false, default);
         }
 
         /// <summary>
@@ -450,7 +450,7 @@ namespace Fusion.Mvvm
                                 bool valuesMatch = EqualityComparer<TValue>.Default.Equals(oldValue, curr.m_value);
                                 if (!valuesMatch)
                                 {
-                                    value = default(TValue);
+                                    value = default;
                                     return false;
                                 }
                             }
@@ -472,7 +472,7 @@ namespace Fusion.Mvvm
                     }
                 }
 
-                value = default(TValue);
+                value = default;
                 return false;
             }
         }
@@ -516,7 +516,7 @@ namespace Fusion.Mvvm
                 n = n.m_next;
             }
 
-            value = default(TValue);
+            value = default;
             return false;
         }
 
@@ -1395,7 +1395,7 @@ namespace Fusion.Mvvm
         void IDictionary.Add(object key, object value)
         {
             if (key == null) throw new ArgumentNullException("key");
-            if (!(key is TKey)) throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfKeyIncorrect"));
+            if (!(key is TKey key1)) throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfKeyIncorrect"));
 
             TValue typedValue;
             try
@@ -1407,7 +1407,7 @@ namespace Fusion.Mvvm
                 throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfValueIncorrect"));
             }
 
-            ((IDictionary<TKey, TValue>)this).Add((TKey)key, typedValue);
+            ((IDictionary<TKey, TValue>)this).Add(key1, typedValue);
         }
 
         /// <summary>
@@ -1424,7 +1424,7 @@ namespace Fusion.Mvvm
         {
             if (key == null) throw new ArgumentNullException("key");
 
-            return (key is TKey) && ((ConcurrentDictionary<TKey, TValue>)this).ContainsKey((TKey)key);
+            return (key is TKey key1) && ((ConcurrentDictionary<TKey, TValue>)this).ContainsKey(key1);
         }
 
         /// <summary>Provides an <see cref="T:System.Collections.Generics.IDictionaryEnumerator"/> for the
@@ -1476,9 +1476,9 @@ namespace Fusion.Mvvm
             if (key == null) throw new ArgumentNullException("key");
 
             TValue throwAwayValue;
-            if (key is TKey)
+            if (key is TKey key1)
             {
-                TryRemove((TKey)key, out throwAwayValue);
+                TryRemove(key1, out throwAwayValue);
             }
         }
 
@@ -1514,7 +1514,7 @@ namespace Fusion.Mvvm
             {
                 if (key == null) throw new ArgumentNullException("key");
 
-                if (key is TKey && TryGetValue((TKey)key, out var value))
+                if (key is TKey key1 && TryGetValue(key1, out var value))
                 {
                     return value;
                 }
@@ -1525,10 +1525,10 @@ namespace Fusion.Mvvm
             {
                 if (key == null) throw new ArgumentNullException("key");
 
-                if (!(key is TKey)) throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfKeyIncorrect"));
-                if (!(value is TValue)) throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfValueIncorrect"));
+                if (!(key is TKey key1)) throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfKeyIncorrect"));
+                if (!(value is TValue value1)) throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfValueIncorrect"));
 
-                ((ConcurrentDictionary<TKey, TValue>)this)[(TKey)key] = (TValue)value;
+                ((ConcurrentDictionary<TKey, TValue>)this)[key1] = value1;
             }
         }
 
@@ -1584,22 +1584,19 @@ namespace Fusion.Mvvm
                 //    - an array of DictionaryEntry structs
                 //    - an array of objects
 
-                KeyValuePair<TKey, TValue>[] pairs = array as KeyValuePair<TKey, TValue>[];
-                if (pairs != null)
+                if (array is KeyValuePair<TKey, TValue>[] pairs)
                 {
                     CopyToPairs(pairs, index);
                     return;
                 }
 
-                DictionaryEntry[] entries = array as DictionaryEntry[];
-                if (entries != null)
+                if (array is DictionaryEntry[] entries)
                 {
                     CopyToEntries(entries, index);
                     return;
                 }
 
-                object[] objects = array as object[];
-                if (objects != null)
+                if (array is object[] objects)
                 {
                     CopyToObjects(objects, index);
                     return;
@@ -2095,7 +2092,7 @@ namespace Fusion.Mvvm
                 this.buckets = buckets;
                 bucketIndex = -1;
                 currentNode = null;
-                current = default(KeyValuePair<TKey, TValue>);
+                current = default;
             }
 
             public KeyValuePair<TKey, TValue> Current => current;
@@ -2130,7 +2127,7 @@ namespace Fusion.Mvvm
             {
                 bucketIndex = -1;
                 currentNode = null;
-                current = default(KeyValuePair<TKey, TValue>);
+                current = default;
             }
 
             public void Dispose()

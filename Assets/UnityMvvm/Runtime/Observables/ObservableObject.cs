@@ -101,8 +101,7 @@ namespace Fusion.Mvvm
             if (propertyExpression == null)
                 throw new ArgumentNullException("propertyExpression");
 
-            var body = propertyExpression.Body as MemberExpression;
-            if (body == null)
+            if (!(propertyExpression.Body is MemberExpression body))
                 throw new ArgumentException("Invalid argument", "propertyExpression");
 
             var property = body.Member as PropertyInfo;

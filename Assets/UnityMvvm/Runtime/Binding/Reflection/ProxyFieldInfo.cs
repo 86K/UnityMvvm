@@ -79,7 +79,7 @@ namespace Fusion.Mvvm
 
         public ProxyFieldInfo(FieldInfo fieldInfo) : base(fieldInfo)
         {
-            if (!typeof(TValue).Equals(this.fieldInfo.FieldType) || !DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TValue) == this.fieldInfo.FieldType) || !DeclaringType.IsAssignableFrom(typeof(T)))
                 throw new ArgumentException("The field types do not match!");
 
             getter = MakeGetter(fieldInfo);
@@ -92,7 +92,7 @@ namespace Fusion.Mvvm
 
         public ProxyFieldInfo(FieldInfo fieldInfo, Func<T, TValue> getter, Action<T, TValue> setter) : base(fieldInfo)
         {
-            if (!typeof(TValue).Equals(this.fieldInfo.FieldType) || !DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TValue) == this.fieldInfo.FieldType) || !DeclaringType.IsAssignableFrom(typeof(T)))
                 throw new ArgumentException("The field types do not match!");
 
             this.getter = getter;

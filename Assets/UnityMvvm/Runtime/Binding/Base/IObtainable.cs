@@ -1,5 +1,3 @@
-
-
 namespace Fusion.Mvvm
 {
     public interface IObtainable
@@ -7,10 +5,5 @@ namespace Fusion.Mvvm
         object GetValue();
 
         TValue GetValue<TValue>();
-    }
-
-    public interface IObtainable<TValue> 
-    {
-        TValue GetValue();
     }
 }

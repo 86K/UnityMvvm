@@ -1,5 +1,3 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
@@ -8,7 +6,8 @@ namespace Fusion.Mvvm
     public abstract class SourceDescription
     {
         private bool isStatic;
-        public virtual bool IsStatic
+
+        public bool IsStatic
         {
             get => isStatic;
             set => isStatic = value;

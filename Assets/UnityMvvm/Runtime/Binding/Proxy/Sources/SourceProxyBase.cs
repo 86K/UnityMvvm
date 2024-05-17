@@ -1,5 +1,3 @@
-
-
 using System;
 using UnityEngine;
 
@@ -7,11 +5,12 @@ namespace Fusion.Mvvm
 {
     public abstract class SourceProxyBase : BindingProxyBase, ISourceProxy
     {
-        protected TypeCode typeCode = TypeCode.Empty;
-        protected readonly object source;
-        public SourceProxyBase(object source)
+        private TypeCode _typeCode = TypeCode.Empty;
+        protected object Source { get; }
+
+        protected SourceProxyBase(object source)
         {
-            this.source = source;
+            Source = source;
         }
 
         public abstract Type Type { get; }
@@ -20,49 +19,37 @@ namespace Fusion.Mvvm
         {
             get
             {
-                if (typeCode == TypeCode.Empty)
+                if (_typeCode == TypeCode.Empty)
                 {
-#if NETFX_CORE
-                    typeCode = WinRTLegacy.TypeExtensions.GetTypeCode(Type);
-#else
-                    typeCode = Type.GetTypeCode(Type);
-#endif
+                    _typeCode = Type.GetTypeCode(Type);
                 }
-                return typeCode;
+
+                return _typeCode;
             }
         }
-
-        public virtual object Source => source;
     }
 
     public abstract class NotifiableSourceProxyBase : SourceProxyBase, INotifiable
     {
         protected readonly object _lock = new object();
-        protected EventHandler valueChanged;
+        private EventHandler _valueChanged;
 
-        public NotifiableSourceProxyBase(object source) : base(source)
+        protected NotifiableSourceProxyBase(object source) : base(source)
         {
         }
 
         public virtual event EventHandler ValueChanged
         {
-            add
-            {
-                lock (_lock) { valueChanged += value; }
-            }
-
-            remove
-            {
-                lock (_lock) { valueChanged -= value; }
-            }
+            add => _valueChanged += value;
+            remove => _valueChanged -= value;
         }
 
-        protected virtual void RaiseValueChanged()
+        protected void RaiseValueChanged()
         {
             try
             {
-                if (valueChanged != null)
-                    valueChanged(this, EventArgs.Empty);
+                if (_valueChanged != null)
+                    _valueChanged(this, EventArgs.Empty);
             }
             catch (Exception e)
             {

@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Reflection;
 using System.Linq.Expressions;
@@ -8,22 +6,18 @@ namespace Fusion.Mvvm
 {
     public class ExpressionSourceDescription : SourceDescription
     {
-        private LambdaExpression expression;
+        private LambdaExpression _expression;
 
-        private Type returnType;
-
-        public ExpressionSourceDescription()
-        {
-        }
+        private Type _returnType;
 
         public LambdaExpression Expression
         {
-            get => expression;
+            get => _expression;
             set
             {
-                expression = value;
+                _expression = value;
 
-                Type[] types = expression.GetType().GetGenericArguments();
+                Type[] types = _expression.GetType().GetGenericArguments();
                 var delType = types[0];
 
                 if (!typeof(Delegate).IsAssignableFrom(delType))
@@ -31,18 +25,21 @@ namespace Fusion.Mvvm
 
                 MethodInfo info = delType.GetMethod("Invoke");
 
-                returnType = info.ReturnType;
+                if (info != null)
+                {
+                    _returnType = info.ReturnType;
 
-                ParameterInfo[] parameters = info.GetParameters();
-                IsStatic = (parameters == null || parameters.Length <= 0) ? true : false;
+                    ParameterInfo[] parameters = info.GetParameters();
+                    IsStatic = parameters.Length <= 0;
+                }
             }
         }
 
-        public Type ReturnType => returnType;
+        public Type ReturnType => _returnType;
 
         public override string ToString()
         {
-            return expression == null ? "Expression:null" : "Expression:" + expression.ToString();
+            return _expression == null ? "Expression:null" : "Expression:" + _expression;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Fusion.Mvvm
 #if NETFX_CORE
             if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition().Equals(genericTypeDefinition))
 #else
-            if (type.IsGenericType && type.GetGenericTypeDefinition().Equals(genericTypeDefinition))
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == genericTypeDefinition)
 #endif
                 return true;
 
@@ -46,7 +46,7 @@ namespace Fusion.Mvvm
             if (type == null)
                 return null;
 
-            if (type.Equals(typeof(string)))
+            if (type == typeof(string))
                 return "";
 #if NETFX_CORE
             if (!type.GetTypeInfo().IsValueType)
@@ -108,9 +108,9 @@ namespace Fusion.Mvvm
             {
                 if (!type.IsInstanceOfType(value))
                 {
-                    if (value is IObservableProperty)
+                    if (value is IObservableProperty property)
                     {
-                        safeValue = (value as IObservableProperty).Value;
+                        safeValue = property.Value;
                         if (!type.IsInstanceOfType(safeValue))
                         {
                             safeValue = ChangeType(safeValue, type);
@@ -126,8 +126,7 @@ namespace Fusion.Mvvm
                     else if (type.IsEnum)
 #endif
                     {
-                        var s = value as string;
-                        safeValue = s != null ? Enum.Parse(type, s, true) : Enum.ToObject(type, value);
+                        safeValue = value is string s ? Enum.Parse(type, s, true) : Enum.ToObject(type, value);
                     }
 #if NETFX_CORE
                     else if (type.GetTypeInfo().IsValueType)
@@ -156,12 +155,11 @@ namespace Fusion.Mvvm
             if (result == null)
                 return false;
 
-            var s = result as string;
-            if (s != null)
+            if (result is string s)
                 return s.ToLower().Equals("true");
 
-            if (result is bool)
-                return (bool)result;
+            if (result is bool b)
+                return b;
 
             var resultType = result.GetType();
 #if NETFX_CORE

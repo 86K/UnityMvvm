@@ -5,10 +5,11 @@ namespace Fusion.Mvvm
 {
     public class UniversalTargetProxyFactory : ITargetProxyFactory
     {
-        private readonly IPathParser pathParser;
+        private readonly IPathParser _pathParser;
+
         public UniversalTargetProxyFactory(IPathParser pathParser)
         {
-            this.pathParser = pathParser;
+            _pathParser = pathParser;
         }
 
         public ITargetProxy CreateProxy(object target, TargetDescription description)
@@ -24,8 +25,7 @@ namespace Fusion.Mvvm
             if (memberInfo == null)
                 throw new MissingMemberException(type.Type.FullName, description.TargetName);
 
-            var propertyInfo = memberInfo as IProxyPropertyInfo;
-            if (propertyInfo != null)
+            if (memberInfo is IProxyPropertyInfo propertyInfo)
             {
                 var valueType = propertyInfo.ValueType;
                 if (typeof(IObservableProperty).IsAssignableFrom(valueType))
@@ -50,8 +50,7 @@ namespace Fusion.Mvvm
                 return new PropertyTargetProxy(target, propertyInfo);
             }
 
-            var fieldInfo = memberInfo as IProxyFieldInfo;
-            if (fieldInfo != null)
+            if (memberInfo is IProxyFieldInfo fieldInfo)
             {
                 var valueType = fieldInfo.ValueType;
                 if (typeof(IObservableProperty).IsAssignableFrom(valueType))
@@ -75,12 +74,10 @@ namespace Fusion.Mvvm
                 return new FieldTargetProxy(target, fieldInfo);
             }
 
-            var eventInfo = memberInfo as IProxyEventInfo;
-            if (eventInfo != null)
+            if (memberInfo is IProxyEventInfo eventInfo)
                 return new EventTargetProxy(target, eventInfo);
 
-            var methodInfo = memberInfo as IProxyMethodInfo;
-            if (methodInfo != null)
+            if (memberInfo is IProxyMethodInfo methodInfo)
                 return new MethodTargetProxy(target, methodInfo);
 
             return null;
@@ -88,7 +85,7 @@ namespace Fusion.Mvvm
 
         private ITargetProxy CreateItemProxy(object target, IProxyType type, TargetDescription description)
         {
-            Path path = pathParser.Parse(description.TargetName);
+            Path path = _pathParser.Parse(description.TargetName);
             if (path.Count < 1 || path.Count > 2)
                 return null;
 
@@ -99,6 +96,7 @@ namespace Fusion.Mvvm
                 indexNode = (IndexedNode)path[0];
                 collectionTarget = target;
             }
+
             if (path.Count == 2)
             {
                 indexNode = (IndexedNode)path[1];
@@ -109,19 +107,21 @@ namespace Fusion.Mvvm
                         $"Unable to bind the \"{description}\". The value of the Property or Field named \"{memberNode.Name}\" cannot be null.");
             }
 
-            IProxyType proxyType = collectionTarget.GetType().AsProxy();
-            IProxyItemInfo itemInfo = proxyType.GetItem();
+            IProxyType proxyType = collectionTarget?.GetType().AsProxy();
+            IProxyItemInfo itemInfo = proxyType?.GetItem();
             if (itemInfo == null)
-                throw new MissingMemberException(proxyType.Type.FullName, "Item");
+                throw new MissingMemberException(proxyType?.Type.FullName, "Item");
 
             if (indexNode is IntegerIndexedNode intNode)
             {
                 return new ItemTargetProxy<int>(collectionTarget, intNode.Value, itemInfo);
             }
-            else if (indexNode is StringIndexedNode stringNode)
+
+            if (indexNode is StringIndexedNode stringNode)
             {
                 return new ItemTargetProxy<string>(collectionTarget, stringNode.Value, itemInfo);
             }
+
             return null;
         }
 

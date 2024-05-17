@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Reflection;
 
@@ -23,7 +21,7 @@ namespace Fusion.Mvvm
                 return null;
 
             ParameterInfo[] parameters = info.GetParameters();
-            if (parameters == null || parameters.Length <= 0)
+            if (parameters.Length <= 0)
                 return null;
 
             return parameters[0].ParameterType;

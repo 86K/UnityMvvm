@@ -62,10 +62,9 @@ namespace Fusion.Mvvm
 
         public object GetValue(object target, object key)
         {
-            if (target is IList)
+            if (target is IList list)
             {
                 int index = (int)key;
-                IList list = target as IList;
 
                 if (index < 0 || index >= list.Count)
                     throw new ArgumentOutOfRangeException("key",
@@ -74,9 +73,8 @@ namespace Fusion.Mvvm
                 return list[index];
             }
 
-            if (target is IDictionary)
+            if (target is IDictionary dict)
             {
-                IDictionary dict = target as IDictionary;
                 if (!dict.Contains(key))
                     return null;
 
@@ -91,10 +89,9 @@ namespace Fusion.Mvvm
 
         public void SetValue(object target, object key, object value)
         {
-            if (target is IList)
+            if (target is IList list)
             {
                 int index = (int)key;
-                IList list = target as IList;
 
                 if (index < 0 || index >= list.Count)
                     throw new ArgumentOutOfRangeException("key",
@@ -104,9 +101,9 @@ namespace Fusion.Mvvm
                 return;
             }
 
-            if (target is IDictionary)
+            if (target is IDictionary dictionary)
             {
-                ((IDictionary)target)[key] = value;
+                dictionary[key] = value;
                 return;
             }
 
@@ -121,7 +118,7 @@ namespace Fusion.Mvvm
     {
         public ListProxyItemInfo(PropertyInfo propertyInfo) : base(propertyInfo)
         {
-            if (!typeof(TValue).Equals(this.propertyInfo.PropertyType) || !typeof(IList<TValue>).IsAssignableFrom(propertyInfo.DeclaringType))
+            if (!(typeof(TValue) == this.propertyInfo.PropertyType) || !typeof(IList<TValue>).IsAssignableFrom(propertyInfo.DeclaringType))
                 throw new ArgumentException("The property types do not match!");
         }
 
@@ -158,14 +155,14 @@ namespace Fusion.Mvvm
     {
         public DictionaryProxyItemInfo(PropertyInfo propertyInfo) : base(propertyInfo)
         {
-            if (!typeof(TValue).Equals(this.propertyInfo.PropertyType) || !typeof(IDictionary<TKey, TValue>).IsAssignableFrom(propertyInfo.DeclaringType))
+            if (!(typeof(TValue) == this.propertyInfo.PropertyType) || !typeof(IDictionary<TKey, TValue>).IsAssignableFrom(propertyInfo.DeclaringType))
                 throw new ArgumentException("The property types do not match!");
         }
 
         public TValue GetValue(T target, TKey key)
         {
             if (!target.ContainsKey(key))
-                return default(TValue);
+                return default;
 
             return target[key];
         }

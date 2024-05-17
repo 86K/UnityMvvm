@@ -52,7 +52,7 @@ namespace Fusion.Mvvm
                 CleanupCheck();
 
                 if (!dictionary.ContainsKey(key))
-                    return default(TValue);
+                    return default;
                 return dictionary[key].Target;
             }
             set => Insert(key, value, false);
@@ -198,11 +198,11 @@ namespace Fusion.Mvvm
         {
             get
             {
-                if (!(key is TKey))
+                if (!(key is TKey key1))
                     return null;
-                if (!dictionary.ContainsKey((TKey)key))
+                if (!dictionary.ContainsKey(key1))
                     return null;
-                return dictionary[(TKey)key].Target;
+                return dictionary[key1].Target;
             }
             set => Insert((TKey)key, (TValue)value, false);
         }
@@ -213,9 +213,9 @@ namespace Fusion.Mvvm
 
         bool IDictionary.Contains(object key)
         {
-            if (!(key is TKey))
+            if (!(key is TKey key1))
                 return false;
-            return (this as IDictionary<TKey, TValue>).ContainsKey((TKey)key);
+            return (this as IDictionary<TKey, TValue>).ContainsKey(key1);
         }
 
         void IDictionary.Add(object key, object value)

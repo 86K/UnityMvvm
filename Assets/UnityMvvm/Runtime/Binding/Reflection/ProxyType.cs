@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 using UnityEngine;
+using Object = System.Object;
 
 namespace Fusion.Mvvm
 {
@@ -99,35 +100,35 @@ namespace Fusion.Mvvm
 
         public void Register(IProxyMemberInfo memberInfo)
         {
-            if (!memberInfo.DeclaringType.Equals(type))
+            if (!(memberInfo.DeclaringType == type))
                 throw new ArgumentException();
 
             string name = memberInfo.Name;
-            if (memberInfo is IProxyPropertyInfo)
+            if (memberInfo is IProxyPropertyInfo info)
             {
-                properties.Add(name, (IProxyPropertyInfo)memberInfo);
+                properties.Add(name, info);
             }
-            else if (memberInfo is IProxyMethodInfo)
+            else if (memberInfo is IProxyMethodInfo methodInfo)
             {
-                AddMethodInfo((IProxyMethodInfo)memberInfo);
+                AddMethodInfo(methodInfo);
             }
-            else if (memberInfo is IProxyFieldInfo)
+            else if (memberInfo is IProxyFieldInfo fieldInfo)
             {
-                fields.Add(name, (IProxyFieldInfo)memberInfo);
+                fields.Add(name, fieldInfo);
             }
-            else if (memberInfo is IProxyEventInfo)
+            else if (memberInfo is IProxyEventInfo eventInfo)
             {
-                events.Add(name, (IProxyEventInfo)memberInfo);
+                events.Add(name, eventInfo);
             }
-            else if (memberInfo is IProxyItemInfo)
+            else if (memberInfo is IProxyItemInfo proxyItemInfo)
             {
-                itemInfo = (IProxyItemInfo)memberInfo;
+                itemInfo = proxyItemInfo;
             }
         }
 
         public void Unregister(IProxyMemberInfo memberInfo)
         {
-            if (!memberInfo.DeclaringType.Equals(type))
+            if (!(memberInfo.DeclaringType == type))
                 throw new ArgumentException();
 
             string name = memberInfo.Name;
@@ -135,9 +136,9 @@ namespace Fusion.Mvvm
             {
                 properties.Remove(name);
             }
-            else if (memberInfo is IProxyMethodInfo)
+            else if (memberInfo is IProxyMethodInfo info)
             {
-                RemoveMethodInfo((IProxyMethodInfo)memberInfo);
+                RemoveMethodInfo(info);
             }
             else if (memberInfo is IProxyFieldInfo)
             {
@@ -235,7 +236,7 @@ namespace Fusion.Mvvm
                 return CreateProxyEventInfo(eventInfo);
             }
 
-            if (type.BaseType != null && !type.BaseType.Equals(typeof(System.Object)))
+            if (type.BaseType != null && !(type.BaseType == typeof(Object)))
             {
                 if (baseType != null)
                 {
@@ -293,7 +294,7 @@ namespace Fusion.Mvvm
                 return CreateProxyFieldInfo(fieldInfo);
             }
 
-            if (type.BaseType != null && !type.BaseType.Equals(typeof(System.Object)))
+            if (type.BaseType != null && !(type.BaseType == typeof(Object)))
             {
                 if (baseType != null)
                 {
@@ -353,7 +354,7 @@ namespace Fusion.Mvvm
                 return CreateProxyPropertyInfo(propertyInfo);
             }
 
-            if (type.BaseType != null && !type.BaseType.Equals(typeof(System.Object)))
+            if (type.BaseType != null && !(type.BaseType == typeof(Object)))
             {
                 if (baseType != null)
                 {
@@ -397,18 +398,16 @@ namespace Fusion.Mvvm
             {
                 return CreateArrayProxyItemInfo(type);
             }
-            else
-            {
-                PropertyInfo propertyInfo = type.GetProperty("Item", BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
-                if (propertyInfo != null)
-                    return CreateProxyItemInfo(propertyInfo);
 
-                IProxyType baseTypeInfo = GetBase();
-                if (baseTypeInfo == null)
-                    return null;
+            PropertyInfo propertyInfo = type.GetProperty("Item", BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+            if (propertyInfo != null)
+                return CreateProxyItemInfo(propertyInfo);
 
-                return baseTypeInfo.GetItem();
-            }
+            IProxyType baseTypeInfo = GetBase();
+            if (baseTypeInfo == null)
+                return null;
+
+            return baseTypeInfo.GetItem();
         }
 
         public IProxyMethodInfo GetMethod(string name)
@@ -557,7 +556,7 @@ namespace Fusion.Mvvm
                 Type returnType = methodInfo.ReturnType;
                 ParameterInfo[] parameters = methodInfo.GetParameters();
                 Type type = methodInfo.DeclaringType;
-                if (typeof(void).Equals(returnType))
+                if (typeof(void) == returnType)
                 {
                     if (methodInfo.IsStatic)
                     {
@@ -727,19 +726,19 @@ namespace Fusion.Mvvm
                         break;
                     case TypeCode.Object:
                         {
-                            if (type.Equals(typeof(Vector2)))
+                            if (type == typeof(Vector2))
                                 info = new ArrayProxyItemInfo<Vector2[], Vector2>();
-                            else if (type.Equals(typeof(Vector3)))
+                            else if (type == typeof(Vector3))
                                 info = new ArrayProxyItemInfo<Vector3[], Vector3>();
-                            else if (type.Equals(typeof(Vector4)))
+                            else if (type == typeof(Vector4))
                                 info = new ArrayProxyItemInfo<Vector4[], Vector4>();
-                            else if (type.Equals(typeof(Color)))
+                            else if (type == typeof(Color))
                                 info = new ArrayProxyItemInfo<Color[], Color>();
-                            else if (type.Equals(typeof(Rect)))
+                            else if (type == typeof(Rect))
                                 info = new ArrayProxyItemInfo<Rect[], Rect>();
-                            else if (type.Equals(typeof(Quaternion)))
+                            else if (type == typeof(Quaternion))
                                 info = new ArrayProxyItemInfo<Quaternion[], Quaternion>();
-                            else if (type.Equals(typeof(Version)))
+                            else if (type == typeof(Version))
                                 info = new ArrayProxyItemInfo<Version[], Version>();
                             else
                                 info = new ArrayProxyItemInfo(type);
@@ -809,7 +808,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                if (keyType.Equals(typeof(int)) && typeof(IList<>).MakeGenericType(valueType).IsAssignableFrom(type))
+                if (keyType == typeof(int) && typeof(IList<>).MakeGenericType(valueType).IsAssignableFrom(type))
                     return 2;
                 if (typeof(IDictionary<,>).MakeGenericType(keyType, valueType).IsAssignableFrom(type))
                     return 1;
@@ -863,19 +862,19 @@ namespace Fusion.Mvvm
                     return new ListProxyItemInfo<IList<UInt64>, UInt64>(propertyInfo);
                 case TypeCode.Object:
                     {
-                        if (type.Equals(typeof(Vector2)))
+                        if (type == typeof(Vector2))
                             return new ListProxyItemInfo<IList<Vector2>, Vector2>(propertyInfo);
-                        if (type.Equals(typeof(Vector3)))
+                        if (type == typeof(Vector3))
                             return new ListProxyItemInfo<IList<Vector3>, Vector3>(propertyInfo);
-                        if (type.Equals(typeof(Vector4)))
+                        if (type == typeof(Vector4))
                             return new ListProxyItemInfo<IList<Vector4>, Vector4>(propertyInfo);
-                        if (type.Equals(typeof(Color)))
+                        if (type == typeof(Color))
                             return new ListProxyItemInfo<IList<Color>, Color>(propertyInfo);
-                        if (type.Equals(typeof(Rect)))
+                        if (type == typeof(Rect))
                             return new ListProxyItemInfo<IList<Rect>, Rect>(propertyInfo);
-                        if (type.Equals(typeof(Quaternion)))
+                        if (type == typeof(Quaternion))
                             return new ListProxyItemInfo<IList<Quaternion>, Quaternion>(propertyInfo);
-                        if (type.Equals(typeof(Version)))
+                        if (type == typeof(Version))
                             return new ListProxyItemInfo<IList<Version>, Version>(propertyInfo);
 
                         return new ProxyItemInfo(propertyInfo);
@@ -895,7 +894,7 @@ namespace Fusion.Mvvm
             TypeCode typeCode = Type.GetTypeCode(type);
 #endif
 
-            if (parameters[0].ParameterType.Equals(typeof(string)))
+            if (parameters[0].ParameterType == typeof(string))
             {
                 switch (typeCode)
                 {
@@ -931,19 +930,19 @@ namespace Fusion.Mvvm
                         return new DictionaryProxyItemInfo<IDictionary<string, UInt64>, string, UInt64>(propertyInfo);
                     case TypeCode.Object:
                         {
-                            if (type.Equals(typeof(Vector2)))
+                            if (type == typeof(Vector2))
                                 return new DictionaryProxyItemInfo<IDictionary<string, Vector2>, string, Vector2>(propertyInfo);
-                            if (type.Equals(typeof(Vector3)))
+                            if (type == typeof(Vector3))
                                 return new DictionaryProxyItemInfo<IDictionary<string, Vector3>, string, Vector3>(propertyInfo);
-                            if (type.Equals(typeof(Vector4)))
+                            if (type == typeof(Vector4))
                                 return new DictionaryProxyItemInfo<IDictionary<string, Vector4>, string, Vector4>(propertyInfo);
-                            if (type.Equals(typeof(Color)))
+                            if (type == typeof(Color))
                                 return new DictionaryProxyItemInfo<IDictionary<string, Color>, string, Color>(propertyInfo);
-                            if (type.Equals(typeof(Rect)))
+                            if (type == typeof(Rect))
                                 return new DictionaryProxyItemInfo<IDictionary<string, Rect>, string, Rect>(propertyInfo);
-                            if (type.Equals(typeof(Quaternion)))
+                            if (type == typeof(Quaternion))
                                 return new DictionaryProxyItemInfo<IDictionary<string, Quaternion>, string, Quaternion>(propertyInfo);
-                            if (type.Equals(typeof(Version)))
+                            if (type == typeof(Version))
                                 return new DictionaryProxyItemInfo<IDictionary<string, Version>, string, Version>(propertyInfo);
 
                             return new ProxyItemInfo(propertyInfo);
@@ -952,7 +951,8 @@ namespace Fusion.Mvvm
                         return new ProxyItemInfo(propertyInfo);
                 }
             }
-            else if (parameters[0].ParameterType.Equals(typeof(int)))
+
+            if (parameters[0].ParameterType == typeof(int))
             {
                 switch (typeCode)
                 {
@@ -987,32 +987,29 @@ namespace Fusion.Mvvm
                     case TypeCode.UInt64:
                         return new DictionaryProxyItemInfo<IDictionary<int, UInt64>, int, UInt64>(propertyInfo);
                     case TypeCode.Object:
-                        {
-                            if (type.Equals(typeof(Vector2)))
-                                return new DictionaryProxyItemInfo<IDictionary<int, Vector2>, int, Vector2>(propertyInfo);
-                            if (type.Equals(typeof(Vector3)))
-                                return new DictionaryProxyItemInfo<IDictionary<int, Vector3>, int, Vector3>(propertyInfo);
-                            if (type.Equals(typeof(Vector4)))
-                                return new DictionaryProxyItemInfo<IDictionary<int, Vector4>, int, Vector4>(propertyInfo);
-                            if (type.Equals(typeof(Color)))
-                                return new DictionaryProxyItemInfo<IDictionary<int, Color>, int, Color>(propertyInfo);
-                            if (type.Equals(typeof(Rect)))
-                                return new DictionaryProxyItemInfo<IDictionary<int, Rect>, int, Rect>(propertyInfo);
-                            if (type.Equals(typeof(Quaternion)))
-                                return new DictionaryProxyItemInfo<IDictionary<int, Quaternion>, int, Quaternion>(propertyInfo);
-                            if (type.Equals(typeof(Version)))
-                                return new DictionaryProxyItemInfo<IDictionary<int, Version>, int, Version>(propertyInfo);
+                    {
+                        if (type == typeof(Vector2))
+                            return new DictionaryProxyItemInfo<IDictionary<int, Vector2>, int, Vector2>(propertyInfo);
+                        if (type == typeof(Vector3))
+                            return new DictionaryProxyItemInfo<IDictionary<int, Vector3>, int, Vector3>(propertyInfo);
+                        if (type == typeof(Vector4))
+                            return new DictionaryProxyItemInfo<IDictionary<int, Vector4>, int, Vector4>(propertyInfo);
+                        if (type == typeof(Color))
+                            return new DictionaryProxyItemInfo<IDictionary<int, Color>, int, Color>(propertyInfo);
+                        if (type == typeof(Rect))
+                            return new DictionaryProxyItemInfo<IDictionary<int, Rect>, int, Rect>(propertyInfo);
+                        if (type == typeof(Quaternion))
+                            return new DictionaryProxyItemInfo<IDictionary<int, Quaternion>, int, Quaternion>(propertyInfo);
+                        if (type == typeof(Version))
+                            return new DictionaryProxyItemInfo<IDictionary<int, Version>, int, Version>(propertyInfo);
 
-                            return new ProxyItemInfo(propertyInfo);
-                        }
+                        return new ProxyItemInfo(propertyInfo);
+                    }
                     default:
                         return new ProxyItemInfo(propertyInfo);
                 }
             }
-            else
-            {
-                return new ProxyItemInfo(propertyInfo);
-            }
+            return new ProxyItemInfo(propertyInfo);
         }
     }
 }

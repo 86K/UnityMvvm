@@ -74,9 +74,9 @@ namespace Fusion.Mvvm
                 }
 
                 current = ie.Current;
-                if (current is IEnumerator)
+                if (current is IEnumerator enumerator)
                 {
-                    stack.Push(current as IEnumerator);
+                    stack.Push(enumerator);
                     return MoveNext();
                 }
 

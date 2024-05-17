@@ -1,5 +1,3 @@
-
-
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,15 +6,16 @@ namespace Fusion.Mvvm
 {
     public abstract class TargetProxyBase : BindingProxyBase, ITargetProxy
     {
-        private readonly WeakReference target;
-        protected TypeCode typeCode = TypeCode.Empty;
-        protected readonly string targetName;
-        public TargetProxyBase(object target)
+        private readonly WeakReference _target;
+        private TypeCode _typeCode = TypeCode.Empty;
+        protected readonly string _targetName;
+
+        protected TargetProxyBase(object target)
         {
             if (target != null)
             {
-                this.target = new WeakReference(target, false);
-                targetName = target.ToString();
+                _target = new WeakReference(target, false);
+                _targetName = target.ToString();
             }
         }
 
@@ -26,15 +25,12 @@ namespace Fusion.Mvvm
         {
             get
             {
-                if (typeCode == TypeCode.Empty)
+                if (_typeCode == TypeCode.Empty)
                 {
-#if NETFX_CORE
-                    typeCode = WinRTLegacy.TypeExtensions.GetTypeCode(Type);
-#else
-                    typeCode = Type.GetTypeCode(Type);
-#endif
+                    _typeCode = Type.GetTypeCode(Type);
                 }
-                return typeCode;
+
+                return _typeCode;
             }
         }
 
@@ -42,26 +38,27 @@ namespace Fusion.Mvvm
         {
             get
             {
-                var target = this.target != null ? this.target.Target : null;
+                var target = _target?.Target;
                 return IsAlive(target) ? target : null;
             }
         }
+
         private bool IsAlive(object target)
         {
             try
             {
-                if (target is UIBehaviour)
+                if (target is UIBehaviour behaviour)
                 {
-                    if (((UIBehaviour)target).IsDestroyed())
+                    if (behaviour.IsDestroyed())
                         return false;
                     return true;
                 }
 
-                if (target is UnityEngine.Object)
+                if (target is UnityEngine.Object o)
                 {
                     //Check if the object is valid because it may have been destroyed.
                     //Unmanaged objects,the weak caches do not accurately track the validity of objects.
-                    var name = ((UnityEngine.Object)target).name;
+                    var name = o.name;
                     return true;
                 }
 
@@ -78,13 +75,13 @@ namespace Fusion.Mvvm
 
     public abstract class ValueTargetProxyBase : TargetProxyBase, IModifiable, IObtainable, INotifiable
     {
-        private bool disposed;
-        private bool subscribed;
+        private bool _disposed;
+        private bool _subscribed;
 
-        protected readonly object _lock = new object();
-        protected EventHandler valueChanged;
+        private readonly object _lock = new object();
+        private EventHandler _valueChanged;
 
-        public ValueTargetProxyBase(object target) : base(target)
+        protected ValueTargetProxyBase(object target) : base(target)
         {
         }
 
@@ -94,9 +91,9 @@ namespace Fusion.Mvvm
             {
                 lock (_lock)
                 {
-                    valueChanged += value;
+                    _valueChanged += value;
 
-                    if (valueChanged != null && !subscribed)
+                    if (_valueChanged != null && !_subscribed)
                         Subscribe();
                 }
             }
@@ -105,31 +102,31 @@ namespace Fusion.Mvvm
             {
                 lock (_lock)
                 {
-                    valueChanged -= value;
+                    _valueChanged -= value;
 
-                    if (valueChanged == null && subscribed)
+                    if (_valueChanged == null && _subscribed)
                         Unsubscribe();
                 }
             }
         }
 
-        protected void Subscribe()
+        private void Subscribe()
         {
             try
             {
-                if (subscribed)
+                if (_subscribed)
                     return;
 
                 var target = Target;
                 if (target == null)
                     return;
 
-                subscribed = true;
+                _subscribed = true;
                 DoSubscribeForValueChange(target);
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"{targetName} Subscribe Exception:{e}");
+                Debug.LogWarning($"{_targetName} Subscribe Exception:{e}");
             }
         }
 
@@ -137,25 +134,26 @@ namespace Fusion.Mvvm
         {
         }
 
-        protected void Unsubscribe()
+        private void Unsubscribe()
         {
             try
             {
-                if (!subscribed)
+                if (!_subscribed)
                     return;
 
                 var target = Target;
                 if (target == null)
                     return;
 
-                subscribed = false;
+                _subscribed = false;
                 DoUnsubscribeForValueChange(target);
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"{targetName} Unsubscribe Exception:{e}");
+                Debug.LogWarning($"{_targetName} Unsubscribe Exception:{e}");
             }
         }
+
         protected virtual void DoUnsubscribeForValueChange(object target)
         {
         }
@@ -172,7 +170,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                var handler = valueChanged;
+                var handler = _valueChanged;
                 if (handler != null)
                     handler(this, EventArgs.Empty);
             }
@@ -184,13 +182,14 @@ namespace Fusion.Mvvm
 
         protected override void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!_disposed)
             {
-                disposed = true;
+                _disposed = true;
                 lock (_lock)
                 {
                     Unsubscribe();
                 }
+
                 base.Dispose(disposing);
             }
         }
@@ -198,7 +197,7 @@ namespace Fusion.Mvvm
 
     public abstract class EventTargetProxyBase : TargetProxyBase, IModifiable
     {
-        public EventTargetProxyBase(object target) : base(target)
+        protected EventTargetProxyBase(object target) : base(target)
         {
         }
 

@@ -4,10 +4,10 @@ namespace Fusion.Mvvm
 {
     public class EventNodeProxy : SourceProxyBase, ISourceProxy, IModifiable
     {
-        protected readonly IProxyEventInfo eventInfo;
-        private bool disposed;
-        private readonly bool isStatic;
-        protected Delegate handler;
+        private readonly IProxyEventInfo _eventInfo;
+        private bool _disposed;
+        private readonly bool _isStatic;
+        private Delegate _handler;
 
         public EventNodeProxy(IProxyEventInfo eventInfo) : this(null, eventInfo)
         {
@@ -15,55 +15,55 @@ namespace Fusion.Mvvm
 
         public EventNodeProxy(object source, IProxyEventInfo eventInfo) : base(source)
         {
-            this.eventInfo = eventInfo;
-            isStatic = this.eventInfo.IsStatic;
+            _eventInfo = eventInfo;
+            _isStatic = _eventInfo.IsStatic;
         }
 
-        public override Type Type => eventInfo.HandlerType;
+        public override Type Type => _eventInfo.HandlerType;
 
-        public virtual void SetValue<TValue>(TValue value)
+        public void SetValue<TValue>(TValue value)
         {
             SetValue((object)value);
         }
 
-        public virtual void SetValue(object value)
+        public void SetValue(object value)
         {
-            if (value != null && !value.GetType().Equals(Type))
+            if (value != null && !(value.GetType() == Type))
                 throw new ArgumentException("Binding delegate to event failed, mismatched delegate type", "value");
 
-            Unbind(Source, handler);
-            handler = (Delegate)value;
-            Bind(Source, handler);
+            Unbind(Source, _handler);
+            _handler = (Delegate)value;
+            Bind(Source, _handler);
         }
 
-        protected virtual void Bind(object target, Delegate handler)
+        private void Bind(object target, Delegate handler)
         {
             if (handler == null)
                 return;
 
-            if (eventInfo != null)
-                eventInfo.Add(target, handler);
+            if (_eventInfo != null)
+                _eventInfo.Add(target, handler);
         }
 
-        protected virtual void Unbind(object target, Delegate handler)
+        private void Unbind(object target, Delegate handler)
         {
             if (handler == null)
                 return;
 
-            if (eventInfo != null)
-                eventInfo.Remove(target, handler);
+            if (_eventInfo != null)
+                _eventInfo.Remove(target, handler);
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!_disposed)
             {
                 var source = Source;
-                if (isStatic || source != null)
-                    Unbind(source, handler);
+                if (_isStatic || source != null)
+                    Unbind(source, _handler);
 
-                handler = null;
-                disposed = true;
+                _handler = null;
+                _disposed = true;
                 base.Dispose(disposing);
             }
         }

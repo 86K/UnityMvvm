@@ -46,7 +46,7 @@ namespace Fusion.Mvvm
         private Predicate<T> match;
         public FilterEnumerator(IEnumerator<T> enumerator, Predicate<T> match)
         {
-            Current = default(T);
+            Current = default;
             this.enumerator = enumerator;
             this.match = match;
         }

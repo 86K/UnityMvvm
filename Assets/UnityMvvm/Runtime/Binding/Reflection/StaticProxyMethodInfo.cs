@@ -35,7 +35,7 @@ namespace Fusion.Mvvm
             if (!methodInfo.IsStatic)
                 throw new ArgumentException("The method isn't static!");
 
-            if (!typeof(TResult).Equals(methodInfo.ReturnType) || !typeof(T).Equals(methodInfo.DeclaringType))
+            if (!(typeof(TResult) == methodInfo.ReturnType) || !(typeof(T) == methodInfo.DeclaringType))
                 throw new ArgumentException("The method types do not match!");
 
             this.function = function;
@@ -101,11 +101,11 @@ namespace Fusion.Mvvm
             if (!methodInfo.IsStatic)
                 throw new ArgumentException("The method isn't static!");
 
-            if (!typeof(TResult).Equals(methodInfo.ReturnType) || !typeof(T).Equals(methodInfo.DeclaringType))
+            if (!(typeof(TResult) == methodInfo.ReturnType) || !(typeof(T) == methodInfo.DeclaringType))
                 throw new ArgumentException("The method types do not match!");
 
             ParameterInfo[] parameters = methodInfo.GetParameters();
-            if (parameters.Length != 1 || !typeof(P1).Equals(parameters[0].ParameterType))
+            if (parameters.Length != 1 || !(typeof(P1) == parameters[0].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
             this.function = function;
@@ -173,11 +173,11 @@ namespace Fusion.Mvvm
             if (!methodInfo.IsStatic)
                 throw new ArgumentException("The method isn't static!");
 
-            if (!typeof(TResult).Equals(methodInfo.ReturnType) || !typeof(T).Equals(methodInfo.DeclaringType))
+            if (!(typeof(TResult) == methodInfo.ReturnType) || !(typeof(T) == methodInfo.DeclaringType))
                 throw new ArgumentException("The method types do not match!");
 
             ParameterInfo[] parameters = methodInfo.GetParameters();
-            if (parameters.Length != 2 || !typeof(P1).Equals(parameters[0].ParameterType) || !typeof(P2).Equals(parameters[1].ParameterType))
+            if (parameters.Length != 2 || !(typeof(P1) == parameters[0].ParameterType) || !(typeof(P2) == parameters[1].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
             this.function = function;
@@ -240,11 +240,11 @@ namespace Fusion.Mvvm
             if (!methodInfo.IsStatic)
                 throw new ArgumentException("The method isn't static!");
 
-            if (!typeof(TResult).Equals(methodInfo.ReturnType) || !typeof(T).Equals(methodInfo.DeclaringType))
+            if (!(typeof(TResult) == methodInfo.ReturnType) || !(typeof(T) == methodInfo.DeclaringType))
                 throw new ArgumentException("The method types do not match!");
 
             ParameterInfo[] parameters = methodInfo.GetParameters();
-            if (parameters.Length != 3 || !typeof(P1).Equals(parameters[0].ParameterType) || !typeof(P2).Equals(parameters[1].ParameterType) || !typeof(P3).Equals(parameters[2].ParameterType))
+            if (parameters.Length != 3 || !(typeof(P1) == parameters[0].ParameterType) || !(typeof(P2) == parameters[1].ParameterType) || !(typeof(P3) == parameters[2].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
             this.function = function;
@@ -307,7 +307,7 @@ namespace Fusion.Mvvm
             if (!methodInfo.IsStatic)
                 throw new ArgumentException("The method isn't static!");
 
-            if (!typeof(void).Equals(methodInfo.ReturnType) || !typeof(T).Equals(methodInfo.DeclaringType))
+            if (!(typeof(void) == methodInfo.ReturnType) || !(typeof(T) == methodInfo.DeclaringType))
                 throw new ArgumentException("The method types do not match!");
 
             this.action = action;
@@ -376,11 +376,11 @@ namespace Fusion.Mvvm
             if (!methodInfo.IsStatic)
                 throw new ArgumentException("The method isn't static!");
 
-            if (!typeof(void).Equals(methodInfo.ReturnType) || !typeof(T).Equals(methodInfo.DeclaringType))
+            if (!(typeof(void) == methodInfo.ReturnType) || !(typeof(T) == methodInfo.DeclaringType))
                 throw new ArgumentException("The method types do not match!");
 
             ParameterInfo[] parameters = methodInfo.GetParameters();
-            if (parameters.Length != 1 || !typeof(P1).Equals(parameters[0].ParameterType))
+            if (parameters.Length != 1 || !(typeof(P1) == parameters[0].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
             this.action = action;
@@ -446,11 +446,11 @@ namespace Fusion.Mvvm
             if (!methodInfo.IsStatic)
                 throw new ArgumentException("The method isn't static!");
 
-            if (!typeof(void).Equals(methodInfo.ReturnType) || !typeof(T).Equals(methodInfo.DeclaringType))
+            if (!(typeof(void) == methodInfo.ReturnType) || !(typeof(T) == methodInfo.DeclaringType))
                 throw new ArgumentException("The method types do not match!");
 
             ParameterInfo[] parameters = methodInfo.GetParameters();
-            if (parameters.Length != 2 || !typeof(P1).Equals(parameters[0].ParameterType) || !typeof(P2).Equals(parameters[1].ParameterType))
+            if (parameters.Length != 2 || !(typeof(P1) == parameters[0].ParameterType) || !(typeof(P2) == parameters[1].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
             this.action = action;
@@ -516,11 +516,11 @@ namespace Fusion.Mvvm
             if (!methodInfo.IsStatic)
                 throw new ArgumentException("The method isn't static!");
 
-            if (!typeof(void).Equals(methodInfo.ReturnType) || !typeof(T).Equals(methodInfo.DeclaringType))
+            if (!(typeof(void) == methodInfo.ReturnType) || !(typeof(T) == methodInfo.DeclaringType))
                 throw new ArgumentException("The method types do not match!");
 
             ParameterInfo[] parameters = methodInfo.GetParameters();
-            if (parameters.Length != 3 || !typeof(P1).Equals(parameters[0].ParameterType) || !typeof(P2).Equals(parameters[1].ParameterType) || !typeof(P3).Equals(parameters[2].ParameterType))
+            if (parameters.Length != 3 || !(typeof(P1) == parameters[0].ParameterType) || !(typeof(P2) == parameters[1].ParameterType) || !(typeof(P3) == parameters[2].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
             this.action = action;

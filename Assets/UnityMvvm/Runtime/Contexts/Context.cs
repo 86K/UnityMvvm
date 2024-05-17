@@ -112,7 +112,7 @@ namespace Fusion.Mvvm
             if (cascade && contextBase != null)
                 return contextBase.Get<T>(name, cascade);
 
-            return default(T);
+            return default;
         }
 
         public virtual void Set(string name, object value)
@@ -133,7 +133,7 @@ namespace Fusion.Mvvm
         public virtual T Remove<T>(string name)
         {
             if (!attributes.ContainsKey(name))
-                return default(T);
+                return default;
 
             object v = attributes[name];
             attributes.Remove(name);
@@ -183,7 +183,7 @@ namespace Fusion.Mvvm
             if (contextBase != null)
                 return contextBase.GetService<T>();
 
-            return default(T);
+            return default;
         }
 
         public virtual T GetService<T>(string name)
@@ -195,7 +195,7 @@ namespace Fusion.Mvvm
             if (contextBase != null)
                 return contextBase.GetService<T>(name);
 
-            return default(T);
+            return default;
         }
 
         #region IDisposable Support
@@ -209,8 +209,7 @@ namespace Fusion.Mvvm
                 {
                     if (innerContainer && container != null)
                     {
-                        IDisposable dis = container as IDisposable;
-                        if (dis != null)
+                        if (container is IDisposable dis)
                             dis.Dispose();
                     }
                 }

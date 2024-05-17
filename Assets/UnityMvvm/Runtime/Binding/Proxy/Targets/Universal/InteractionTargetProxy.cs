@@ -6,13 +6,14 @@ namespace Fusion.Mvvm
 {
     public class InteractionTargetProxy : TargetProxyBase, IObtainable
     {
-        private readonly EventHandler<InteractionEventArgs> handler;
-        private readonly IInteractionAction interactionAction;
-        private SendOrPostCallback postCallback;
+        private readonly EventHandler<InteractionEventArgs> _handler;
+        private readonly IInteractionAction _interactionAction;
+        private SendOrPostCallback _postCallback;
+
         public InteractionTargetProxy(object target, IInteractionAction interactionAction) : base(target)
         {
-            this.interactionAction = interactionAction;
-            handler = OnRequest;
+            _interactionAction = interactionAction;
+            _handler = OnRequest;
         }
 
         public override Type Type => typeof(EventHandler<InteractionEventArgs>);
@@ -21,7 +22,7 @@ namespace Fusion.Mvvm
 
         public object GetValue()
         {
-            return handler;
+            return _handler;
         }
 
         public TValue GetValue<TValue>()
@@ -37,26 +38,28 @@ namespace Fusion.Mvvm
                 if (target == null || (target is Behaviour behaviour && !behaviour.isActiveAndEnabled))
                     return;
 
-                interactionAction.OnRequest(sender, args);
+                _interactionAction.OnRequest(sender, args);
             }
             else
             {
-                if (postCallback == null)
+                if (_postCallback == null)
                 {
-                    postCallback = state =>
+                    _postCallback = state =>
                     {
                         PostArgs postArgs = (PostArgs)state;
                         var target = Target;
                         if (target == null || (target is Behaviour behaviour && !behaviour.isActiveAndEnabled))
                             return;
 
-                        interactionAction.OnRequest(postArgs.sender, postArgs.args);
+                        _interactionAction.OnRequest(postArgs.sender, postArgs.args);
                     };
                 }
-                UISynchronizationContext.Post(postCallback, new PostArgs(sender, args));
+
+                UISynchronizationContext.Post(_postCallback, new PostArgs(sender, args));
             }
         }
 
+        // NOTE：can use event system to combine 
         class PostArgs
         {
             public PostArgs(object sender, InteractionEventArgs args)

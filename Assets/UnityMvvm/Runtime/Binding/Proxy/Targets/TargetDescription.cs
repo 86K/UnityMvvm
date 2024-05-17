@@ -47,7 +47,7 @@ namespace Fusion.Mvvm
                 buf.Append(" Converter:").Append(Converter.GetType().Name);
 
             if (Source != null)
-                buf.Append(" ").Append(Source.ToString());
+                buf.Append(" ").Append(Source);
 
             if (CommandParameter != null)
                 buf.Append(" CommandParameter:").Append(CommandParameter);

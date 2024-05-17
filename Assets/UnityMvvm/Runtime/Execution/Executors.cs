@@ -149,7 +149,7 @@ namespace Fusion.Mvvm
         public static TResult RunOnMainThread<TResult>(Func<TResult> func)
         {
             if (disposed)
-                return default(TResult);
+                return default;
 
             AsyncResult<TResult> result = new AsyncResult<TResult>();
             RunOnMainThread<TResult>(func, result);
@@ -253,7 +253,7 @@ namespace Fusion.Mvvm
 
         protected static InterceptableEnumerator WrapEnumerator(IEnumerator routine, IPromise promise)
         {
-            InterceptableEnumerator enumerator = routine is InterceptableEnumerator ? (InterceptableEnumerator)routine : InterceptableEnumerator.Create(routine);
+            InterceptableEnumerator enumerator = routine is InterceptableEnumerator interceptableEnumerator ? interceptableEnumerator : InterceptableEnumerator.Create(routine);
             if (promise != null)
             {
                 enumerator.RegisterConditionBlock(() => !(promise.IsCancellationRequested));
@@ -663,15 +663,15 @@ namespace Fusion.Mvvm
                     try
                     {
                         object task = stopingTempQueue[i];
-                        if (task is IEnumerator)
+                        if (task is IEnumerator enumerator)
                         {
-                            StopCoroutine((IEnumerator)task);
+                            StopCoroutine(enumerator);
                             continue;
                         }
 
-                        if (task is Coroutine)
+                        if (task is Coroutine coroutine)
                         {
-                            StopCoroutine((Coroutine)task);
+                            StopCoroutine(coroutine);
                             continue;
                         }
                     }
@@ -700,15 +700,15 @@ namespace Fusion.Mvvm
                     try
                     {
                         object task = runningQueue[i];
-                        if (task is Action)
+                        if (task is Action action)
                         {
-                            ((Action)task)();
+                            action();
                             continue;
                         }
 
-                        if (task is IEnumerator)
+                        if (task is IEnumerator enumerator)
                         {
-                            StartCoroutine((IEnumerator)task);
+                            StartCoroutine(enumerator);
                             continue;
                         }
                     }

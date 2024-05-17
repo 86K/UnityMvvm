@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Fusion.Mvvm
 {
-    public class ObjectSourceProxyFactory : TypedSourceProxyFactory<ObjectSourceDescription>, INodeProxyFactory, INodeProxyFactoryRegister
+    public class ObjectSourceProxyFactory : TypedSourceProxyFactory<ObjectSourceDescription>, INodeProxyFactory, IRegistry<INodeProxyFactory>
     {
-        private readonly List<PriorityFactoryPair> factories = new List<PriorityFactoryPair>();
+        private readonly List<FactoryPriorityPair<INodeProxyFactory>> factories = new List<FactoryPriorityPair<INodeProxyFactory>>();
 
         protected override bool TryCreateProxy(object source, ObjectSourceDescription description, out ISourceProxy proxy)
         {
@@ -22,48 +22,37 @@ namespace Fusion.Mvvm
             return true;
         }
 
-        public virtual ISourceProxy Create(object source, PathToken token)
+        public ISourceProxy Create(object source, PathToken token)
         {
-            ISourceProxy proxy = null;
-            foreach (PriorityFactoryPair pair in factories)
+            foreach (var pair in factories)
             {
                 var factory = pair.factory;
                 if (factory == null)
                     continue;
 
-                proxy = factory.Create(source, token);
+                var proxy = factory.Create(source, token);
                 if (proxy != null)
                     return proxy;
             }
-            return proxy;
+
+            return null;
         }
 
-        public virtual void Register(INodeProxyFactory factory, int priority = 100)
+        public void Register(INodeProxyFactory factory, int priority = 100)
         {
             if (factory == null)
                 return;
 
-            factories.Add(new PriorityFactoryPair(factory, priority));
+            factories.Add(new FactoryPriorityPair<INodeProxyFactory>(factory, priority));
             factories.Sort((x, y) => y.priority.CompareTo(x.priority));
         }
 
-        public virtual void Unregister(INodeProxyFactory factory)
+        public void Unregister(INodeProxyFactory factory)
         {
             if (factory == null)
                 return;
 
             factories.RemoveAll(pair => pair.factory == factory);
-        }
-
-        struct PriorityFactoryPair
-        {
-            public PriorityFactoryPair(INodeProxyFactory factory, int priority)
-            {
-                this.factory = factory;
-                this.priority = priority;
-            }
-            public readonly int priority;
-            public readonly INodeProxyFactory factory;
         }
     }
 }

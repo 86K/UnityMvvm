@@ -72,7 +72,7 @@ namespace Fusion.Mvvm
             get
             {
                 if (!dictionary.ContainsKey(key))
-                    return default(TValue);
+                    return default;
                 return dictionary[key];
             }
             set => Insert(key, value, false);
@@ -175,11 +175,8 @@ namespace Fusion.Mvvm
                 {
                     if (items.Keys.Any((k) => dictionary.ContainsKey(k)))
                         throw new ArgumentException("An item with the same key has already been added.");
-                    else
-                    {
-                        foreach (var item in items)
-                            ((IDictionary<TKey, TValue>)dictionary).Add(item);
-                    }
+                    foreach (var item in items)
+                        ((IDictionary<TKey, TValue>)dictionary).Add(item);
                 }
                 else
                 {

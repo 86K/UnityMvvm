@@ -51,7 +51,7 @@ namespace Fusion.Mvvm
                 return "unknown";
 
             string typeName = owner.GetType().Name;
-            string name = (owner is Behaviour) ? ((Behaviour)owner).name : "";
+            string name = (owner is Behaviour behaviour) ? behaviour.name : "";
             return string.IsNullOrEmpty(name) ? typeName : $"{typeName}[{name}]";
         }
 
@@ -299,37 +299,37 @@ namespace Fusion.Mvvm
                     case TypeCode.Object:
                         {
                             Type valueType = sourceProxy.Type;
-                            if (valueType.Equals(typeof(Vector2)))
+                            if (valueType == typeof(Vector2))
                             {
                                 var value = obtainable.GetValue<Vector2>();
                                 SetTargetValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(Vector3)))
+                            else if (valueType == typeof(Vector3))
                             {
                                 var value = obtainable.GetValue<Vector3>();
                                 SetTargetValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(Vector4)))
+                            else if (valueType == typeof(Vector4))
                             {
                                 var value = obtainable.GetValue<Vector4>();
                                 SetTargetValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(Color)))
+                            else if (valueType == typeof(Color))
                             {
                                 var value = obtainable.GetValue<Color>();
                                 SetTargetValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(Rect)))
+                            else if (valueType == typeof(Rect))
                             {
                                 var value = obtainable.GetValue<Rect>();
                                 SetTargetValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(Quaternion)))
+                            else if (valueType == typeof(Quaternion))
                             {
                                 var value = obtainable.GetValue<Quaternion>();
                                 SetTargetValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(TimeSpan)))
+                            else if (valueType == typeof(TimeSpan))
                             {
                                 var value = obtainable.GetValue<TimeSpan>();
                                 SetTargetValue(modifier, value);
@@ -352,7 +352,7 @@ namespace Fusion.Mvvm
             catch (Exception e)
             {
                 Debug.LogWarning(
-                    $"An exception occurs when the target property is updated.Please check the binding \"{targetTypeName}{_targetDescription.ToString()}\" in the view \"{GetViewName()}\".exception: {e}");
+                    $"An exception occurs when the target property is updated.Please check the binding \"{targetTypeName}{_targetDescription}\" in the view \"{GetViewName()}\".exception: {e}");
             }
             finally
             {
@@ -474,37 +474,37 @@ namespace Fusion.Mvvm
                     case TypeCode.Object:
                         {
                             Type valueType = targetProxy.Type;
-                            if (valueType.Equals(typeof(Vector2)))
+                            if (valueType == typeof(Vector2))
                             {
                                 var value = obtainable.GetValue<Vector2>();
                                 SetSourceValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(Vector3)))
+                            else if (valueType == typeof(Vector3))
                             {
                                 var value = obtainable.GetValue<Vector3>();
                                 SetSourceValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(Vector4)))
+                            else if (valueType == typeof(Vector4))
                             {
                                 var value = obtainable.GetValue<Vector4>();
                                 SetSourceValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(Color)))
+                            else if (valueType == typeof(Color))
                             {
                                 var value = obtainable.GetValue<Color>();
                                 SetSourceValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(Rect)))
+                            else if (valueType == typeof(Rect))
                             {
                                 var value = obtainable.GetValue<Rect>();
                                 SetSourceValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(Quaternion)))
+                            else if (valueType == typeof(Quaternion))
                             {
                                 var value = obtainable.GetValue<Quaternion>();
                                 SetSourceValue(modifier, value);
                             }
-                            else if (valueType.Equals(typeof(TimeSpan)))
+                            else if (valueType == typeof(TimeSpan))
                             {
                                 var value = obtainable.GetValue<TimeSpan>();
                                 SetSourceValue(modifier, value);
@@ -527,7 +527,7 @@ namespace Fusion.Mvvm
             catch (Exception e)
             {
                 Debug.LogWarning(
-                    $"An exception occurs when the source property is updated.Please check the binding \"{targetTypeName}{_targetDescription.ToString()}\" in the view \"{GetViewName()}\".exception: {e}");
+                    $"An exception occurs when the source property is updated.Please check the binding \"{targetTypeName}{_targetDescription}\" in the view \"{GetViewName()}\".exception: {e}");
             }
             finally
             {
@@ -537,7 +537,7 @@ namespace Fusion.Mvvm
 
         protected void SetTargetValue<T>(IModifiable modifier, T value)
         {
-            if (converter == null && typeof(T).Equals(targetProxy.Type))
+            if (converter == null && typeof(T) == targetProxy.Type)
             {
                 modifier.SetValue(value);
                 return;
@@ -555,7 +555,7 @@ namespace Fusion.Mvvm
 
         private void SetSourceValue<T>(IModifiable modifier, T value)
         {
-            if (converter == null && typeof(T).Equals(sourceProxy.Type))
+            if (converter == null && typeof(T) == sourceProxy.Type)
             {
                 modifier.SetValue(value);
                 return;

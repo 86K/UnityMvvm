@@ -1,90 +1,68 @@
-
-
 using System;
 using System.Reflection;
 using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Linq;
 
-#if UNITY_IOS || ENABLE_IL2CPP
-using Loxodon.Framework.Binding.Expressions;
-#endif
-
 namespace Fusion.Mvvm
 {
     public class PathExpressionVisitor
     {
-        //private static readonly ILog log = LogManager.GetLogger(typeof(PathExpressionVisitor));
+        private readonly List<Path> _paths = new List<Path>();
 
-        private readonly List<Path> list = new List<Path>();
+        public List<Path> Paths => _paths;
 
-        public List<Path> Paths => list;
-
-        public virtual Expression Visit(Expression expression)
+        public  Expression Visit(Expression expression)
         {
             if (expression == null)
                 return null;
 
-            var bin = expression as BinaryExpression;
-            if (bin != null)
+            if (expression is BinaryExpression bin)
                 return VisitBinary(bin);
 
-            var cond = expression as ConditionalExpression;
-            if (cond != null)
+            if (expression is ConditionalExpression cond)
                 return VisitConditional(cond);
 
-            var constant = expression as ConstantExpression;
-            if (constant != null)
+            if (expression is ConstantExpression constant)
                 return VisitConstant(constant);
 
-            var lambda = expression as LambdaExpression;
-            if (lambda != null)
+            if (expression is LambdaExpression lambda)
                 return VisitLambda(lambda);
 
-            var listInit = expression as ListInitExpression;
-            if (listInit != null)
+            if (expression is ListInitExpression listInit)
                 return VisitListInit(listInit);
 
-            var member = expression as MemberExpression;
-            if (member != null)
+            if (expression is MemberExpression member)
                 return VisitMember(member);
 
-            var memberInit = expression as MemberInitExpression;
-            if (memberInit != null)
+            if (expression is MemberInitExpression memberInit)
                 return VisitMemberInit(memberInit);
 
-            var methodCall = expression as MethodCallExpression;
-            if (methodCall != null)
+            if (expression is MethodCallExpression methodCall)
                 return VisitMethodCall(methodCall);
 
-            var newExpr = expression as NewExpression;
-            if (newExpr != null)
+            if (expression is NewExpression newExpr)
                 return VisitNew(newExpr);
 
-            var newArrayExpr = expression as NewArrayExpression;
-            if (newArrayExpr != null)
+            if (expression is NewArrayExpression newArrayExpr)
                 return VisitNewArray(newArrayExpr);
 
-            var param = expression as ParameterExpression;
-            if (param != null)
+            if (expression is ParameterExpression param)
                 return VisitParameter(param);
 
-            var typeBinary = expression as TypeBinaryExpression;
-            if (typeBinary != null)
+            if (expression is TypeBinaryExpression typeBinary)
                 return VisitTypeBinary(typeBinary);
 
-            var unary = expression as UnaryExpression;
-            if (unary != null)
+            if (expression is UnaryExpression unary)
                 return VisitUnary(unary);
 
-            var invocation = expression as InvocationExpression;
-            if (invocation != null)
+            if (expression is InvocationExpression invocation)
                 return VisitInvocation(invocation);
 
             throw new NotSupportedException("Expressions of type " + expression.Type + " are not supported.");
         }
 
-        protected virtual void Visit(IList<Expression> nodes)
+        private void Visit(IList<Expression> nodes)
         {
             if (nodes == null || nodes.Count <= 0)
                 return;
@@ -93,18 +71,17 @@ namespace Fusion.Mvvm
                 Visit(expression);
         }
 
-        protected virtual Expression VisitLambda(LambdaExpression node)
+        private  Expression VisitLambda(LambdaExpression node)
         {
-            if (node.Parameters != null)
-                Visit(node.Parameters.Select(p => (Expression)p).ToList());
+            Visit(node.Parameters.Select(p => (Expression)p).ToList());
             return Visit(node.Body);
         }
 
-        protected virtual Expression VisitBinary(BinaryExpression node)
+        private  Expression VisitBinary(BinaryExpression node)
         {
             if (node.NodeType == ExpressionType.ArrayIndex)
             {
-                Visit(ParseMemberPath(node, null, list));
+                Visit(ParseMemberPath(node, null, _paths));
             }
             else
             {
@@ -114,19 +91,19 @@ namespace Fusion.Mvvm
             return null;
         }
 
-        protected virtual Expression VisitConditional(ConditionalExpression node)
+        private  Expression VisitConditional(ConditionalExpression node)
         {
             List<Expression> list = new List<Expression>() { node.IfFalse, node.IfTrue, node.Test };
             Visit(list);
             return null;
         }
 
-        protected virtual Expression VisitConstant(ConstantExpression node)
+        private  Expression VisitConstant(ConstantExpression node)
         {
             return null;
         }
 
-        protected virtual void VisitElementInit(ElementInit init)
+        private  void VisitElementInit(ElementInit init)
         {
             if (init == null)
                 return;
@@ -134,74 +111,61 @@ namespace Fusion.Mvvm
             Visit(init.Arguments);
         }
 
-        protected virtual Expression VisitListInit(ListInitExpression node)
+        private  Expression VisitListInit(ListInitExpression node)
         {
-            if (node.Initializers != null)
+            foreach (ElementInit init in node.Initializers)
             {
-                foreach (ElementInit init in node.Initializers)
-                {
-                    VisitElementInit(init);
-                }
+                VisitElementInit(init);
             }
             return Visit(node.NewExpression);
         }
 
-        protected virtual Expression VisitMember(MemberExpression node)
+        private  Expression VisitMember(MemberExpression node)
         {
-            Visit(ParseMemberPath(node, null, list));
+            Visit(ParseMemberPath(node, null, _paths));
             return null;
         }
 
-        protected virtual Expression VisitInvocation(InvocationExpression node)
+        private  Expression VisitInvocation(InvocationExpression node)
         {
             Visit(node.Arguments);
             return Visit(node.Expression);
         }
 
-        protected virtual Expression VisitMemberInit(MemberInitExpression expr)
+        private  Expression VisitMemberInit(MemberInitExpression expr)
         {
             return Visit(expr.NewExpression);
         }
-
-        protected virtual MemberListBinding VisitMemberListBinding(MemberListBinding binding)
+        
+        private  Expression VisitMethodCall(MethodCallExpression node)
         {
+            Visit(ParseMemberPath(node, null, _paths));
             return null;
         }
 
-        protected virtual MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding binding)
-        {
-            return null;
-        }
-
-        protected virtual Expression VisitMethodCall(MethodCallExpression node)
-        {
-            Visit(ParseMemberPath(node, null, list));
-            return null;
-        }
-
-        protected virtual Expression VisitNew(NewExpression expr)
+        private  Expression VisitNew(NewExpression expr)
         {
             Visit(expr.Arguments);
             return null;
         }
 
-        protected virtual Expression VisitNewArray(NewArrayExpression node)
+        private  Expression VisitNewArray(NewArrayExpression node)
         {
             Visit(node.Expressions);
             return null;
         }
 
-        protected virtual Expression VisitParameter(ParameterExpression node)
+        private  Expression VisitParameter(ParameterExpression node)
         {
             return null;
         }
 
-        protected virtual Expression VisitTypeBinary(TypeBinaryExpression node)
+        private  Expression VisitTypeBinary(TypeBinaryExpression node)
         {
             return Visit(node.Expression);
         }
 
-        protected virtual Expression VisitUnary(UnaryExpression node)
+        private  Expression VisitUnary(UnaryExpression node)
         {
             return Visit(node.Operand);
         }
@@ -234,7 +198,7 @@ namespace Fusion.Mvvm
             Expression current = expression;
             while (current != null && (current is MemberExpression || current is MethodCallExpression || current is BinaryExpression || current is ParameterExpression || current is ConstantExpression))
             {
-                if (current is MemberExpression)
+                if (current is MemberExpression me)
                 {
                     if (path == null)
                     {
@@ -242,7 +206,6 @@ namespace Fusion.Mvvm
                         list.Add(path);
                     }
 
-                    MemberExpression me = (MemberExpression)current;
                     var field = me.Member as FieldInfo;
                     if (field != null)
                     {
@@ -259,9 +222,8 @@ namespace Fusion.Mvvm
 
                     current = me.Expression;
                 }
-                else if (current is MethodCallExpression)
+                else if (current is MethodCallExpression mc)
                 {
-                    MethodCallExpression mc = (MethodCallExpression)current;
                     if (mc.Method.Name.Equals("get_Item") && mc.Arguments.Count == 1)
                     {
                         if (path == null)
@@ -275,13 +237,13 @@ namespace Fusion.Mvvm
                             argument = ConvertMemberAccessToConstant(argument);
 
                         object value = (argument as ConstantExpression).Value;
-                        if (value is string)
+                        if (value is string s)
                         {
-                            path.PrependIndexed((string)value);
+                            path.PrependIndexed(s);
                         }
-                        else if (value is Int32)
+                        else if (value is Int32 i)
                         {
-                            path.PrependIndexed((int)value);
+                            path.PrependIndexed(i);
                         }
 
                         current = mc.Object;
@@ -293,9 +255,8 @@ namespace Fusion.Mvvm
                         result.Add(mc.Object);
                     }
                 }
-                else if (current is BinaryExpression)
+                else if (current is BinaryExpression binary)
                 {
-                    var binary = current as BinaryExpression;
                     if (binary.NodeType == ExpressionType.ArrayIndex)
                     {
                         if (path == null)
@@ -310,13 +271,13 @@ namespace Fusion.Mvvm
                             right = ConvertMemberAccessToConstant(right);
 
                         object value = (right as ConstantExpression).Value;
-                        if (value is string)
+                        if (value is string s)
                         {
-                            path.PrependIndexed((string)value);
+                            path.PrependIndexed(s);
                         }
-                        else if (value is Int32)
+                        else if (value is Int32 i)
                         {
-                            path.PrependIndexed((int)value);
+                            path.PrependIndexed(i);
                         }
 
                         current = left;

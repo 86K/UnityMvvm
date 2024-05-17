@@ -35,18 +35,18 @@ namespace Fusion.Mvvm
         {
             try
             {
-                if (target is UIBehaviour)
+                if (target is UIBehaviour behaviour)
                 {
-                    if (((UIBehaviour)target).IsDestroyed())
+                    if (behaviour.IsDestroyed())
                         return false;
                     return true;
                 }
 
-                if (target is UnityEngine.Object)
+                if (target is UnityEngine.Object o)
                 {
                     //Check if the object is valid because it may have been destroyed.
                     //Unmanaged objects,the weak caches do not accurately track the validity of objects.
-                    var name = ((UnityEngine.Object)target).name;
+                    var name = o.name;
                     return true;
                 }
 

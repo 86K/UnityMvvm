@@ -1,8 +1,6 @@
-
- 
 namespace Fusion.Mvvm
 {
-    public interface IExpressionSourceProxy:ISourceProxy,IObtainable,INotifiable
+    public interface IExpressionSourceProxy : ISourceProxy, IObtainable, INotifiable
     {
     }
 }

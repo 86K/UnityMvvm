@@ -30,7 +30,7 @@ namespace Fusion.Mvvm
         public ImmutableProgressResult(TProgress progress) : base(false)
         {
             UpdateProgress(progress);
-            SetResult(default(TResult));
+            SetResult(default);
         }
 
         public ImmutableProgressResult(TResult result, TProgress progress) : base(false)

@@ -102,10 +102,9 @@ namespace Fusion.Mvvm
             if (this == obj)
                 return true;
 
-            if (obj == null || !(obj is WeakBase<TDelegate>))
+            if (obj == null || !(obj is WeakBase<TDelegate> other))
                 return false;
 
-            WeakBase<TDelegate> other = (WeakBase<TDelegate>)obj;
             if (isStatic != other.isStatic)
                 return false;
 

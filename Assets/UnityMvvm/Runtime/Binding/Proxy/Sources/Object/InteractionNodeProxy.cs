@@ -7,12 +7,10 @@ namespace Fusion.Mvvm
 {
     public class InteractionNodeProxy : SourceProxyBase, IModifiable
     {
-        
-        private readonly IInteractionRequest request;
-
-        private bool disposed;
-        protected IInvoker invoker;
-        protected Delegate handler;
+        private readonly IInteractionRequest _request;
+        private bool _disposed;
+        private IInvoker _invoker;
+        private Delegate _handler;
 
         public InteractionNodeProxy(IInteractionRequest request) : this(null, request)
         {
@@ -20,27 +18,24 @@ namespace Fusion.Mvvm
 
         public InteractionNodeProxy(object source, IInteractionRequest request) : base(source)
         {
-            this.request = request;
+            _request = request;
             BindEvent();
         }
 
         public override Type Type => typeof(EventHandler<InteractionEventArgs>);
 
-        public virtual void SetValue<TValue>(TValue value)
+        public void SetValue<TValue>(TValue value)
         {
             SetValue((object)value);
         }
 
-        public virtual void SetValue(object value)
+        public void SetValue(object value)
         {
             if (value != null && !(value is IInvoker || value is Delegate))
                 throw new ArgumentException("Binding object to InteractionRequest failed, unsupported object type", "value");
 
-            if (this.invoker != null)
-                this.invoker = null;
-
-            if (this.handler != null)
-                this.handler = null;
+            _invoker = null;
+            _handler = null;
 
             if (value == null)
                 return;
@@ -50,15 +45,16 @@ namespace Fusion.Mvvm
             {
                 if (IsValid(proxyInvoker))
                 {
-                    invoker = proxyInvoker;
+                    _invoker = proxyInvoker;
                     return;
                 }
 
                 throw new ArgumentException("Binding the IProxyInvoker to InteractionRequest failed, mismatched parameter type.");
             }
-            else if (value is IInvoker invoker)
+
+            if (value is IInvoker invoker)
             {
-                this.invoker = invoker;
+                _invoker = invoker;
             }
 
             //Bind Delegate
@@ -66,7 +62,7 @@ namespace Fusion.Mvvm
             {
                 if (IsValid(handler))
                 {
-                    this.handler = handler;
+                    _handler = handler;
                     return;
                 }
 
@@ -74,16 +70,13 @@ namespace Fusion.Mvvm
             }
         }
 
-        protected virtual bool IsValid(Delegate handler)
+        private bool IsValid(Delegate handler)
         {
             if (handler is EventHandler<InteractionEventArgs>)
                 return true;
-#if NETFX_CORE
-            MethodInfo info = handler.GetMethodInfo();
-#else
+
             MethodInfo info = handler.Method;
-#endif
-            if (!info.ReturnType.Equals(typeof(void)))
+            if (!(info.ReturnType == typeof(void)))
                 return false;
 
             List<Type> parameterTypes = info.GetParameterTypes();
@@ -93,48 +86,48 @@ namespace Fusion.Mvvm
             return parameterTypes[0].IsAssignableFrom(typeof(object)) && parameterTypes[1].IsAssignableFrom(typeof(InteractionEventArgs));
         }
 
-        protected virtual bool IsValid(IProxyInvoker invoker)
+        private bool IsValid(IProxyInvoker invoker)
         {
             IProxyMethodInfo info = invoker.ProxyMethodInfo;
-            if (!info.ReturnType.Equals(typeof(void)))
+            if (!(info.ReturnType == typeof(void)))
                 return false;
 
             ParameterInfo[] parameters = info.Parameters;
             if (parameters == null || parameters.Length != 2)
                 return false;
 
-            return parameters[0].ParameterType.IsAssignableFrom(typeof(object)) && parameters[1].ParameterType.IsAssignableFrom(typeof(InteractionEventArgs));
+            return parameters[0].ParameterType.IsAssignableFrom(typeof(object)) &&
+                   parameters[1].ParameterType.IsAssignableFrom(typeof(InteractionEventArgs));
         }
 
-        protected virtual void BindEvent()
+        private void BindEvent()
         {
-            if (request != null)
-                request.Raised += OnRaised;
+            if (_request != null)
+                _request.Raised += OnRaised;
         }
 
-        protected virtual void UnbindEvent()
+        private void UnbindEvent()
         {
-            if (request != null)
-                request.Raised -= OnRaised;
+            if (_request != null)
+                _request.Raised -= OnRaised;
         }
 
-        protected virtual void OnRaised(object sender, InteractionEventArgs args)
+        private void OnRaised(object sender, InteractionEventArgs args)
         {
             try
             {
-                if (invoker != null)
+                if (_invoker != null)
                 {
-                    invoker.Invoke(sender, args);
+                    _invoker.Invoke(sender, args);
                     return;
                 }
 
-                if (handler != null)
+                if (_handler != null)
                 {
-                    if (handler is EventHandler<InteractionEventArgs> eventHandler)
+                    if (_handler is EventHandler<InteractionEventArgs> eventHandler)
                         eventHandler(sender, args);
                     else
-                        handler.DynamicInvoke(sender, args);
-                    return;
+                        _handler.DynamicInvoke(sender, args);
                 }
             }
             catch (Exception e)
@@ -145,12 +138,12 @@ namespace Fusion.Mvvm
 
         protected override void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!_disposed)
             {
                 UnbindEvent();
-                handler = null;
-                invoker = null;
-                disposed = true;
+                _handler = null;
+                _invoker = null;
+                _disposed = true;
                 base.Dispose(disposing);
             }
         }

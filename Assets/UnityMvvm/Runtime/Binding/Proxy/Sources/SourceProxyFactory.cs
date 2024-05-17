@@ -1,13 +1,11 @@
-
-
 using System;
 using System.Collections.Generic;
 
 namespace Fusion.Mvvm
 {
-    public class SourceProxyFactory : ISourceProxyFactory, ISourceProxyFactoryRegistry
+    public class SourceProxyFactory : ISourceProxyFactory, IRegistry<ISourceProxyFactory>
     {
-        private readonly List<PriorityFactoryPair> factories = new List<PriorityFactoryPair>();
+        private readonly List<FactoryPriorityPair<ISourceProxyFactory>> _factories = new List<FactoryPriorityPair<ISourceProxyFactory>>();
 
         public ISourceProxy CreateProxy(object source, SourceDescription description)
         {
@@ -23,14 +21,14 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                throw new ProxyException(e, "An exception occurred while creating a proxy for the \"{0}\".", description.ToString());
+                throw new Exception("An exception occurred while creating a proxy for the \"{description.ToString()}\".\n{e}");
             }
         }
 
-        protected virtual bool TryCreateProxy(object source, SourceDescription description, out ISourceProxy proxy)
+        private bool TryCreateProxy(object source, SourceDescription description, out ISourceProxy proxy)
         {
             proxy = null;
-            foreach (PriorityFactoryPair pair in factories)
+            foreach (var pair in _factories)
             {
                 var factory = pair.factory;
                 if (factory == null)
@@ -53,7 +51,7 @@ namespace Fusion.Mvvm
                 catch (Exception e)
                 {
                     UnityEngine.Debug.LogWarning(
-                        $"An exception occurred when using the \"{factory.GetType().Name}\" factory to create a proxy for the \"{description.ToString()}\";exception:{e}");
+                        $"An exception occurred when using the \"{factory.GetType().Name}\" factory to create a proxy for the \"{description}\";exception:{e}");
                 }
             }
 
@@ -66,8 +64,8 @@ namespace Fusion.Mvvm
             if (factory == null)
                 return;
 
-            factories.Add(new PriorityFactoryPair(factory, priority));
-            factories.Sort((x, y) => y.priority.CompareTo(x.priority));
+            _factories.Add(new FactoryPriorityPair<ISourceProxyFactory>(factory, priority));
+            _factories.Sort((x, y) => y.priority.CompareTo(x.priority));
         }
 
         public void Unregister(ISourceProxyFactory factory)
@@ -75,18 +73,7 @@ namespace Fusion.Mvvm
             if (factory == null)
                 return;
 
-            factories.RemoveAll(pair => pair.factory == factory);
-        }
-
-        struct PriorityFactoryPair
-        {
-            public PriorityFactoryPair(ISourceProxyFactory factory, int priority)
-            {
-                this.factory = factory;
-                this.priority = priority;
-            }
-            public readonly int priority;
-            public readonly ISourceProxyFactory factory;
+            _factories.RemoveAll(pair => pair.factory == factory);
         }
     }
 }

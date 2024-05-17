@@ -1,5 +1,3 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
@@ -19,7 +17,7 @@ namespace Fusion.Mvvm
             Path = path;
         }
 
-        public virtual Path Path
+        public Path Path
         {
             get => path;
             set
@@ -32,7 +30,7 @@ namespace Fusion.Mvvm
 
         public override string ToString()
         {
-            return path == null ? "Path:null" : "Path:" + path.ToString();
+            return path == null ? "Path:null" : "Path:" + path;
         }
     }
 }

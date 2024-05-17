@@ -6,12 +6,13 @@ namespace Fusion.Mvvm
 {
     public class MethodTargetProxy : TargetProxyBase, IObtainable, IProxyInvoker
     {
-        protected readonly IProxyMethodInfo methodInfo;
-        protected SendOrPostCallback postCallback;
+        private readonly IProxyMethodInfo _methodInfo;
+        private SendOrPostCallback _postCallback;
+
         public MethodTargetProxy(object target, IProxyMethodInfo methodInfo) : base(target)
         {
-            this.methodInfo = methodInfo;
-            if (!methodInfo.ReturnType.Equals(typeof(void)))
+            _methodInfo = methodInfo;
+            if (!(methodInfo.ReturnType == typeof(void)))
                 throw new ArgumentException("methodInfo");
         }
 
@@ -19,7 +20,7 @@ namespace Fusion.Mvvm
 
         public override Type Type => typeof(IProxyInvoker);
 
-        public IProxyMethodInfo ProxyMethodInfo => methodInfo;
+        public IProxyMethodInfo ProxyMethodInfo => _methodInfo;
 
         public object GetValue()
         {
@@ -35,9 +36,9 @@ namespace Fusion.Mvvm
         {
             if (UISynchronizationContext.InThread)
             {
-                if (methodInfo.IsStatic)
+                if (_methodInfo.IsStatic)
                 {
-                    methodInfo.Invoke(null, args);
+                    _methodInfo.Invoke(null, args);
                     return null;
                 }
 
@@ -45,30 +46,29 @@ namespace Fusion.Mvvm
                 if (target == null || (target is Behaviour behaviour && !behaviour.isActiveAndEnabled))
                     return null;
 
-                return methodInfo.Invoke(target, args);
+                return _methodInfo.Invoke(target, args);
             }
-            else
+
+            if (_postCallback == null)
             {
-                if (postCallback == null)
+                _postCallback = state =>
                 {
-                    postCallback = state =>
+                    if (_methodInfo.IsStatic)
                     {
-                        if (methodInfo.IsStatic)
-                        {
-                            methodInfo.Invoke(null, args);
-                            return;
-                        }
+                        _methodInfo.Invoke(null, args);
+                        return;
+                    }
 
-                        var target = Target;
-                        if (target == null || (target is Behaviour behaviour && !behaviour.isActiveAndEnabled))
-                            return;
+                    var target = Target;
+                    if (target == null || (target is Behaviour behaviour && !behaviour.isActiveAndEnabled))
+                        return;
 
-                        methodInfo.Invoke(target, (object[])state);
-                    };
-                }
-                UISynchronizationContext.Post(postCallback, args);
-                return null;
+                    _methodInfo.Invoke(target, (object[])state);
+                };
             }
+
+            UISynchronizationContext.Post(_postCallback, args);
+            return null;
         }
     }
 }

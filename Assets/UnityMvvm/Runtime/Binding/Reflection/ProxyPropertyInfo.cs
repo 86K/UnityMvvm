@@ -93,7 +93,7 @@ namespace Fusion.Mvvm
 
         public ProxyPropertyInfo(PropertyInfo propertyInfo) : base(propertyInfo)
         {
-            if (!typeof(TValue).Equals(this.propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TValue) == this.propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
                 throw new ArgumentException("The property types do not match!");
 
             if (IsStatic)
@@ -109,7 +109,7 @@ namespace Fusion.Mvvm
 
         public ProxyPropertyInfo(PropertyInfo propertyInfo, Func<T, TValue> getter, Action<T, TValue> setter) : base(propertyInfo)
         {
-            if (!typeof(TValue).Equals(this.propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TValue) == this.propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
                 throw new ArgumentException("The property types do not match!");
 
             if (IsStatic)

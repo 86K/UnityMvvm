@@ -4,22 +4,22 @@ namespace Fusion.Mvvm
 {
     public class EventTargetProxy : EventTargetProxyBase
     {
-        private bool disposed;
-        protected readonly IProxyEventInfo eventInfo;
-        protected Delegate handler;
+        private bool _disposed;
+        private readonly IProxyEventInfo _eventInfo;
+        private Delegate _handler;
 
         public EventTargetProxy(object target, IProxyEventInfo eventInfo) : base(target)
         {
-            this.eventInfo = eventInfo;
+            _eventInfo = eventInfo;
         }
 
-        public override Type Type => eventInfo.HandlerType;
+        public override Type Type => _eventInfo.HandlerType;
 
         public override BindingMode DefaultMode => BindingMode.OneWay;
 
         public override void SetValue(object value)
         {
-            if (value != null && !value.GetType().Equals(Type))
+            if (value != null && !(value.GetType() == Type))
                 throw new ArgumentException("Binding delegate to event failed, mismatched delegate type", "value");
 
             var target = Target;
@@ -31,11 +31,10 @@ namespace Fusion.Mvvm
             if (value == null)
                 return;
 
-            if (value.GetType().Equals(Type))
+            if (value.GetType() == Type)
             {
-                handler = (Delegate)value;
+                _handler = (Delegate)value;
                 Bind(target);
-                return;
             }
         }
 
@@ -44,35 +43,35 @@ namespace Fusion.Mvvm
             SetValue((object)value);
         }
 
-        protected virtual void Bind(object target)
+        private void Bind(object target)
         {
-            if (handler == null)
+            if (_handler == null)
                 return;
 
-            if (eventInfo != null)
-                eventInfo.Add(target, handler);
+            if (_eventInfo != null)
+                _eventInfo.Add(target, _handler);
         }
 
-        protected virtual void Unbind(object target)
+        private void Unbind(object target)
         {
-            if (handler == null)
+            if (_handler == null)
                 return;
 
-            if (eventInfo != null)
-                eventInfo.Remove(target, handler);
+            if (_eventInfo != null)
+                _eventInfo.Remove(target, _handler);
 
-            handler = null;
+            _handler = null;
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!_disposed)
             {
                 var target = Target;
-                if (eventInfo.IsStatic || target != null)
+                if (_eventInfo.IsStatic || target != null)
                     Unbind(target);
 
-                disposed = true;
+                _disposed = true;
                 base.Dispose(disposing);
             }
         }

@@ -32,8 +32,7 @@ namespace Fusion.Mvvm
         {
             if (notification.Visible)
                 return Show(notification.ViewModel, notification.WaitDisabled);
-            else
-                return Hide();
+            return Hide();
         }
 
         protected virtual async Task Show(object viewModel, bool waitDisabled)

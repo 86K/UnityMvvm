@@ -50,7 +50,7 @@ namespace Fusion.Mvvm
 
                     for (int i = 0; i < types.Count; i++)
                     {
-                        if (component.GetType().Equals(types[i]))
+                        if (component.GetType() == types[i])
                         {
                             index = i;
                             break;

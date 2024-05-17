@@ -4,18 +4,16 @@ namespace Fusion.Mvvm
 {
     public class FieldTargetProxy : ValueTargetProxyBase
     {
-        //private static readonly ILog log = LogManager.GetLogger(typeof(FieldTargetProxy));
-
-        protected readonly IProxyFieldInfo fieldInfo;
+        private readonly IProxyFieldInfo _fieldInfo;
 
         public FieldTargetProxy(object target, IProxyFieldInfo fieldInfo) : base(target)
         {
-            this.fieldInfo = fieldInfo;
+            _fieldInfo = fieldInfo;
         }
 
-        public override Type Type => fieldInfo.ValueType;
+        public override Type Type => _fieldInfo.ValueType;
 
-        public override TypeCode TypeCode => fieldInfo.ValueTypeCode;
+        public override TypeCode TypeCode => _fieldInfo.ValueTypeCode;
 
         public override BindingMode DefaultMode => BindingMode.OneWay;
 
@@ -25,19 +23,19 @@ namespace Fusion.Mvvm
             if (target == null)
                 return null;
 
-            return fieldInfo.GetValue(target);
+            return _fieldInfo.GetValue(target);
         }
 
         public override TValue GetValue<TValue>()
         {
             var target = Target;
             if (target == null)
-                return default(TValue);
+                return default;
 
-            if (fieldInfo is IProxyFieldInfo<TValue>)
-                return ((IProxyFieldInfo<TValue>)fieldInfo).GetValue(target);
+            if (_fieldInfo is IProxyFieldInfo<TValue> info)
+                return info.GetValue(target);
 
-            return (TValue)fieldInfo.GetValue(target);
+            return (TValue)_fieldInfo.GetValue(target);
         }
 
         public override void SetValue(object value)
@@ -46,7 +44,7 @@ namespace Fusion.Mvvm
             if (target == null)
                 return;
 
-            fieldInfo.SetValue(target, value);
+            _fieldInfo.SetValue(target, value);
         }
 
         public override void SetValue<TValue>(TValue value)
@@ -55,13 +53,13 @@ namespace Fusion.Mvvm
             if (target == null)
                 return;
 
-            if (fieldInfo is IProxyFieldInfo<TValue>)
+            if (_fieldInfo is IProxyFieldInfo<TValue> info)
             {
-                ((IProxyFieldInfo<TValue>)fieldInfo).SetValue(target, value);
+                info.SetValue(target, value);
                 return;
             }
 
-            fieldInfo.SetValue(target, value);
+            _fieldInfo.SetValue(target, value);
         }
     }
 }

@@ -71,7 +71,7 @@ namespace Fusion.Mvvm
             get
             {
                 var result = base.Result;
-                return result != null ? (TResult)result : default(TResult);
+                return result != null ? (TResult)result : default;
             }
         }
 

@@ -10,7 +10,7 @@ namespace Fusion.Mvvm
         private static CoroutineAwaiter RunOnCoroutine(IEnumerator routine)
         {
             CoroutineAwaiter awaiter = new CoroutineAwaiter();
-            InterceptableEnumerator enumerator = routine is InterceptableEnumerator ? (InterceptableEnumerator)routine : InterceptableEnumerator.Create(routine);
+            InterceptableEnumerator enumerator = routine is InterceptableEnumerator interceptableEnumerator ? interceptableEnumerator : InterceptableEnumerator.Create(routine);
             enumerator.RegisterCatchBlock(e =>
             {
                 awaiter.SetResult(e);

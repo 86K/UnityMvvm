@@ -26,7 +26,7 @@ namespace Fusion.Mvvm
     {
         public ImmutableAsyncResult() : base(false)
         {
-            SetResult(default(TResult));
+            SetResult(default);
         }
 
         public ImmutableAsyncResult(TResult result) : base(false)

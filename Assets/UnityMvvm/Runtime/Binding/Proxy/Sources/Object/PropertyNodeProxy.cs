@@ -1,13 +1,12 @@
 using System;
-
 using INotifyPropertyChanged = System.ComponentModel.INotifyPropertyChanged;
 using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 
 namespace Fusion.Mvvm
 {
-    public class PropertyNodeProxy : NotifiableSourceProxyBase, IObtainable, IModifiable, INotifiable
+    public class PropertyNodeProxy : NotifiableSourceProxyBase, IObtainable, IModifiable
     {
-        protected IProxyPropertyInfo propertyInfo;
+        private readonly IProxyPropertyInfo _propertyInfo;
 
         public PropertyNodeProxy(IProxyPropertyInfo propertyInfo) : this(null, propertyInfo)
         {
@@ -15,14 +14,13 @@ namespace Fusion.Mvvm
 
         public PropertyNodeProxy(object source, IProxyPropertyInfo propertyInfo) : base(source)
         {
-            this.propertyInfo = propertyInfo;
+            _propertyInfo = propertyInfo;
 
-            if (this.source == null)
+            if (Source == null)
                 return;
 
-            if (this.source is INotifyPropertyChanged)
+            if (Source is INotifyPropertyChanged sourceNotify)
             {
-                var sourceNotify = this.source as INotifyPropertyChanged;
                 sourceNotify.PropertyChanged += OnPropertyChanged;
             }
             else
@@ -32,64 +30,64 @@ namespace Fusion.Mvvm
             }
         }
 
-        public override Type Type => propertyInfo.ValueType;
+        public override Type Type => _propertyInfo.ValueType;
 
-        public override TypeCode TypeCode => propertyInfo.ValueTypeCode;
+        public override TypeCode TypeCode => _propertyInfo.ValueTypeCode;
 
-        protected virtual void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var name = e.PropertyName;
-            if (string.IsNullOrEmpty(name) || name.Equals(propertyInfo.Name))
+            if (string.IsNullOrEmpty(name) || name.Equals(_propertyInfo.Name))
                 RaiseValueChanged();
         }
 
-        public virtual object GetValue()
+        public object GetValue()
         {
-            return propertyInfo.GetValue(source);
+            return _propertyInfo.GetValue(Source);
         }
 
-        public virtual TValue GetValue<TValue>()
+        public TValue GetValue<TValue>()
         {
-            var proxy = propertyInfo as IProxyPropertyInfo<TValue>;
-            if (proxy != null)
-                return proxy.GetValue(source);
+            if (_propertyInfo is IProxyPropertyInfo<TValue> proxy)
+                return proxy.GetValue(Source);
 
-            return (TValue)propertyInfo.GetValue(source);
+            return (TValue)_propertyInfo.GetValue(Source);
         }
 
-        public virtual void SetValue(object value)
+        public void SetValue(object value)
         {
-            propertyInfo.SetValue(source, value);
+            _propertyInfo.SetValue(Source, value);
         }
 
-        public virtual void SetValue<TValue>(TValue value)
+        public void SetValue<TValue>(TValue value)
         {
-            var proxy = propertyInfo as IProxyPropertyInfo<TValue>;
-            if (proxy != null)
+            if (_propertyInfo is IProxyPropertyInfo<TValue> proxy)
             {
-                proxy.SetValue(source, value);
+                proxy.SetValue(Source, value);
                 return;
             }
 
-            propertyInfo.SetValue(source, value);
+            _propertyInfo.SetValue(Source, value);
         }
 
-        #region IDisposable Support    
+        #region IDisposable Support
+
         private bool disposedValue;
 
         protected override void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
-                if (source != null && source is INotifyPropertyChanged)
+                if (Source != null && Source is INotifyPropertyChanged sourceNotify)
                 {
-                    var sourceNotify = source as INotifyPropertyChanged;
                     sourceNotify.PropertyChanged -= OnPropertyChanged;
                 }
+
                 disposedValue = true;
                 base.Dispose(disposing);
             }
         }
+
         #endregion
     }
 }
