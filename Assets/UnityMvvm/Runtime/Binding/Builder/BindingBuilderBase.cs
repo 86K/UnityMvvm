@@ -6,8 +6,6 @@ namespace Fusion.Mvvm
     public class BindingBuilderBase : IBindingBuilder
     {
         private bool _isBuilded;
-        // NOTE：这个没有用？
-        private object _scopeKey;
         private readonly object _target;
         private readonly IBindingContext _bindingContext;
         protected readonly TargetDescription _targetDescription;
@@ -118,7 +116,7 @@ namespace Fusion.Mvvm
                     return;
 
                 CheckBindingDescription();
-                _bindingContext.Add(_target, _targetDescription, _scopeKey);
+                _bindingContext.Add(_target, _targetDescription);
                 _isBuilded = true;
             }
             catch (Exception e)

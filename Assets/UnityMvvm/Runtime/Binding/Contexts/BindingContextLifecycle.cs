@@ -1,32 +1,32 @@
-
-
 using UnityEngine;
+
 namespace Fusion.Mvvm
 {
     public class BindingContextLifecycle : MonoBehaviour
     {
-        private IBindingContext bindingContext;
+        private IBindingContext _bindingContext;
+
         public IBindingContext BindingContext
         {
-            get => bindingContext;
+            get => _bindingContext;
             set
             {
-                if (bindingContext == value)
+                if (_bindingContext == value)
                     return;
 
-                if (bindingContext != null)
-                    bindingContext.Dispose();
+                if (_bindingContext != null)
+                    _bindingContext.Dispose();
 
-                bindingContext = value;
+                _bindingContext = value;
             }
         }
 
-        protected virtual void OnDestroy()
+        protected void OnDestroy()
         {
-            if (bindingContext != null)
+            if (_bindingContext != null)
             {
-                bindingContext.Dispose();
-                bindingContext = null;
+                _bindingContext.Dispose();
+                _bindingContext = null;
             }
         }
     }

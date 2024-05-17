@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,77 +7,63 @@ namespace Fusion.Mvvm
     public class BindingContext : IBindingContext
     {
         private readonly string DEFAULT_KEY = "_KEY_";
-        private readonly Dictionary<object, List<IBinding>> bindings = new Dictionary<object, List<IBinding>>();
+        private readonly Dictionary<object, List<IBinding>> _bindings = new Dictionary<object, List<IBinding>>();
 
-        private IBinder binder;
-        private object owner;
-        private object dataContext;
+        private IBinder _binder;
+        private object _owner;
+        private object _dataContext;
         private readonly object _lock = new object();
-        private EventHandler dataContextChanged;
+        private EventHandler _dataContextChanged;
 
+        [Obsolete("这个的实用性好像不强？没有被用到！")]
         public event EventHandler DataContextChanged
         {
-            add { lock (_lock) { dataContextChanged += value; } }
-            remove { lock (_lock) { dataContextChanged -= value; } }
-        }
-
-        public BindingContext(IBinder binder) : this(null, binder, (object)null)
-        {
-        }
-
-        public BindingContext(object owner, IBinder binder) : this(owner, binder, (object)null)
-        {
-        }
-
-        public BindingContext(object owner, IBinder binder, object dataContext)
-        {
-            this.owner = owner;
-            this.binder = binder;
-            DataContext = dataContext;
-        }
-
-        public BindingContext(object owner, IBinder binder, IDictionary<object, IEnumerable<TargetDescription>> firstBindings) : this(owner, binder, null, firstBindings)
-        {
-        }
-
-        public BindingContext(object owner, IBinder binder, object dataContext, IDictionary<object, IEnumerable<TargetDescription>> firstBindings)
-        {
-            this.owner = owner;
-            this.binder = binder;
-            DataContext = dataContext;
-
-            if (firstBindings != null && firstBindings.Count > 0)
+            add
             {
-                foreach (var kvp in firstBindings)
+                lock (_lock)
                 {
-                    Add(kvp.Key, kvp.Value);
+                    _dataContextChanged += value;
+                }
+            }
+            remove
+            {
+                lock (_lock)
+                {
+                    _dataContextChanged -= value;
                 }
             }
         }
 
-        protected IBinder Binder => binder;
+        public BindingContext(object owner, IBinder binder, object dataContext = null)
+        {
+            _owner = owner;
+            _binder = binder;
+            DataContext = dataContext;
+        }
 
-        public object Owner => owner;
+        private IBinder Binder => _binder;
+
+        public object Owner => _owner;
 
         public object DataContext
         {
-            get => dataContext;
+            get => _dataContext;
             set
             {
-                if (dataContext == value)
+                if (_dataContext == value)
                     return;
 
-                dataContext = value;
+                _dataContext = value;
                 OnDataContextChanged();
                 RaiseDataContextChanged();
             }
         }
 
-        protected void RaiseDataContextChanged()
+        private void RaiseDataContextChanged()
         {
             try
             {
-                var handler = dataContextChanged;
+                var handler = _dataContextChanged;
                 if (handler != null)
                     handler(this, EventArgs.Empty);
             }
@@ -89,11 +73,11 @@ namespace Fusion.Mvvm
             }
         }
 
-        protected virtual void OnDataContextChanged()
+        private void OnDataContextChanged()
         {
             try
             {
-                foreach (var kv in bindings)
+                foreach (var kv in _bindings)
                 {
                     foreach (var binding in kv.Value)
                     {
@@ -106,81 +90,38 @@ namespace Fusion.Mvvm
                 Debug.LogWarning(e);
             }
         }
-
-        protected List<IBinding> GetOrCreateList(object key)
+        
+        private List<IBinding> GetOrCreateList()
         {
-            if (key == null)
-                key = DEFAULT_KEY;
-
-            List<IBinding> list;
-            if (bindings.TryGetValue(key, out list))
+            if (_bindings.TryGetValue(DEFAULT_KEY, out var list))
                 return list;
 
             list = new List<IBinding>();
-            bindings.Add(key, list);
+            _bindings.Add(DEFAULT_KEY, list);
             return list;
         }
-
-
-        public virtual void Add(IBinding binding, object key = null)
+        
+        void Add(IBinding binding)
         {
             if (binding == null)
                 return;
 
-            List<IBinding> list = GetOrCreateList(key);
+            List<IBinding> list = GetOrCreateList();
             binding.BindingContext = this;
             list.Add(binding);
         }
 
-        public virtual void Add(IEnumerable<IBinding> bindings, object key = null)
-        {
-            if (bindings == null)
-                return;
-
-            List<IBinding> list = GetOrCreateList(key);
-            foreach (IBinding binding in bindings)
-            {
-                binding.BindingContext = this;
-                list.Add(binding);
-            }
-        }
-
-        public virtual void Add(object target, TargetDescription description, object key = null)
+        public void Add(object target, TargetDescription description)
         {
             IBinding binding = Binder.Bind(this, DataContext, target, description);
-            Add(binding, key);
+            Add(binding);
         }
 
-        public virtual void Add(object target, IEnumerable<TargetDescription> descriptions, object key = null)
-        {
-            IEnumerable<IBinding> bindings = Binder.Bind(this, DataContext, target, descriptions);
-            Add(bindings, key);
-        }
-
-        public virtual void Clear(object key)
-        {
-            if (key == null)
-                return;
-
-            List<IBinding> list;
-            if (!bindings.TryGetValue(key, out list))
-                return;
-
-            bindings.Remove(key);
-            if (list != null && list.Count > 0)
-            {
-                foreach (IBinding binding in list)
-                {
-                    binding.Dispose();
-                }
-            }
-        }
-
-        public virtual void Clear()
+        void Clear()
         {
             try
             {
-                foreach (var kv in bindings)
+                foreach (var kv in _bindings)
                 {
                     foreach (var binding in kv.Value)
                     {
@@ -190,23 +131,25 @@ namespace Fusion.Mvvm
             }
             finally
             {
-                bindings.Clear();
+                _bindings.Clear();
             }
         }
 
         #region IDisposable Support
+
         private bool disposed;
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposed)
             {
                 if (disposing)
                 {
                     Clear();
-                    owner = null;
-                    binder = null;
+                    _owner = null;
+                    _binder = null;
                 }
+
                 disposed = true;
             }
         }
@@ -221,6 +164,7 @@ namespace Fusion.Mvvm
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }
