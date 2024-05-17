@@ -75,30 +75,6 @@ namespace Fusion.Mvvm
             OneWay();
             return this;
         }
-
-        public BindingBuilder<TTarget, TSource> TwoWay()
-        {
-            SetMode(BindingMode.TwoWay);
-            return this;
-        }
-
-        public BindingBuilder<TTarget, TSource> OneWay()
-        {
-            SetMode(BindingMode.OneWay);
-            return this;
-        }
-
-        public BindingBuilder<TTarget, TSource> OneWayToSource()
-        {
-            SetMode(BindingMode.OneWayToSource);
-            return this;
-        }
-
-        public BindingBuilder<TTarget, TSource> OneTime()
-        {
-            SetMode(BindingMode.OneTime);
-            return this;
-        }
         
         public BindingBuilder<TTarget, TSource> CommandParameter<T>(T parameter)
         {
@@ -207,30 +183,6 @@ namespace Fusion.Mvvm
         {
             SetExpression(expression);
             OneWay();
-            return this;
-        }
-
-        public BindingBuilder<TTarget> TwoWay()
-        {
-            SetMode(BindingMode.TwoWay);
-            return this;
-        }
-
-        public BindingBuilder<TTarget> OneWay()
-        {
-            SetMode(BindingMode.OneWay);
-            return this;
-        }
-
-        public BindingBuilder<TTarget> OneWayToSource()
-        {
-            SetMode(BindingMode.OneWayToSource);
-            return this;
-        }
-
-        public BindingBuilder<TTarget> OneTime()
-        {
-            SetMode(BindingMode.OneTime);
             return this;
         }
 

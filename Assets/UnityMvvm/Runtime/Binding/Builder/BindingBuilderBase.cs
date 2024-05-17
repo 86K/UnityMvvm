@@ -17,8 +17,7 @@ namespace Fusion.Mvvm
         protected IPathParser PathParser => pathParser ??= Context.GetApplicationContext().GetService<IPathParser>();
 
         private IConverterRegistry ConverterRegistry => converterRegistry ??= Context.GetApplicationContext().GetService<IConverterRegistry>();
-
-
+        
         protected BindingBuilderBase(IBindingContext context, object target)
         {
             this.context = context ?? throw new ArgumentNullException("context");
@@ -28,6 +27,26 @@ namespace Fusion.Mvvm
             {
                 Mode = BindingMode.Default
             };
+        }
+        
+        public void TwoWay()
+        {
+            SetMode(BindingMode.TwoWay);
+        }
+
+        public void OneWay()
+        {
+            SetMode(BindingMode.OneWay);
+        }
+
+        public void OneWayToSource()
+        {
+            SetMode(BindingMode.OneWayToSource);
+        }
+
+        public void OneTime()
+        {
+            SetMode(BindingMode.OneTime);
         }
 
         protected void SetLiteral(object value)
@@ -41,7 +60,7 @@ namespace Fusion.Mvvm
             };
         }
 
-        protected void SetMode(BindingMode mode)
+        void SetMode(BindingMode mode)
         {
             description.Mode = mode;
         }
