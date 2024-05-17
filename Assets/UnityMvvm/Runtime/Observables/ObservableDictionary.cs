@@ -92,8 +92,7 @@ namespace Fusion.Mvvm
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            TValue value;
-            dictionary.TryGetValue(key, out value);
+            dictionary.TryGetValue(key, out var value);
             var removed = dictionary.Remove(key);
             if (removed)
             {
@@ -198,8 +197,7 @@ namespace Fusion.Mvvm
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            TValue item;
-            if (dictionary.TryGetValue(key, out item))
+            if (dictionary.TryGetValue(key, out var item))
             {
                 if (add)
                     throw new ArgumentException("An item with the same key has already been added.");

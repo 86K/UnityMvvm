@@ -1,25 +1,24 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
 {
     public class ParameterWrapBase
     {
-        protected readonly ICommandParameter commandParameter;
-        public ParameterWrapBase(ICommandParameter commandParameter)
+        private readonly ICommandParameter _commandParameter;
+
+        protected ParameterWrapBase(ICommandParameter commandParameter)
         {
-            this.commandParameter = commandParameter ?? throw new ArgumentNullException("commandParameter");
+            _commandParameter = commandParameter ?? throw new ArgumentNullException("commandParameter");
         }
 
-        protected virtual object GetParameterValue()
+        protected object GetParameterValue()
         {
-            return commandParameter.GetValue();
+            return _commandParameter.GetValue();
         }
 
-        protected virtual Type GetParameterValueType()
+        protected Type GetParameterValueType()
         {
-            return commandParameter.GetValueType();
+            return _commandParameter.GetValueType();
         }
     }
 }

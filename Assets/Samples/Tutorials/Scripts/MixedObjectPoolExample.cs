@@ -66,8 +66,7 @@ namespace Fusion.Mvvm
 
         protected void Add(string typeName, int count)
         {
-            List<GameObject> list;
-            if (!dict.TryGetValue(typeName, out list))
+            if (!dict.TryGetValue(typeName, out var list))
             {
                 list = new List<GameObject>();
                 dict.Add(typeName, list);
@@ -85,8 +84,7 @@ namespace Fusion.Mvvm
 
         protected void Delete(string typeName, int count)
         {
-            List<GameObject> list;
-            if (!dict.TryGetValue(typeName, out list) || list.Count <= 0)
+            if (!dict.TryGetValue(typeName, out var list) || list.Count <= 0)
                 return;
 
             for (int i = 0; i < count; i++)

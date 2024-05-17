@@ -31,8 +31,7 @@ namespace Fusion.Mvvm
 
         public int GetMaxSize(string typeName)
         {
-            int size;
-            if (typeSize.TryGetValue(typeName, out size))
+            if (typeSize.TryGetValue(typeName, out var size))
                 return size;
             return defaultMaxSizePerType;
         }
@@ -49,8 +48,7 @@ namespace Fusion.Mvvm
 
             lock (_lock)
             {
-                List<T> list;
-                if (entries.TryGetValue(typeName, out list) && list.Count > 0)
+                if (entries.TryGetValue(typeName, out var list) && list.Count > 0)
                 {
                     T obj = list[0];
                     list.RemoveAt(0);

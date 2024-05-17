@@ -4,59 +4,59 @@ namespace Fusion.Mvvm
 {
     public class ParameterWrapCommand : ParameterWrapBase, ICommand
     {
-        private readonly object _lock = new object();
-        private readonly ICommand wrappedCommand;
+        private readonly ICommand _wrappedCommand;
+
         public ParameterWrapCommand(ICommand wrappedCommand, ICommandParameter commandParameter) : base(commandParameter)
         {
-            this.wrappedCommand = wrappedCommand ?? throw new ArgumentNullException("wrappedCommand");
+            _wrappedCommand = wrappedCommand ?? throw new ArgumentNullException("wrappedCommand");
         }
 
         public event EventHandler CanExecuteChanged
         {
-            add { lock (_lock) { wrappedCommand.CanExecuteChanged += value; } }
-            remove { lock (_lock) { wrappedCommand.CanExecuteChanged -= value; } }
+            add => _wrappedCommand.CanExecuteChanged += value;
+            remove => _wrappedCommand.CanExecuteChanged -= value;
         }
 
         public bool CanExecute(object parameter)
         {
-            return wrappedCommand.CanExecute(GetParameterValue());
+            return _wrappedCommand.CanExecute(GetParameterValue());
         }
 
         public void Execute(object parameter)
         {
             var param = GetParameterValue();
-            if (wrappedCommand.CanExecute(param))
-                wrappedCommand.Execute(param);
+            if (_wrappedCommand.CanExecute(param))
+                _wrappedCommand.Execute(param);
         }
     }
 
     public class ParameterWrapCommand<T> : ICommand
     {
-        private readonly object _lock = new object();
-        private readonly ICommand<T> wrappedCommand;
-        private readonly ICommandParameter<T> commandParameter;
+        private readonly ICommand<T> _wrappedCommand;
+        private readonly ICommandParameter<T> _commandParameter;
+
         public ParameterWrapCommand(ICommand<T> wrappedCommand, ICommandParameter<T> commandParameter)
         {
-            this.commandParameter = commandParameter ?? throw new ArgumentNullException("commandParameter");
-            this.wrappedCommand = wrappedCommand ?? throw new ArgumentNullException("wrappedCommand");
+            _commandParameter = commandParameter ?? throw new ArgumentNullException("commandParameter");
+            _wrappedCommand = wrappedCommand ?? throw new ArgumentNullException("wrappedCommand");
         }
 
         public event EventHandler CanExecuteChanged
         {
-            add { lock (_lock) { wrappedCommand.CanExecuteChanged += value; } }
-            remove { lock (_lock) { wrappedCommand.CanExecuteChanged -= value; } }
+            add => _wrappedCommand.CanExecuteChanged += value;
+            remove => _wrappedCommand.CanExecuteChanged -= value;
         }
 
         public bool CanExecute(object parameter)
         {
-            return wrappedCommand.CanExecute(commandParameter.GetValue());
+            return _wrappedCommand.CanExecute(_commandParameter.GetValue());
         }
 
         public void Execute(object parameter)
         {
-            var param = commandParameter.GetValue();
-            if (wrappedCommand.CanExecute(param))
-                wrappedCommand.Execute(param);
+            var param = _commandParameter.GetValue();
+            if (_wrappedCommand.CanExecute(param))
+                _wrappedCommand.Execute(param);
         }
     }
 }

@@ -24,8 +24,7 @@ namespace Fusion.Mvvm
         /// if the disposable object is disposed,the message is automatically unsubscribed.</returns>
         public virtual ISubscription<object> Subscribe(Type type, Action<object> action)
         {
-            SubjectBase notifier;
-            if (!notifiers.TryGetValue(type, out notifier))
+            if (!notifiers.TryGetValue(type, out var notifier))
             {
                 notifier = new Subject<object>();
                 if (!notifiers.TryAdd(type, notifier))
@@ -44,8 +43,7 @@ namespace Fusion.Mvvm
         public virtual ISubscription<T> Subscribe<T>(Action<T> action)
         {
             Type type = typeof(T);
-            SubjectBase notifier;
-            if (!notifiers.TryGetValue(type, out notifier))
+            if (!notifiers.TryGetValue(type, out var notifier))
             {
                 notifier = new Subject<T>();
                 if (!notifiers.TryAdd(type, notifier))
@@ -68,16 +66,14 @@ namespace Fusion.Mvvm
         /// if the disposable object is disposed,the message is automatically unsubscribed.</returns>
         public virtual ISubscription<object> Subscribe(string channel, Type type, Action<object> action)
         {
-            SubjectBase notifier = null;
-            ConcurrentDictionary<Type, SubjectBase> dict = null;
-            if (!channelNotifiers.TryGetValue(channel, out dict))
+            if (!channelNotifiers.TryGetValue(channel, out var dict))
             {
                 dict = new ConcurrentDictionary<Type, SubjectBase>();
                 if (!channelNotifiers.TryAdd(channel, dict))
                     channelNotifiers.TryGetValue(channel, out dict);
             }
 
-            if (!dict.TryGetValue(type, out notifier))
+            if (!dict.TryGetValue(type, out var notifier))
             {
                 notifier = new Subject<object>();
                 if (!dict.TryAdd(type, notifier))
@@ -100,16 +96,14 @@ namespace Fusion.Mvvm
         /// if the disposable object is disposed,the message is automatically unsubscribed.</returns>
         public virtual ISubscription<T> Subscribe<T>(string channel, Action<T> action)
         {
-            SubjectBase notifier = null;
-            ConcurrentDictionary<Type, SubjectBase> dict = null;
-            if (!channelNotifiers.TryGetValue(channel, out dict))
+            if (!channelNotifiers.TryGetValue(channel, out var dict))
             {
                 dict = new ConcurrentDictionary<Type, SubjectBase>();
                 if (!channelNotifiers.TryAdd(channel, dict))
                     channelNotifiers.TryGetValue(channel, out dict);
             }
 
-            if (!dict.TryGetValue(typeof(T), out notifier))
+            if (!dict.TryGetValue(typeof(T), out var notifier))
             {
                 notifier = new Subject<T>();
                 if (!dict.TryAdd(typeof(T), notifier))
@@ -174,8 +168,7 @@ namespace Fusion.Mvvm
             if (string.IsNullOrEmpty(channel) || message == null)
                 return;
 
-            ConcurrentDictionary<Type, SubjectBase> dict = null;
-            if (!channelNotifiers.TryGetValue(channel, out dict) || dict.Count <= 0)
+            if (!channelNotifiers.TryGetValue(channel, out var dict) || dict.Count <= 0)
                 return;
 
             Type messageType = message.GetType();

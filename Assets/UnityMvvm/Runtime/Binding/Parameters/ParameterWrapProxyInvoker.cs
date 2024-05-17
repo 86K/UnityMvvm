@@ -4,24 +4,24 @@ namespace Fusion.Mvvm
 {
     public class ParameterWrapProxyInvoker : ParameterWrapBase, IInvoker
     {
-        private readonly IProxyInvoker invoker;
+        private readonly IProxyInvoker _invoker;
 
         public ParameterWrapProxyInvoker(IProxyInvoker invoker, ICommandParameter commandParameter) : base(commandParameter)
         {
-            this.invoker = invoker ?? throw new ArgumentNullException("invoker");
+            _invoker = invoker ?? throw new ArgumentNullException("invoker");
             if (!IsValid(invoker))
                 throw new ArgumentException("Bind method failed.the parameter types do not match.");
         }
 
         public object Invoke(params object[] args)
         {
-            return invoker.Invoke(GetParameterValue());
+            return _invoker.Invoke(GetParameterValue());
         }
 
-        protected bool IsValid(IProxyInvoker invoker)
+        private bool IsValid(IProxyInvoker invoker)
         {
             IProxyMethodInfo info = invoker.ProxyMethodInfo;
-            if (!info.ReturnType.Equals(typeof(void)))
+            if (info.ReturnType != typeof(void))
                 return false;
 
             var parameters = info.Parameters;

@@ -1,15 +1,14 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
 {
     public class ExpressionCommandParameter<TParam> : ICommandParameter<TParam>
     {
-        private readonly Func<TParam> expression;
+        private readonly Func<TParam> _expression;
+
         public ExpressionCommandParameter(Func<TParam> expression)
         {
-            this.expression = expression;
+            _expression = expression;
         }
 
         object ICommandParameter.GetValue()
@@ -24,7 +23,7 @@ namespace Fusion.Mvvm
 
         public TParam GetValue()
         {
-            return expression();
+            return _expression();
         }
     }
 }

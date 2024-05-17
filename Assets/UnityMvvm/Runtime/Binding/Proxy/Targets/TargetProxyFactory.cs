@@ -14,8 +14,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                ITargetProxy proxy = null;
-                if (TryCreateProxy(target, description, out proxy))
+                if (TryCreateProxy(target, description, out var proxy))
                     return proxy;
 
                 throw new NotSupportedException("Not found available proxy factory.");

@@ -28,8 +28,7 @@ namespace Fusion.Mvvm
 
             foreach (var kv in subscriptions)
             {
-                Subscription subscription;
-                kv.Value.TryGetTarget(out subscription);
+                kv.Value.TryGetTarget(out var subscription);
                 if (subscription != null)
                     subscription.Publish(message);
                 else

@@ -21,8 +21,7 @@ namespace Fusion.Mvvm
 
         public virtual Task<Account> Get(string username)
         {
-            Account account = null;
-            cache.TryGetValue(username, out account);
+            cache.TryGetValue(username, out var account);
             return Task.FromResult(account);
         }
 

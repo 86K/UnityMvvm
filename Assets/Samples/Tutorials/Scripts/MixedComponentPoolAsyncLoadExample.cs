@@ -65,8 +65,7 @@ namespace Fusion.Mvvm
 
         protected async Task Add(string typeName, int count)
         {
-            List<PooledCube> list;
-            if (!dict.TryGetValue(typeName, out list))
+            if (!dict.TryGetValue(typeName, out var list))
             {
                 list = new List<PooledCube>();
                 dict.Add(typeName, list);
@@ -87,8 +86,7 @@ namespace Fusion.Mvvm
 
         protected void Delete(string typeName, int count)
         {
-            List<PooledCube> list;
-            if (!dict.TryGetValue(typeName, out list) || list.Count <= 0)
+            if (!dict.TryGetValue(typeName, out var list) || list.Count <= 0)
                 return;
 
             for (int i = 0; i < count; i++)

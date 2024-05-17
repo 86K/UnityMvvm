@@ -48,8 +48,7 @@ namespace Fusion.Mvvm
 
         public virtual T Get<T>(string key, T defaultValue) where T : new()
         {
-            object value;
-            if (data.TryGetValue(key, out value))
+            if (data.TryGetValue(key, out var value))
                 return (T)value;
 
             return defaultValue;

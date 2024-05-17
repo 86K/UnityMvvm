@@ -42,11 +42,10 @@ namespace Fusion.Mvvm
         protected virtual T DoLoadView<T>(string name)
         {
             name = Normalize(name);
-            WeakReference weakRef;
             GameObject viewTemplateGo = null;
             try
             {
-                if (templates.TryGetValue(name, out weakRef) && weakRef.IsAlive)
+                if (templates.TryGetValue(name, out var weakRef) && weakRef.IsAlive)
                 {
                     viewTemplateGo = (GameObject)weakRef.Target;
 
@@ -94,11 +93,10 @@ namespace Fusion.Mvvm
         protected virtual IEnumerator DoLoad<T>(IProgressPromise<float, T> promise, string name,IWindowManager windowManager=null)
         {
             name = Normalize(name);
-            WeakReference weakRef;
             GameObject viewTemplateGo = null;
             try
             {
-                if (templates.TryGetValue(name, out weakRef) && weakRef.IsAlive)
+                if (templates.TryGetValue(name, out var weakRef) && weakRef.IsAlive)
                 {
                     viewTemplateGo = (GameObject)weakRef.Target;
 

@@ -2,18 +2,19 @@ using System;
 
 namespace Fusion.Mvvm
 {
+    [Obsolete("Use for lua...")]
     public class ParameterWrapScriptInvoker : ParameterWrapBase, IInvoker
     {
-        private readonly IScriptInvoker invoker;
+        private readonly IScriptInvoker _invoker;
 
         public ParameterWrapScriptInvoker(IScriptInvoker invoker, ICommandParameter commandParameter) : base(commandParameter)
         {
-            this.invoker = invoker ?? throw new ArgumentNullException("invoker");
+            _invoker = invoker ?? throw new ArgumentNullException("invoker");
         }
 
         public object Invoke(params object[] args)
         {
-            return invoker.Invoke(GetParameterValue());
+            return _invoker.Invoke(GetParameterValue());
         }
     }
 }

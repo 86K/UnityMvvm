@@ -6,28 +6,28 @@ namespace Fusion.Mvvm
 {
     public class ParameterWrapDelegateInvoker : ParameterWrapBase, IInvoker
     {
-        private readonly Delegate handler;
+        private readonly Delegate _handler;
 
         public ParameterWrapDelegateInvoker(Delegate handler, ICommandParameter commandParameter) : base(commandParameter)
         {
-            this.handler = handler ?? throw new ArgumentNullException("handler");
+            _handler = handler ?? throw new ArgumentNullException("handler");
             if (!IsValid(handler))
                 throw new ArgumentException("Bind method failed.the parameter types do not match.");
         }
 
         public object Invoke(params object[] args)
         {
-            return handler.DynamicInvoke(GetParameterValue());
+            return _handler.DynamicInvoke(GetParameterValue());
         }
 
-        protected virtual bool IsValid(Delegate handler)
+        private bool IsValid(Delegate handler)
         {
 #if NETFX_CORE
             MethodInfo info = handler.GetMethodInfo();
 #else
             MethodInfo info = handler.Method;
 #endif
-            if (!info.ReturnType.Equals(typeof(void)))
+            if (info.ReturnType != typeof(void))
                 return false;
 
             List<Type> parameterTypes = info.GetParameterTypes();
@@ -40,17 +40,18 @@ namespace Fusion.Mvvm
 
     public class ParameterWrapActionInvoker<T> : IInvoker
     {
-        private readonly Action<T> handler;
-        private readonly ICommandParameter<T> commandParameter;
+        private readonly Action<T> _handler;
+        private readonly ICommandParameter<T> _commandParameter;
+
         public ParameterWrapActionInvoker(Action<T> handler, ICommandParameter<T> commandParameter)
         {
-            this.commandParameter = commandParameter ?? throw new ArgumentNullException("commandParameter");
-            this.handler = handler ?? throw new ArgumentNullException("handler");
+            _commandParameter = commandParameter ?? throw new ArgumentNullException("commandParameter");
+            _handler = handler ?? throw new ArgumentNullException("handler");
         }
 
         public object Invoke(params object[] args)
         {
-            handler(commandParameter.GetValue());
+            _handler(_commandParameter.GetValue());
             return null;
         }
     }

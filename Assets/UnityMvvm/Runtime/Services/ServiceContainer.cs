@@ -12,32 +12,28 @@ namespace Fusion.Mvvm
 
         public virtual object Resolve(Type type)
         {
-            Entry entry;
-            if (typeServiceMappings.TryGetValue(type, out entry))
+            if (typeServiceMappings.TryGetValue(type, out var entry))
                 return entry.Factory.Create();
             return null;
         }
 
         public virtual T Resolve<T>()
         {
-            Entry entry;
-            if (typeServiceMappings.TryGetValue(typeof(T), out entry))
+            if (typeServiceMappings.TryGetValue(typeof(T), out var entry))
                 return (T)entry.Factory.Create();
             return default(T);
         }
 
         public virtual object Resolve(string name)
         {
-            Entry entry;
-            if (nameServiceMappings.TryGetValue(name, out entry))
+            if (nameServiceMappings.TryGetValue(name, out var entry))
                 return entry.Factory.Create();
             return null;
         }
 
         public virtual T Resolve<T>(string name)
         {
-            Entry entry;
-            if (nameServiceMappings.TryGetValue(name, out entry))
+            if (nameServiceMappings.TryGetValue(name, out var entry))
                 return (T)entry.Factory.Create();
             return default(T);
         }
@@ -137,12 +133,10 @@ namespace Fusion.Mvvm
         {
             lock (_lock)
             {
-                Entry entry;
-                if (!nameServiceMappings.TryRemove(name, out entry) || entry == null || entry.Type == null)
+                if (!nameServiceMappings.TryRemove(name, out var entry) || entry == null || entry.Type == null)
                     return;
 
-                Entry entry2;
-                if (!typeServiceMappings.TryGetValue(entry.Type, out entry2) || entry != entry2)
+                if (!typeServiceMappings.TryGetValue(entry.Type, out var entry2) || entry != entry2)
                     return;
 
                 typeServiceMappings.TryRemove(entry.Type, out _);
@@ -153,12 +147,10 @@ namespace Fusion.Mvvm
         {
             lock (_lock)
             {
-                Entry entry;
-                if (!typeServiceMappings.TryRemove(type, out entry) || entry == null || string.IsNullOrEmpty(entry.Name))
+                if (!typeServiceMappings.TryRemove(type, out var entry) || entry == null || string.IsNullOrEmpty(entry.Name))
                     return;
 
-                Entry entry2;
-                if (!nameServiceMappings.TryGetValue(entry.Name, out entry2) || entry != entry2)
+                if (!nameServiceMappings.TryGetValue(entry.Name, out var entry2) || entry != entry2)
                     return;
 
                 nameServiceMappings.TryRemove(entry.Name, out _);

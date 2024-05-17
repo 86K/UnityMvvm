@@ -19,8 +19,7 @@ namespace Fusion.Mvvm
 
         public static InterceptableEnumerator Create(IEnumerator routine)
         {
-            InterceptableEnumerator enumerator;
-            if (pools.TryDequeue(out enumerator))
+            if (pools.TryDequeue(out var enumerator))
             {
                 enumerator.stack.Push(routine);
                 return enumerator;

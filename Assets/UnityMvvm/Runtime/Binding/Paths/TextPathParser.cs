@@ -142,9 +142,8 @@ namespace Fusion.Mvvm
 
             } while (MoveNext());
 
-            uint index;
             string num = new string(buffer, 0, i);
-            if (!uint.TryParse(num, out index))
+            if (!uint.TryParse(num, out var index))
                 throw new Exception($"Unable to parse integer text from {num} in {text}");
             return index;
         }

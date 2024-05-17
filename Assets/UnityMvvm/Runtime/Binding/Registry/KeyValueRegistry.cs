@@ -12,15 +12,13 @@ namespace Fusion.Mvvm
 
         public virtual V Find(K key)
         {
-            V toReturn;
-            lookups.TryGetValue(key, out toReturn);
+            lookups.TryGetValue(key, out var toReturn);
             return toReturn;
         }
 
         public virtual V Find(K key,V defaultValue)
         {
-            V toReturn;
-            if (lookups.TryGetValue(key, out toReturn))
+            if (lookups.TryGetValue(key, out var toReturn))
                 return toReturn;
 
             return defaultValue;

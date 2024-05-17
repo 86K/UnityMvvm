@@ -21,8 +21,7 @@ namespace Fusion.Mvvm
             if (propertyName == null)
                 return NULL_EVENT_ARGS;
 
-            PropertyChangedEventArgs eventArgs;
-            if (PROPERTY_EVENT_ARGS.TryGetValue(propertyName, out eventArgs))
+            if (PROPERTY_EVENT_ARGS.TryGetValue(propertyName, out var eventArgs))
                 return eventArgs;
 
             eventArgs = new PropertyChangedEventArgs(propertyName);

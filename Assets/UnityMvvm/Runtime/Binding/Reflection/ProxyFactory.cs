@@ -24,8 +24,7 @@ namespace Fusion.Mvvm
 
         internal virtual ProxyType GetType(Type type, bool create = true)
         {
-            ProxyType ret;
-            if (types.TryGetValue(type, out ret) && ret != null)
+            if (types.TryGetValue(type, out var ret) && ret != null)
                 return ret;
 
             return create ? types.GetOrAdd(type, (t) => new ProxyType(t, this)) : null;

@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -18,10 +16,12 @@ namespace Fusion.Mvvm
         {
             parent = null;
         }
+
         public Scope(Scope parent)
         {
             this.parent = parent;
         }
+
         public bool ContainsKey(ParameterExpression key)
         {
             return values.ContainsKey(key) || (parent != null && parent.ContainsKey(key));
@@ -31,8 +31,7 @@ namespace Fusion.Mvvm
         {
             get
             {
-                object result;
-                if (values.TryGetValue(key, out result))
+                if (values.TryGetValue(key, out var result))
                     return result;
 
                 if (parent != null)
@@ -40,7 +39,7 @@ namespace Fusion.Mvvm
 
                 throw new InvalidOperationException("Parameter not defined.");
             }
-            set
+            private set
             {
                 if (values.ContainsKey(key))
                 {
@@ -80,12 +79,15 @@ namespace Fusion.Mvvm
                 var boxType = typeof(StrongBox<>).MakeGenericType(expr.Type);
                 return Expression.Field(Expression.Constant(Activator.CreateInstance(boxType, scope[expr]), boxType), "Value");
             }
+
             return base.VisitParameter(expr);
         }
     }
 
     class EvaluatingVisitor : ExpressionVisitor
     {
+        private readonly float _floatComparerPrecisionValue = 0.001f;
+
         private Scope values = new Scope();
 
         private object BinaryOperate(ExpressionType exprType, TypeCode typeCode, object left, object right)
@@ -93,372 +95,393 @@ namespace Fusion.Mvvm
             switch (exprType)
             {
                 case ExpressionType.Add:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left + (sbyte)right;
-                            case TypeCode.Byte: return (byte)left + (byte)right;
-                            case TypeCode.Int16: return (short)left + (short)right;
-                            case TypeCode.UInt16: return (ushort)left + (ushort)right;
-                            case TypeCode.Int32: return (int)left + (int)right;
-                            case TypeCode.UInt32: return (uint)left + (uint)right;
-                            case TypeCode.Int64: return (long)left + (long)right;
-                            case TypeCode.UInt64: return (ulong)left + (ulong)right;
-                            case TypeCode.Char: return (char)left + (char)right;
-                            case TypeCode.Single: return (float)left + (float)right;
-                            case TypeCode.Double: return (double)left + (double)right;
-                            case TypeCode.Decimal: return (decimal)left + (decimal)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left + (sbyte)right;
+                        case TypeCode.Byte: return (byte)left + (byte)right;
+                        case TypeCode.Int16: return (short)left + (short)right;
+                        case TypeCode.UInt16: return (ushort)left + (ushort)right;
+                        case TypeCode.Int32: return (int)left + (int)right;
+                        case TypeCode.UInt32: return (uint)left + (uint)right;
+                        case TypeCode.Int64: return (long)left + (long)right;
+                        case TypeCode.UInt64: return (ulong)left + (ulong)right;
+                        case TypeCode.Char: return (char)left + (char)right;
+                        case TypeCode.Single: return (float)left + (float)right;
+                        case TypeCode.Double: return (double)left + (double)right;
+                        case TypeCode.Decimal: return (decimal)left + (decimal)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.AddChecked:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return checked((sbyte)left + (sbyte)right);
-                            case TypeCode.Byte: return checked((byte)left + (byte)right);
-                            case TypeCode.Int16: return checked((short)left + (short)right);
-                            case TypeCode.UInt16: return checked((ushort)left + (ushort)right);
-                            case TypeCode.Int32: return checked((int)left + (int)right);
-                            case TypeCode.UInt32: return checked((uint)left + (uint)right);
-                            case TypeCode.Int64: return checked((long)left + (long)right);
-                            case TypeCode.UInt64: return checked((ulong)left + (ulong)right);
-                            case TypeCode.Char: return checked((char)left + (char)right);
-                            case TypeCode.Single: return checked((float)left + (float)right);
-                            case TypeCode.Double: return checked((double)left + (double)right);
-                            case TypeCode.Decimal: return checked((decimal)left + (decimal)right);
-                        }
-                        break;
+                        case TypeCode.SByte: return checked((sbyte)left + (sbyte)right);
+                        case TypeCode.Byte: return checked((byte)left + (byte)right);
+                        case TypeCode.Int16: return checked((short)left + (short)right);
+                        case TypeCode.UInt16: return checked((ushort)left + (ushort)right);
+                        case TypeCode.Int32: return checked((int)left + (int)right);
+                        case TypeCode.UInt32: return checked((uint)left + (uint)right);
+                        case TypeCode.Int64: return checked((long)left + (long)right);
+                        case TypeCode.UInt64: return checked((ulong)left + (ulong)right);
+                        case TypeCode.Char: return checked((char)left + (char)right);
+                        case TypeCode.Single: return checked((float)left + (float)right);
+                        case TypeCode.Double: return checked((double)left + (double)right);
+                        case TypeCode.Decimal: return checked((decimal)left + (decimal)right);
                     }
+
+                    break;
+                }
                 case ExpressionType.Subtract:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left - (sbyte)right;
-                            case TypeCode.Byte: return (byte)left - (byte)right;
-                            case TypeCode.Int16: return (short)left - (short)right;
-                            case TypeCode.UInt16: return (ushort)left - (ushort)right;
-                            case TypeCode.Int32: return (int)left - (int)right;
-                            case TypeCode.UInt32: return (uint)left - (uint)right;
-                            case TypeCode.Int64: return (long)left - (long)right;
-                            case TypeCode.UInt64: return (ulong)left - (ulong)right;
-                            case TypeCode.Char: return (char)left - (char)right;
-                            case TypeCode.Single: return (float)left - (float)right;
-                            case TypeCode.Double: return (double)left - (double)right;
-                            case TypeCode.Decimal: return (decimal)left - (decimal)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left - (sbyte)right;
+                        case TypeCode.Byte: return (byte)left - (byte)right;
+                        case TypeCode.Int16: return (short)left - (short)right;
+                        case TypeCode.UInt16: return (ushort)left - (ushort)right;
+                        case TypeCode.Int32: return (int)left - (int)right;
+                        case TypeCode.UInt32: return (uint)left - (uint)right;
+                        case TypeCode.Int64: return (long)left - (long)right;
+                        case TypeCode.UInt64: return (ulong)left - (ulong)right;
+                        case TypeCode.Char: return (char)left - (char)right;
+                        case TypeCode.Single: return (float)left - (float)right;
+                        case TypeCode.Double: return (double)left - (double)right;
+                        case TypeCode.Decimal: return (decimal)left - (decimal)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.SubtractChecked:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return checked((sbyte)left - (sbyte)right);
-                            case TypeCode.Byte: return checked((byte)left - (byte)right);
-                            case TypeCode.Int16: return checked((short)left - (short)right);
-                            case TypeCode.UInt16: return checked((ushort)left - (ushort)right);
-                            case TypeCode.Int32: return checked((int)left - (int)right);
-                            case TypeCode.UInt32: return checked((uint)left - (uint)right);
-                            case TypeCode.Int64: return checked((long)left - (long)right);
-                            case TypeCode.UInt64: return checked((ulong)left - (ulong)right);
-                            case TypeCode.Char: return checked((char)left - (char)right);
-                            case TypeCode.Single: return checked((float)left - (float)right);
-                            case TypeCode.Double: return checked((double)left - (double)right);
-                            case TypeCode.Decimal: return checked((decimal)left - (decimal)right);
-                        }
-                        break;
+                        case TypeCode.SByte: return checked((sbyte)left - (sbyte)right);
+                        case TypeCode.Byte: return checked((byte)left - (byte)right);
+                        case TypeCode.Int16: return checked((short)left - (short)right);
+                        case TypeCode.UInt16: return checked((ushort)left - (ushort)right);
+                        case TypeCode.Int32: return checked((int)left - (int)right);
+                        case TypeCode.UInt32: return checked((uint)left - (uint)right);
+                        case TypeCode.Int64: return checked((long)left - (long)right);
+                        case TypeCode.UInt64: return checked((ulong)left - (ulong)right);
+                        case TypeCode.Char: return checked((char)left - (char)right);
+                        case TypeCode.Single: return checked((float)left - (float)right);
+                        case TypeCode.Double: return checked((double)left - (double)right);
+                        case TypeCode.Decimal: return checked((decimal)left - (decimal)right);
                     }
+
+                    break;
+                }
                 case ExpressionType.Multiply:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left * (sbyte)right;
-                            case TypeCode.Byte: return (byte)left * (byte)right;
-                            case TypeCode.Int16: return (short)left * (short)right;
-                            case TypeCode.UInt16: return (ushort)left * (ushort)right;
-                            case TypeCode.Int32: return (int)left * (int)right;
-                            case TypeCode.UInt32: return (uint)left * (uint)right;
-                            case TypeCode.Int64: return (long)left * (long)right;
-                            case TypeCode.UInt64: return (ulong)left * (ulong)right;
-                            case TypeCode.Char: return (char)left * (char)right;
-                            case TypeCode.Single: return (float)left * (float)right;
-                            case TypeCode.Double: return (double)left * (double)right;
-                            case TypeCode.Decimal: return (decimal)left * (decimal)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left * (sbyte)right;
+                        case TypeCode.Byte: return (byte)left * (byte)right;
+                        case TypeCode.Int16: return (short)left * (short)right;
+                        case TypeCode.UInt16: return (ushort)left * (ushort)right;
+                        case TypeCode.Int32: return (int)left * (int)right;
+                        case TypeCode.UInt32: return (uint)left * (uint)right;
+                        case TypeCode.Int64: return (long)left * (long)right;
+                        case TypeCode.UInt64: return (ulong)left * (ulong)right;
+                        case TypeCode.Char: return (char)left * (char)right;
+                        case TypeCode.Single: return (float)left * (float)right;
+                        case TypeCode.Double: return (double)left * (double)right;
+                        case TypeCode.Decimal: return (decimal)left * (decimal)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.MultiplyChecked:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return checked((sbyte)left * (sbyte)right);
-                            case TypeCode.Byte: return checked((byte)left * (byte)right);
-                            case TypeCode.Int16: return checked((short)left * (short)right);
-                            case TypeCode.UInt16: return checked((ushort)left * (ushort)right);
-                            case TypeCode.Int32: return checked((int)left * (int)right);
-                            case TypeCode.UInt32: return checked((uint)left * (uint)right);
-                            case TypeCode.Int64: return checked((long)left * (long)right);
-                            case TypeCode.UInt64: return checked((ulong)left * (ulong)right);
-                            case TypeCode.Char: return checked((char)left * (char)right);
-                            case TypeCode.Single: return checked((float)left * (float)right);
-                            case TypeCode.Double: return checked((double)left * (double)right);
-                            case TypeCode.Decimal: return checked((decimal)left * (decimal)right);
-                        }
-                        break;
+                        case TypeCode.SByte: return checked((sbyte)left * (sbyte)right);
+                        case TypeCode.Byte: return checked((byte)left * (byte)right);
+                        case TypeCode.Int16: return checked((short)left * (short)right);
+                        case TypeCode.UInt16: return checked((ushort)left * (ushort)right);
+                        case TypeCode.Int32: return checked((int)left * (int)right);
+                        case TypeCode.UInt32: return checked((uint)left * (uint)right);
+                        case TypeCode.Int64: return checked((long)left * (long)right);
+                        case TypeCode.UInt64: return checked((ulong)left * (ulong)right);
+                        case TypeCode.Char: return checked((char)left * (char)right);
+                        case TypeCode.Single: return checked((float)left * (float)right);
+                        case TypeCode.Double: return checked((double)left * (double)right);
+                        case TypeCode.Decimal: return checked((decimal)left * (decimal)right);
                     }
+
+                    break;
+                }
                 case ExpressionType.Divide:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left / (sbyte)right;
-                            case TypeCode.Byte: return (byte)left / (byte)right;
-                            case TypeCode.Int16: return (short)left / (short)right;
-                            case TypeCode.UInt16: return (ushort)left / (ushort)right;
-                            case TypeCode.Int32: return (int)left / (int)right;
-                            case TypeCode.UInt32: return (uint)left / (uint)right;
-                            case TypeCode.Int64: return (long)left / (long)right;
-                            case TypeCode.UInt64: return (ulong)left / (ulong)right;
-                            case TypeCode.Char: return (char)left / (char)right;
-                            case TypeCode.Single: return (float)left / (float)right;
-                            case TypeCode.Double: return (double)left / (double)right;
-                            case TypeCode.Decimal: return (decimal)left / (decimal)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left / (sbyte)right;
+                        case TypeCode.Byte: return (byte)left / (byte)right;
+                        case TypeCode.Int16: return (short)left / (short)right;
+                        case TypeCode.UInt16: return (ushort)left / (ushort)right;
+                        case TypeCode.Int32: return (int)left / (int)right;
+                        case TypeCode.UInt32: return (uint)left / (uint)right;
+                        case TypeCode.Int64: return (long)left / (long)right;
+                        case TypeCode.UInt64: return (ulong)left / (ulong)right;
+                        case TypeCode.Char: return (char)left / (char)right;
+                        case TypeCode.Single: return (float)left / (float)right;
+                        case TypeCode.Double: return (double)left / (double)right;
+                        case TypeCode.Decimal: return (decimal)left / (decimal)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.Modulo:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left % (sbyte)right;
-                            case TypeCode.Byte: return (byte)left % (byte)right;
-                            case TypeCode.Int16: return (short)left % (short)right;
-                            case TypeCode.UInt16: return (ushort)left % (ushort)right;
-                            case TypeCode.Int32: return (int)left % (int)right;
-                            case TypeCode.UInt32: return (uint)left % (uint)right;
-                            case TypeCode.Int64: return (long)left % (long)right;
-                            case TypeCode.UInt64: return (ulong)left % (ulong)right;
-                            case TypeCode.Char: return (char)left % (char)right;
-                            case TypeCode.Single: return (float)left % (float)right;
-                            case TypeCode.Double: return (double)left % (double)right;
-                            case TypeCode.Decimal: return (decimal)left % (decimal)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left % (sbyte)right;
+                        case TypeCode.Byte: return (byte)left % (byte)right;
+                        case TypeCode.Int16: return (short)left % (short)right;
+                        case TypeCode.UInt16: return (ushort)left % (ushort)right;
+                        case TypeCode.Int32: return (int)left % (int)right;
+                        case TypeCode.UInt32: return (uint)left % (uint)right;
+                        case TypeCode.Int64: return (long)left % (long)right;
+                        case TypeCode.UInt64: return (ulong)left % (ulong)right;
+                        case TypeCode.Char: return (char)left % (char)right;
+                        case TypeCode.Single: return (float)left % (float)right;
+                        case TypeCode.Double: return (double)left % (double)right;
+                        case TypeCode.Decimal: return (decimal)left % (decimal)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.And:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left & (sbyte)right;
-                            case TypeCode.Byte: return (byte)left & (byte)right;
-                            case TypeCode.Int16: return (short)left & (short)right;
-                            case TypeCode.UInt16: return (ushort)left & (ushort)right;
-                            case TypeCode.Int32: return (int)left & (int)right;
-                            case TypeCode.UInt32: return (uint)left & (uint)right;
-                            case TypeCode.Int64: return (long)left & (long)right;
-                            case TypeCode.UInt64: return (ulong)left & (ulong)right;
-                            case TypeCode.Char: return (char)left & (char)right;
-                            case TypeCode.Boolean: return (bool)left & (bool)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left & (sbyte)right;
+                        case TypeCode.Byte: return (byte)left & (byte)right;
+                        case TypeCode.Int16: return (short)left & (short)right;
+                        case TypeCode.UInt16: return (ushort)left & (ushort)right;
+                        case TypeCode.Int32: return (int)left & (int)right;
+                        case TypeCode.UInt32: return (uint)left & (uint)right;
+                        case TypeCode.Int64: return (long)left & (long)right;
+                        case TypeCode.UInt64: return (ulong)left & (ulong)right;
+                        case TypeCode.Char: return (char)left & (char)right;
+                        case TypeCode.Boolean: return (bool)left & (bool)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.Or:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return Convert.ToByte(left) | Convert.ToByte(right);
-                            case TypeCode.Byte: return (byte)left | (byte)right;
-                            case TypeCode.Int16: return (short)left | (short)right;
-                            case TypeCode.UInt16: return (ushort)left | (ushort)right;
-                            case TypeCode.Int32: return (int)left | (int)right;
-                            case TypeCode.UInt32: return (uint)left | (uint)right;
-                            case TypeCode.Int64: return (long)left | (long)right;
-                            case TypeCode.UInt64: return (ulong)left | (ulong)right;
-                            case TypeCode.Char: return (char)left | (char)right;
-                            case TypeCode.Boolean: return (bool)left | (bool)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return Convert.ToByte(left) | Convert.ToByte(right);
+                        case TypeCode.Byte: return (byte)left | (byte)right;
+                        case TypeCode.Int16: return (short)left | (short)right;
+                        case TypeCode.UInt16: return (ushort)left | (ushort)right;
+                        case TypeCode.Int32: return (int)left | (int)right;
+                        case TypeCode.UInt32: return (uint)left | (uint)right;
+                        case TypeCode.Int64: return (long)left | (long)right;
+                        case TypeCode.UInt64: return (ulong)left | (ulong)right;
+                        case TypeCode.Char: return (char)left | (char)right;
+                        case TypeCode.Boolean: return (bool)left | (bool)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.ExclusiveOr:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left ^ (sbyte)right;
-                            case TypeCode.Byte: return (byte)left ^ (byte)right;
-                            case TypeCode.Int16: return (short)left ^ (short)right;
-                            case TypeCode.UInt16: return (ushort)left ^ (ushort)right;
-                            case TypeCode.Int32: return (int)left ^ (int)right;
-                            case TypeCode.UInt32: return (uint)left ^ (uint)right;
-                            case TypeCode.Int64: return (long)left ^ (long)right;
-                            case TypeCode.UInt64: return (ulong)left ^ (ulong)right;
-                            case TypeCode.Char: return (char)left ^ (char)right;
-                            case TypeCode.Boolean: return (bool)left ^ (bool)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left ^ (sbyte)right;
+                        case TypeCode.Byte: return (byte)left ^ (byte)right;
+                        case TypeCode.Int16: return (short)left ^ (short)right;
+                        case TypeCode.UInt16: return (ushort)left ^ (ushort)right;
+                        case TypeCode.Int32: return (int)left ^ (int)right;
+                        case TypeCode.UInt32: return (uint)left ^ (uint)right;
+                        case TypeCode.Int64: return (long)left ^ (long)right;
+                        case TypeCode.UInt64: return (ulong)left ^ (ulong)right;
+                        case TypeCode.Char: return (char)left ^ (char)right;
+                        case TypeCode.Boolean: return (bool)left ^ (bool)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.AndAlso:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.Boolean: return (bool)left && (bool)right;
-                        }
-                        break;
+                        case TypeCode.Boolean: return (bool)left && (bool)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.OrElse:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.Boolean: return (bool)left || (bool)right;
-                        }
-                        break;
+                        case TypeCode.Boolean: return (bool)left || (bool)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.Equal:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left == (sbyte)right;
-                            case TypeCode.Byte: return (byte)left == (byte)right;
-                            case TypeCode.Int16: return (short)left == (short)right;
-                            case TypeCode.UInt16: return (ushort)left == (ushort)right;
-                            case TypeCode.Int32: return (int)left == (int)right;
-                            case TypeCode.UInt32: return (uint)left == (uint)right;
-                            case TypeCode.Int64: return (long)left == (long)right;
-                            case TypeCode.UInt64: return (ulong)left == (ulong)right;
-                            case TypeCode.Char: return (char)left == (char)right;
-                            case TypeCode.Single: return (float)left == (float)right;
-                            case TypeCode.Double: return (double)left == (double)right;
-                            case TypeCode.Decimal: return (decimal)left == (decimal)right;
-                            case TypeCode.Boolean: return (bool)left == (bool)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left == (sbyte)right;
+                        case TypeCode.Byte: return (byte)left == (byte)right;
+                        case TypeCode.Int16: return (short)left == (short)right;
+                        case TypeCode.UInt16: return (ushort)left == (ushort)right;
+                        case TypeCode.Int32: return (int)left == (int)right;
+                        case TypeCode.UInt32: return (uint)left == (uint)right;
+                        case TypeCode.Int64: return (long)left == (long)right;
+                        case TypeCode.UInt64: return (ulong)left == (ulong)right;
+                        case TypeCode.Char: return (char)left == (char)right;
+                        case TypeCode.Single: return Math.Abs((float)left - (float)right) < _floatComparerPrecisionValue;
+                        case TypeCode.Double: return Math.Abs((double)left - (double)right) < _floatComparerPrecisionValue;
+                        case TypeCode.Decimal: return (decimal)left == (decimal)right;
+                        case TypeCode.Boolean: return (bool)left == (bool)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.NotEqual:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left != (sbyte)right;
-                            case TypeCode.Byte: return (byte)left != (byte)right;
-                            case TypeCode.Int16: return (short)left != (short)right;
-                            case TypeCode.UInt16: return (ushort)left != (ushort)right;
-                            case TypeCode.Int32: return (int)left != (int)right;
-                            case TypeCode.UInt32: return (uint)left != (uint)right;
-                            case TypeCode.Int64: return (long)left != (long)right;
-                            case TypeCode.UInt64: return (ulong)left != (ulong)right;
-                            case TypeCode.Char: return (char)left != (char)right;
-                            case TypeCode.Single: return (float)left != (float)right;
-                            case TypeCode.Double: return (double)left != (double)right;
-                            case TypeCode.Decimal: return (decimal)left != (decimal)right;
-                            case TypeCode.Boolean: return (bool)left != (bool)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left != (sbyte)right;
+                        case TypeCode.Byte: return (byte)left != (byte)right;
+                        case TypeCode.Int16: return (short)left != (short)right;
+                        case TypeCode.UInt16: return (ushort)left != (ushort)right;
+                        case TypeCode.Int32: return (int)left != (int)right;
+                        case TypeCode.UInt32: return (uint)left != (uint)right;
+                        case TypeCode.Int64: return (long)left != (long)right;
+                        case TypeCode.UInt64: return (ulong)left != (ulong)right;
+                        case TypeCode.Char: return (char)left != (char)right;
+                        case TypeCode.Single: return Math.Abs((float)left - (float)right) > _floatComparerPrecisionValue;
+                        case TypeCode.Double: return Math.Abs((double)left - (double)right) > _floatComparerPrecisionValue;
+                        case TypeCode.Decimal: return (decimal)left != (decimal)right;
+                        case TypeCode.Boolean: return (bool)left != (bool)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.LessThan:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left < (sbyte)right;
-                            case TypeCode.Byte: return (byte)left < (byte)right;
-                            case TypeCode.Int16: return (short)left < (short)right;
-                            case TypeCode.UInt16: return (ushort)left < (ushort)right;
-                            case TypeCode.Int32: return (int)left < (int)right;
-                            case TypeCode.UInt32: return (uint)left < (uint)right;
-                            case TypeCode.Int64: return (long)left < (long)right;
-                            case TypeCode.UInt64: return (ulong)left < (ulong)right;
-                            case TypeCode.Char: return (char)left < (char)right;
-                            case TypeCode.Single: return (float)left < (float)right;
-                            case TypeCode.Double: return (double)left < (double)right;
-                            case TypeCode.Decimal: return (decimal)left < (decimal)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left < (sbyte)right;
+                        case TypeCode.Byte: return (byte)left < (byte)right;
+                        case TypeCode.Int16: return (short)left < (short)right;
+                        case TypeCode.UInt16: return (ushort)left < (ushort)right;
+                        case TypeCode.Int32: return (int)left < (int)right;
+                        case TypeCode.UInt32: return (uint)left < (uint)right;
+                        case TypeCode.Int64: return (long)left < (long)right;
+                        case TypeCode.UInt64: return (ulong)left < (ulong)right;
+                        case TypeCode.Char: return (char)left < (char)right;
+                        case TypeCode.Single: return (float)left < (float)right;
+                        case TypeCode.Double: return (double)left < (double)right;
+                        case TypeCode.Decimal: return (decimal)left < (decimal)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.LessThanOrEqual:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left <= (sbyte)right;
-                            case TypeCode.Byte: return (byte)left <= (byte)right;
-                            case TypeCode.Int16: return (short)left <= (short)right;
-                            case TypeCode.UInt16: return (ushort)left <= (ushort)right;
-                            case TypeCode.Int32: return (int)left <= (int)right;
-                            case TypeCode.UInt32: return (uint)left <= (uint)right;
-                            case TypeCode.Int64: return (long)left <= (long)right;
-                            case TypeCode.UInt64: return (ulong)left <= (ulong)right;
-                            case TypeCode.Char: return (char)left <= (char)right;
-                            case TypeCode.Single: return (float)left <= (float)right;
-                            case TypeCode.Double: return (double)left <= (double)right;
-                            case TypeCode.Decimal: return (decimal)left <= (decimal)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left <= (sbyte)right;
+                        case TypeCode.Byte: return (byte)left <= (byte)right;
+                        case TypeCode.Int16: return (short)left <= (short)right;
+                        case TypeCode.UInt16: return (ushort)left <= (ushort)right;
+                        case TypeCode.Int32: return (int)left <= (int)right;
+                        case TypeCode.UInt32: return (uint)left <= (uint)right;
+                        case TypeCode.Int64: return (long)left <= (long)right;
+                        case TypeCode.UInt64: return (ulong)left <= (ulong)right;
+                        case TypeCode.Char: return (char)left <= (char)right;
+                        case TypeCode.Single: return (float)left <= (float)right;
+                        case TypeCode.Double: return (double)left <= (double)right;
+                        case TypeCode.Decimal: return (decimal)left <= (decimal)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.GreaterThan:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left > (sbyte)right;
-                            case TypeCode.Byte: return (byte)left > (byte)right;
-                            case TypeCode.Int16: return (short)left > (short)right;
-                            case TypeCode.UInt16: return (ushort)left > (ushort)right;
-                            case TypeCode.Int32: return (int)left > (int)right;
-                            case TypeCode.UInt32: return (uint)left > (uint)right;
-                            case TypeCode.Int64: return (long)left > (long)right;
-                            case TypeCode.UInt64: return (ulong)left > (ulong)right;
-                            case TypeCode.Char: return (char)left > (char)right;
-                            case TypeCode.Single: return (float)left > (float)right;
-                            case TypeCode.Double: return (double)left > (double)right;
-                            case TypeCode.Decimal: return (decimal)left > (decimal)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left > (sbyte)right;
+                        case TypeCode.Byte: return (byte)left > (byte)right;
+                        case TypeCode.Int16: return (short)left > (short)right;
+                        case TypeCode.UInt16: return (ushort)left > (ushort)right;
+                        case TypeCode.Int32: return (int)left > (int)right;
+                        case TypeCode.UInt32: return (uint)left > (uint)right;
+                        case TypeCode.Int64: return (long)left > (long)right;
+                        case TypeCode.UInt64: return (ulong)left > (ulong)right;
+                        case TypeCode.Char: return (char)left > (char)right;
+                        case TypeCode.Single: return (float)left > (float)right;
+                        case TypeCode.Double: return (double)left > (double)right;
+                        case TypeCode.Decimal: return (decimal)left > (decimal)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.GreaterThanOrEqual:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left >= (sbyte)right;
-                            case TypeCode.Byte: return (byte)left >= (byte)right;
-                            case TypeCode.Int16: return (short)left >= (short)right;
-                            case TypeCode.UInt16: return (ushort)left >= (ushort)right;
-                            case TypeCode.Int32: return (int)left >= (int)right;
-                            case TypeCode.UInt32: return (uint)left >= (uint)right;
-                            case TypeCode.Int64: return (long)left >= (long)right;
-                            case TypeCode.UInt64: return (ulong)left >= (ulong)right;
-                            case TypeCode.Char: return (char)left >= (char)right;
-                            case TypeCode.Single: return (float)left >= (float)right;
-                            case TypeCode.Double: return (double)left >= (double)right;
-                            case TypeCode.Decimal: return (decimal)left >= (decimal)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left >= (sbyte)right;
+                        case TypeCode.Byte: return (byte)left >= (byte)right;
+                        case TypeCode.Int16: return (short)left >= (short)right;
+                        case TypeCode.UInt16: return (ushort)left >= (ushort)right;
+                        case TypeCode.Int32: return (int)left >= (int)right;
+                        case TypeCode.UInt32: return (uint)left >= (uint)right;
+                        case TypeCode.Int64: return (long)left >= (long)right;
+                        case TypeCode.UInt64: return (ulong)left >= (ulong)right;
+                        case TypeCode.Char: return (char)left >= (char)right;
+                        case TypeCode.Single: return (float)left >= (float)right;
+                        case TypeCode.Double: return (double)left >= (double)right;
+                        case TypeCode.Decimal: return (decimal)left >= (decimal)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.RightShift:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left >> (int)right;
-                            case TypeCode.Byte: return (byte)left >> (int)right;
-                            case TypeCode.Int16: return (short)left >> (int)right;
-                            case TypeCode.UInt16: return (ushort)left >> (int)right;
-                            case TypeCode.Int32: return (int)left >> (int)right;
-                            case TypeCode.UInt32: return (uint)left >> (int)right;
-                            case TypeCode.Int64: return (long)left >> (int)right;
-                            case TypeCode.UInt64: return (ulong)left >> (int)right;
-                            case TypeCode.Char: return (char)left >> (int)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left >> (int)right;
+                        case TypeCode.Byte: return (byte)left >> (int)right;
+                        case TypeCode.Int16: return (short)left >> (int)right;
+                        case TypeCode.UInt16: return (ushort)left >> (int)right;
+                        case TypeCode.Int32: return (int)left >> (int)right;
+                        case TypeCode.UInt32: return (uint)left >> (int)right;
+                        case TypeCode.Int64: return (long)left >> (int)right;
+                        case TypeCode.UInt64: return (ulong)left >> (int)right;
+                        case TypeCode.Char: return (char)left >> (int)right;
                     }
+
+                    break;
+                }
                 case ExpressionType.LeftShift:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte: return (sbyte)left << (int)right;
-                            case TypeCode.Byte: return (byte)left << (int)right;
-                            case TypeCode.Int16: return (short)left << (int)right;
-                            case TypeCode.UInt16: return (ushort)left << (int)right;
-                            case TypeCode.Int32: return (int)left << (int)right;
-                            case TypeCode.UInt32: return (uint)left << (int)right;
-                            case TypeCode.Int64: return (long)left << (int)right;
-                            case TypeCode.UInt64: return (ulong)left << (int)right;
-                            case TypeCode.Char: return (char)left << (int)right;
-                        }
-                        break;
+                        case TypeCode.SByte: return (sbyte)left << (int)right;
+                        case TypeCode.Byte: return (byte)left << (int)right;
+                        case TypeCode.Int16: return (short)left << (int)right;
+                        case TypeCode.UInt16: return (ushort)left << (int)right;
+                        case TypeCode.Int32: return (int)left << (int)right;
+                        case TypeCode.UInt32: return (uint)left << (int)right;
+                        case TypeCode.Int64: return (long)left << (int)right;
+                        case TypeCode.UInt64: return (ulong)left << (int)right;
+                        case TypeCode.Char: return (char)left << (int)right;
                     }
+
+                    break;
+                }
             }
 
             throw new NotSupportedException("Expressions of type " + exprType + " failed.");
@@ -474,13 +497,16 @@ namespace Fusion.Mvvm
 #if NETFX_CORE
             if (unliftedLeft.GetTypeInfo().IsEnum && unliftedLeft.Equals(unliftedRight))
 #else
-            if (unliftedLeft.IsEnum && unliftedLeft.Equals(unliftedRight))
+            if (unliftedLeft.IsEnum && unliftedLeft == unliftedRight)
 #endif
             {
                 var underlyingType = Enum.GetUnderlyingType(unliftedLeft);
                 var nullableUnderlying = typeof(Nullable<>).MakeGenericType(underlyingType);
-                return Visit(Expression.Convert(Expression.MakeBinary(expr.NodeType, Expression.Convert(expr.Left, nullableUnderlying), Expression.Convert(expr.Right, nullableUnderlying), expr.IsLiftedToNull, expr.Method, expr.Conversion), expr.Type));
+                return Visit(Expression.Convert(
+                    Expression.MakeBinary(expr.NodeType, Expression.Convert(expr.Left, nullableUnderlying),
+                        Expression.Convert(expr.Right, nullableUnderlying), expr.IsLiftedToNull, expr.Method, expr.Conversion), expr.Type));
             }
+
             object result = null;
 #if NETFX_CORE
             if (!unliftedLeft.GetTypeInfo().IsPrimitive)
@@ -490,26 +516,30 @@ namespace Fusion.Mvvm
             {
                 if (expr.NodeType == ExpressionType.AndAlso || expr.NodeType == ExpressionType.OrElse)
                 {
-                    var truthMethod = unliftedLeft.GetMethod(expr.NodeType == ExpressionType.AndAlso ? "op_False" : "op_True", new[] { unliftedLeft });
+                    var truthMethod = unliftedLeft.GetMethod(expr.NodeType == ExpressionType.AndAlso ? "op_False" : "op_True",
+                        new[] { unliftedLeft });
                     if (truthMethod != null && (bool)truthMethod.Invoke(null, new object[] { left }))
                     {
                         return Expression.Constant(left, expr.Type);
                     }
+
                     if (expr.IsLiftedToNull && right == null)
                     {
                         return Expression.Constant(null, expr.Type);
                     }
+
                     if (expr.Method != null)
                     {
                         return Expression.Constant(expr.Method.Invoke(null, new object[] { left, right }), expr.Type);
                     }
                 }
             }
-            if (expr.IsLiftedToNull && (expr.Left.Type.Equals(typeof(bool?))
-                || expr.Left.Type.Equals(typeof(bool)))
-                && (expr.Right.Type.Equals(typeof(bool?))
-                || expr.Right.Type.Equals(typeof(bool))) && expr.Type.Equals(typeof(bool?))
-                && (expr.NodeType == ExpressionType.And || expr.NodeType == ExpressionType.Or))
+
+            if (expr.IsLiftedToNull && (expr.Left.Type == typeof(bool?)
+                                        || expr.Left.Type == typeof(bool))
+                                    && (expr.Right.Type == typeof(bool?)
+                                        || expr.Right.Type == typeof(bool)) && expr.Type == typeof(bool?)
+                                    && (expr.NodeType == ExpressionType.And || expr.NodeType == ExpressionType.Or))
             {
                 Func<bool?, bool?, bool?> evaluator = null;
                 switch (expr.NodeType)
@@ -521,27 +551,32 @@ namespace Fusion.Mvvm
                         evaluator = (l, r) => l | r;
                         break;
                 }
-                return Expression.Constant(evaluator.DynamicInvoke(left, right), expr.Type);
+
+                if (evaluator != null) return Expression.Constant(evaluator.DynamicInvoke(left, right), expr.Type);
             }
+
             if (expr.IsLiftedToNull)
             {
-                if ((expr.Left.Type.Equals(typeof(bool?)) || expr.Left.Type.Equals(typeof(bool))) &&
-                  (expr.Right.Type.Equals(typeof(bool?)) || expr.Right.Type.Equals(typeof(bool))))
+                if ((expr.Left.Type == typeof(bool?) || expr.Left.Type == typeof(bool)) &&
+                    (expr.Right.Type == typeof(bool?) || expr.Right.Type == typeof(bool)))
                 {
                     if (expr.NodeType == ExpressionType.AndAlso && false.Equals(left))
                     {
                         return Expression.Constant(false, expr.Type);
                     }
+
                     if (expr.NodeType == ExpressionType.OrElse && true.Equals(left))
                     {
                         return Expression.Constant(true, expr.Type);
                     }
                 }
+
                 if (left == null || right == null)
                 {
                     return Expression.Constant(null, expr.Type);
                 }
             }
+
             if (expr.IsLifted)
             {
                 switch (expr.NodeType)
@@ -554,21 +589,25 @@ namespace Fusion.Mvvm
                         {
                             return Expression.Constant(false, expr.Type);
                         }
+
                         break;
                     case ExpressionType.Equal:
                         if (left == null || right == null)
                         {
                             return Expression.Constant(left == right, expr.Type);
                         }
+
                         break;
                     case ExpressionType.NotEqual:
                         if (left == null || right == null)
                         {
                             return Expression.Constant(left != right, expr.Type);
                         }
+
                         break;
                 }
             }
+
             if (expr.Method != null)
             {
                 result = expr.Method.Invoke(null, new[] { left, right });
@@ -588,12 +627,13 @@ namespace Fusion.Mvvm
                         {
                             result = right;
                         }
+
                         break;
                     case ExpressionType.ArrayIndex:
 #if NETFX_CORE
                         result = ((Array)left).GetValue((int)right);
 #else
-                        if (expr.Right.Type.Equals(typeof(int)))
+                        if (expr.Right.Type == typeof(int))
                         {
                             result = ((Array)left).GetValue((int)right);
                         }
@@ -627,6 +667,7 @@ namespace Fusion.Mvvm
                 if (IsNullable(expr.Expression.Type))
                     return Expression.Constant(PerformOnNullable(root, expr.Member, new Expression[0]), expr.Type);
             }
+
             return Expression.Constant(expr.Member.Get(root));
         }
 
@@ -635,7 +676,7 @@ namespace Fusion.Mvvm
 #if NETFX_CORE
             return t.GetTypeInfo().IsGenericType && t.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
 #else
-            return t.IsGenericType && t.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
+            return t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>);
 #endif
         }
 
@@ -695,171 +736,175 @@ namespace Fusion.Mvvm
                     return Expression.Constant(Convert.ChangeType(val, realTargetType), expr.Type);
                 case ExpressionType.ConvertChecked:
                     var convertMethod = typeof(Convert).GetMethod("To" + realTargetType.Name, new[] { val.GetType() });
-                    return Expression.Constant(convertMethod.Invoke(null, new object[] { val }), expr.Type);
+                    return Expression.Constant(convertMethod?.Invoke(null, new object[] { val }), expr.Type);
                 case ExpressionType.ArrayLength:
                     return Expression.Constant(((Array)val).Length, expr.Type);
                 case ExpressionType.Negate:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte:
-                                result = -(sbyte)val;
-                                break;
-                            case TypeCode.Byte:
-                                result = -(byte)val;
-                                break;
-                            case TypeCode.Int16:
-                                result = -(short)val;
-                                break;
-                            case TypeCode.UInt16:
-                                result = -(ushort)val;
-                                break;
-                            case TypeCode.Int32:
-                                result = -(int)val;
-                                break;
-                            case TypeCode.UInt32:
-                                result = -(uint)val;
-                                break;
-                            case TypeCode.Int64:
-                                result = -(long)val;
-                                break;
-                            case TypeCode.Char:
-                                result = -(char)val;
-                                break;
-                            case TypeCode.Single:
-                                result = -(float)val;
-                                break;
-                            case TypeCode.Double:
-                                result = -(double)val;
-                                break;
-                            case TypeCode.Decimal:
-                                result = -(decimal)val;
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
+                        case TypeCode.SByte:
+                            result = -(sbyte)val;
+                            break;
+                        case TypeCode.Byte:
+                            result = -(byte)val;
+                            break;
+                        case TypeCode.Int16:
+                            result = -(short)val;
+                            break;
+                        case TypeCode.UInt16:
+                            result = -(ushort)val;
+                            break;
+                        case TypeCode.Int32:
+                            result = -(int)val;
+                            break;
+                        case TypeCode.UInt32:
+                            result = -(uint)val;
+                            break;
+                        case TypeCode.Int64:
+                            result = -(long)val;
+                            break;
+                        case TypeCode.Char:
+                            result = -(char)val;
+                            break;
+                        case TypeCode.Single:
+                            result = -(float)val;
+                            break;
+                        case TypeCode.Double:
+                            result = -(double)val;
+                            break;
+                        case TypeCode.Decimal:
+                            result = -(decimal)val;
+                            break;
+                        default:
+                            break;
                     }
+
+                    break;
+                }
                 case ExpressionType.NegateChecked:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte:
-                                result = checked(-(sbyte)val);
-                                break;
-                            case TypeCode.Byte:
-                                result = checked(-(byte)val);
-                                break;
-                            case TypeCode.Int16:
-                                result = checked(-(short)val);
-                                break;
-                            case TypeCode.UInt16:
-                                result = checked(-(ushort)val);
-                                break;
-                            case TypeCode.Int32:
-                                result = checked(-(int)val);
-                                break;
-                            case TypeCode.UInt32:
-                                result = checked(-(uint)val);
-                                break;
-                            case TypeCode.Int64:
-                                result = checked(-(long)val);
-                                break;
-                            case TypeCode.Char:
-                                result = checked(-(char)val);
-                                break;
-                            case TypeCode.Single:
-                                result = checked(-(float)val);
-                                break;
-                            case TypeCode.Double:
-                                result = checked(-(double)val);
-                                break;
-                            case TypeCode.Decimal:
-                                result = checked(-(decimal)val);
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
+                        case TypeCode.SByte:
+                            result = checked(-(sbyte)val);
+                            break;
+                        case TypeCode.Byte:
+                            result = checked(-(byte)val);
+                            break;
+                        case TypeCode.Int16:
+                            result = checked(-(short)val);
+                            break;
+                        case TypeCode.UInt16:
+                            result = checked(-(ushort)val);
+                            break;
+                        case TypeCode.Int32:
+                            result = checked(-(int)val);
+                            break;
+                        case TypeCode.UInt32:
+                            result = checked(-(uint)val);
+                            break;
+                        case TypeCode.Int64:
+                            result = checked(-(long)val);
+                            break;
+                        case TypeCode.Char:
+                            result = checked(-(char)val);
+                            break;
+                        case TypeCode.Single:
+                            result = checked(-(float)val);
+                            break;
+                        case TypeCode.Double:
+                            result = checked(-(double)val);
+                            break;
+                        case TypeCode.Decimal:
+                            result = checked(-(decimal)val);
+                            break;
+                        default:
+                            break;
                     }
+
+                    break;
+                }
                 case ExpressionType.UnaryPlus:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte:
-                                result = +(sbyte)val;
-                                break;
-                            case TypeCode.Byte:
-                                result = +(byte)val;
-                                break;
-                            case TypeCode.Int16:
-                                result = +(short)val;
-                                break;
-                            case TypeCode.UInt16:
-                                result = +(ushort)val;
-                                break;
-                            case TypeCode.Int32:
-                                result = +(int)val;
-                                break;
-                            case TypeCode.UInt32:
-                                result = +(uint)val;
-                                break;
-                            case TypeCode.Int64:
-                                result = +(long)val;
-                                break;
-                            case TypeCode.Char:
-                                result = +(char)val;
-                                break;
-                            case TypeCode.Single:
-                                result = +(float)val;
-                                break;
-                            case TypeCode.Double:
-                                result = +(double)val;
-                                break;
-                            case TypeCode.Decimal:
-                                result = +(decimal)val;
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
+                        case TypeCode.SByte:
+                            result = +(sbyte)val;
+                            break;
+                        case TypeCode.Byte:
+                            result = +(byte)val;
+                            break;
+                        case TypeCode.Int16:
+                            result = +(short)val;
+                            break;
+                        case TypeCode.UInt16:
+                            result = +(ushort)val;
+                            break;
+                        case TypeCode.Int32:
+                            result = +(int)val;
+                            break;
+                        case TypeCode.UInt32:
+                            result = +(uint)val;
+                            break;
+                        case TypeCode.Int64:
+                            result = +(long)val;
+                            break;
+                        case TypeCode.Char:
+                            result = +(char)val;
+                            break;
+                        case TypeCode.Single:
+                            result = +(float)val;
+                            break;
+                        case TypeCode.Double:
+                            result = +(double)val;
+                            break;
+                        case TypeCode.Decimal:
+                            result = +(decimal)val;
+                            break;
+                        default:
+                            break;
                     }
+
+                    break;
+                }
                 case ExpressionType.Not:
+                {
+                    switch (typeCode)
                     {
-                        switch (typeCode)
-                        {
-                            case TypeCode.SByte:
-                                result = ~(sbyte)val;
-                                break;
-                            case TypeCode.Byte:
-                                result = ~(byte)val;
-                                break;
-                            case TypeCode.Int16:
-                                result = ~(short)val;
-                                break;
-                            case TypeCode.UInt16:
-                                result = ~(ushort)val;
-                                break;
-                            case TypeCode.Int32:
-                                result = ~(int)val;
-                                break;
-                            case TypeCode.UInt32:
-                                result = ~(uint)val;
-                                break;
-                            case TypeCode.Int64:
-                                result = ~(long)val;
-                                break;
-                            case TypeCode.Char:
-                                result = ~(char)val;
-                                break;
-                            case TypeCode.Boolean:
-                                result = !(bool)val;
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
+                        case TypeCode.SByte:
+                            result = ~(sbyte)val;
+                            break;
+                        case TypeCode.Byte:
+                            result = ~(byte)val;
+                            break;
+                        case TypeCode.Int16:
+                            result = ~(short)val;
+                            break;
+                        case TypeCode.UInt16:
+                            result = ~(ushort)val;
+                            break;
+                        case TypeCode.Int32:
+                            result = ~(int)val;
+                            break;
+                        case TypeCode.UInt32:
+                            result = ~(uint)val;
+                            break;
+                        case TypeCode.Int64:
+                            result = ~(long)val;
+                            break;
+                        case TypeCode.Char:
+                            result = ~(char)val;
+                            break;
+                        case TypeCode.Boolean:
+                            result = !(bool)val;
+                            break;
+                        default:
+                            break;
                     }
+
+                    break;
+                }
             }
 
             if (result != null)
@@ -926,11 +971,12 @@ namespace Fusion.Mvvm
             else
             {
                 root = ((ConstantExpression)Visit(expr.Object)).Value;
-                if (IsNullable(expr.Object.Type))
+                if (IsNullable(expr.Object?.Type))
                     return Expression.Constant(PerformOnNullable(root, expr.Method, expr.Arguments), expr.Type);
             }
 
-            return Expression.Constant(InvokeMethod(args => expr.Method.Invoke(root, args), expr.Arguments), expr.Type.Equals(typeof(void)) ? typeof(object) : expr.Type);
+            return Expression.Constant(InvokeMethod(args => expr.Method.Invoke(root, args), expr.Arguments),
+                expr.Type == typeof(void) ? typeof(object) : expr.Type);
         }
 
         protected override Expression VisitConditional(ConditionalExpression expr)
@@ -950,39 +996,39 @@ namespace Fusion.Mvvm
 
         protected override Expression VisitLambda(LambdaExpression expr)
         {
-            Func<object[], object> proxy = args => Evaluate(expr, values, args);
-            return Expression.Constant(proxy, typeof(Func<object[], object>));
+            object Proxy(object[] args) => Evaluate(expr, values, args);
+            return Expression.Constant((Func<object[], object>)Proxy, typeof(Func<object[], object>));
         }
 
         protected override Expression VisitInvocation(InvocationExpression expr)
         {
             var toInvoke = (Delegate)((ConstantExpression)Visit(expr.Expression)).Value;
             var result = InvokeMethod(args => toInvoke.DynamicInvoke(args), expr.Arguments);
-            return Expression.Constant(result, expr.Type.Equals(typeof(void)) ? typeof(object) : expr.Type);
+            return Expression.Constant(result, expr.Type == typeof(void) ? typeof(object) : expr.Type);
         }
 
         protected override Expression VisitNewArrayInit(NewArrayExpression expr)
         {
             var expressions = expr.Expressions;
-            int count = expressions != null ? expressions.Count : 0;
+            int count = expressions.Count;
             Array array = (Array)Activator.CreateInstance(expr.Type, count);
             for (int i = 0; i < count; i++)
             {
                 var expression = Visit(expressions[i]);
-                ConstantExpression constantExpression = expression as ConstantExpression;
-                if (constantExpression != null)
+                if (expression is ConstantExpression constantExpression)
                     array.SetValue(constantExpression.Value, i);
             }
+
             return Expression.Constant(array, expr.Type);
         }
 
-        internal static object Evaluate(LambdaExpression expr, Scope scope, params object[] args)
+        private static object Evaluate(LambdaExpression expr, Scope scope, params object[] args)
         {
             var visitor = new EvaluatingVisitor();
             visitor.values = new Scope(scope);
 
             var first = expr.Parameters.GetEnumerator();
-            var sencond = args != null ? args.GetEnumerator() : null;
+            var sencond = args?.GetEnumerator();
             while (first.MoveNext())
             {
                 if (sencond.MoveNext())
@@ -990,10 +1036,9 @@ namespace Fusion.Mvvm
                     visitor.values.Register(first.Current, sencond.Current);
                 }
             }
+
             var result = visitor.Visit(expr.Body);
             return ((ConstantExpression)result).Value;
         }
     }
-
-    public delegate object InvokeProxy(params object[] args);
 }

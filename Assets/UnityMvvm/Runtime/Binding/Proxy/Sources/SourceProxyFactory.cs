@@ -16,8 +16,7 @@ namespace Fusion.Mvvm
                 if (!description.IsStatic && source == null)
                     return new EmptSourceProxy(description);
 
-                ISourceProxy proxy = null;
-                if (TryCreateProxy(source, description, out proxy))
+                if (TryCreateProxy(source, description, out var proxy))
                     return proxy;
 
                 throw new NotSupportedException("Not found available proxy factory.");

@@ -16,8 +16,7 @@ namespace Fusion.Mvvm
             if (!IsSupported(description))
                 return null;
 
-            ISourceProxy proxy = null;
-            if (TryCreateProxy(source, (T)description, out proxy))
+            if (TryCreateProxy(source, (T)description, out var proxy))
                 return proxy;
 
             return proxy;

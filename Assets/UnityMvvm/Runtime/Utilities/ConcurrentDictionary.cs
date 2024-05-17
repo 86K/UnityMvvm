@@ -427,8 +427,7 @@ namespace Fusion.Mvvm
 
                 IEqualityComparer<TKey> comparer = tables.m_comparer;
 
-                int bucketNo, lockNo;
-                GetBucketAndLockNo(comparer.GetHashCode(key), out bucketNo, out lockNo, tables.m_buckets.Length, tables.m_locks.Length);
+                GetBucketAndLockNo(comparer.GetHashCode(key), out var bucketNo, out var lockNo, tables.m_buckets.Length, tables.m_locks.Length);
 
                 lock (tables.m_locks[lockNo])
                 {
@@ -496,12 +495,12 @@ namespace Fusion.Mvvm
         {
             if (key == null) throw new ArgumentNullException("key");
 
-            int bucketNo, lockNoUnused;
+            int lockNoUnused;
 
             // We must capture the m_buckets field in a local variable. It is set to a new table on each table resize.
             Tables tables = m_tables;
             IEqualityComparer<TKey> comparer = tables.m_comparer;
-            GetBucketAndLockNo(comparer.GetHashCode(key), out bucketNo, out lockNoUnused, tables.m_buckets.Length, tables.m_locks.Length);
+            GetBucketAndLockNo(comparer.GetHashCode(key), out var bucketNo, out lockNoUnused, tables.m_buckets.Length, tables.m_locks.Length);
 
             // We can get away w/out a lock here.
             // The Volatile.Read ensures that the load of the fields of 'n' doesn't move before the load from buckets[i].
@@ -545,15 +544,13 @@ namespace Fusion.Mvvm
 
             while (true)
             {
-                int bucketNo;
-                int lockNo;
                 int hashcode;
 
                 Tables tables = m_tables;
                 IEqualityComparer<TKey> comparer = tables.m_comparer;
 
                 hashcode = comparer.GetHashCode(key);
-                GetBucketAndLockNo(hashcode, out bucketNo, out lockNo, tables.m_buckets.Length, tables.m_locks.Length);
+                GetBucketAndLockNo(hashcode, out var bucketNo, out var lockNo, tables.m_buckets.Length, tables.m_locks.Length);
 
                 lock (tables.m_locks[lockNo])
                 {
@@ -824,13 +821,12 @@ namespace Fusion.Mvvm
         {
             while (true)
             {
-                int bucketNo, lockNo;
                 int hashcode;
 
                 Tables tables = m_tables;
                 IEqualityComparer<TKey> comparer = tables.m_comparer;
                 hashcode = comparer.GetHashCode(key);
-                GetBucketAndLockNo(hashcode, out bucketNo, out lockNo, tables.m_buckets.Length, tables.m_locks.Length);
+                GetBucketAndLockNo(hashcode, out var bucketNo, out var lockNo, tables.m_buckets.Length, tables.m_locks.Length);
 
                 bool resizeDesired = false;
                 bool lockTaken = false;
@@ -984,8 +980,7 @@ namespace Fusion.Mvvm
         {
             get
             {
-                TValue value;
-                if (!TryGetValue(key, out value))
+                if (!TryGetValue(key, out var value))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -1060,8 +1055,7 @@ namespace Fusion.Mvvm
             if (key == null) throw new ArgumentNullException("key");
             if (valueFactory == null) throw new ArgumentNullException("valueFactory");
 
-            TValue resultingValue;
-            if (TryGetValue(key, out resultingValue))
+            if (TryGetValue(key, out var resultingValue))
             {
                 return resultingValue;
             }
@@ -1085,8 +1079,7 @@ namespace Fusion.Mvvm
         {
             if (key == null) throw new ArgumentNullException("key");
 
-            TValue resultingValue;
-            TryAddInternal(key, value, false, true, out resultingValue);
+            TryAddInternal(key, value, false, true, out var resultingValue);
             return resultingValue;
         }
 
@@ -1115,11 +1108,10 @@ namespace Fusion.Mvvm
             if (addValueFactory == null) throw new ArgumentNullException("addValueFactory");
             if (updateValueFactory == null) throw new ArgumentNullException("updateValueFactory");
 
-            TValue newValue, resultingValue;
+            TValue newValue;
             while (true)
             {
-                TValue oldValue;
-                if (TryGetValue(key, out oldValue))
+                if (TryGetValue(key, out var oldValue))
                 //key exists, try to update
                 {
                     newValue = updateValueFactory(key, oldValue);
@@ -1131,7 +1123,7 @@ namespace Fusion.Mvvm
                 else //try add
                 {
                     newValue = addValueFactory(key);
-                    if (TryAddInternal(key, newValue, false, true, out resultingValue))
+                    if (TryAddInternal(key, newValue, false, true, out var resultingValue))
                     {
                         return resultingValue;
                     }
@@ -1160,11 +1152,10 @@ namespace Fusion.Mvvm
         {
             if (key == null) throw new ArgumentNullException("key");
             if (updateValueFactory == null) throw new ArgumentNullException("updateValueFactory");
-            TValue newValue, resultingValue;
+            TValue newValue;
             while (true)
             {
-                TValue oldValue;
-                if (TryGetValue(key, out oldValue))
+                if (TryGetValue(key, out var oldValue))
                 //key exists, try to update
                 {
                     newValue = updateValueFactory(key, oldValue);
@@ -1175,7 +1166,7 @@ namespace Fusion.Mvvm
                 }
                 else //try add
                 {
-                    if (TryAddInternal(key, addValue, false, true, out resultingValue))
+                    if (TryAddInternal(key, addValue, false, true, out var resultingValue))
                     {
                         return resultingValue;
                     }
@@ -1327,8 +1318,7 @@ namespace Fusion.Mvvm
         /// cref="T:System.Collections.Generic.ICollection{TKey,TValue}"/>; otherwise, false.</returns>
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair)
         {
-            TValue value;
-            if (!TryGetValue(keyValuePair.Key, out value))
+            if (!TryGetValue(keyValuePair.Key, out var value))
             {
                 return false;
             }
@@ -1524,8 +1514,7 @@ namespace Fusion.Mvvm
             {
                 if (key == null) throw new ArgumentNullException("key");
 
-                TValue value;
-                if (key is TKey && TryGetValue((TKey)key, out value))
+                if (key is TKey && TryGetValue((TKey)key, out var value))
                 {
                     return value;
                 }
@@ -1771,7 +1760,6 @@ namespace Fusion.Mvvm
                     while (current != null)
                     {
                         Node next = current.m_next;
-                        int newBucketNo, newLockNo;
                         int nodeHashCode = current.m_hashcode;
 
                         if (regenerateHashKeys)
@@ -1780,7 +1768,7 @@ namespace Fusion.Mvvm
                             nodeHashCode = newComparer.GetHashCode(current.m_key);
                         }
 
-                        GetBucketAndLockNo(nodeHashCode, out newBucketNo, out newLockNo, newBuckets.Length, newLocks.Length);
+                        GetBucketAndLockNo(nodeHashCode, out var newBucketNo, out var newLockNo, newBuckets.Length, newLocks.Length);
 
                         newBuckets[newBucketNo] = new Node(current.m_key, current.m_value, nodeHashCode, newBuckets[newBucketNo]);
 

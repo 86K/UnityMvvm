@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,7 +7,7 @@ namespace Fusion.Mvvm
 {
     abstract class ExpressionVisitor
     {
-        public virtual Expression Visit(Expression expr)
+        public Expression Visit(Expression expr)
         {
             if (expr == null)
                 return null;
@@ -76,20 +74,13 @@ namespace Fusion.Mvvm
                     return VisitParameter((ParameterExpression)expr);
                 case ExpressionType.NewArrayInit:
                     return VisitNewArrayInit((NewArrayExpression)expr);
-                //case ExpressionType.New:
-                //return this.VisitNew((NewExpression)expr);
-                //case ExpressionType.NewArrayBounds:
-                //    return this.VisitNewArray((NewArrayExpression)expr);
-                //case ExpressionType.MemberInit:
-                //    return this.VisitMemberInit((MemberInitExpression)expr);
-                //case ExpressionType.ListInit:
-                //    return this.VisitListInit((ListInitExpression)expr);
+           
                 default:
                     throw new NotSupportedException("Expressions of type " + expr.Type + " are not supported.");
             }
         }
 
-        protected virtual ReadOnlyCollection<T> VisitExpressionList<T>(ReadOnlyCollection<T> original) where T : Expression
+        private ReadOnlyCollection<T> VisitExpressionList<T>(ReadOnlyCollection<T> original) where T : Expression
         {
             List<T> list = null;
             for (int i = 0, n = original.Count; i < n; i++)
@@ -145,7 +136,7 @@ namespace Fusion.Mvvm
         {
             Expression body = Visit(expr.Body);
             IEnumerable<ParameterExpression> parameters = VisitExpressionList(expr.Parameters);
-            if (body != expr.Body || parameters != expr.Parameters)
+            if (body != expr.Body || !Equals(parameters, expr.Parameters))
                 return Expression.Lambda(expr.Type, body, parameters);
             return expr;
         }
@@ -154,7 +145,7 @@ namespace Fusion.Mvvm
         {
             IEnumerable<Expression> args = VisitExpressionList(expr.Arguments);
             Expression expression = Visit(expr.Expression);
-            if (args != expr.Arguments || expression != expr.Expression)
+            if (!Equals(args, expr.Arguments) || expression != expr.Expression)
                 return Expression.Invoke(expression, args);
             return expr;
         }
@@ -171,7 +162,7 @@ namespace Fusion.Mvvm
         {
             Expression obj = Visit(expr.Object);
             IEnumerable<Expression> args = VisitExpressionList(expr.Arguments);
-            if (obj != expr.Object || args != expr.Arguments)
+            if (obj != expr.Object || !Equals(args, expr.Arguments))
                 return Expression.Call(obj, expr.Method, args);
             return expr;
         }
@@ -195,12 +186,12 @@ namespace Fusion.Mvvm
         protected virtual Expression VisitNewArrayInit(NewArrayExpression expr)
         {
             IEnumerable<Expression> args = VisitExpressionList(expr.Expressions);
-            if (args != expr.Expressions)
+            if (!Equals(args, expr.Expressions))
                 return Expression.NewArrayInit(expr.Type, args);
             return expr;
         }
 
-        protected virtual Expression VisitConstant(ConstantExpression expr)
+        private Expression VisitConstant(ConstantExpression expr)
         {
             return expr;
         }

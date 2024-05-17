@@ -41,8 +41,7 @@ namespace Fusion.Mvvm
             lock (_lock)
             {
                 string name = methodInfo.Name;
-                List<IProxyMethodInfo> list;
-                if (!methods.TryGetValue(name, out list))
+                if (!methods.TryGetValue(name, out var list))
                 {
                     list = new List<IProxyMethodInfo>();
                     methods.Add(name, list);
@@ -56,8 +55,7 @@ namespace Fusion.Mvvm
             lock (_lock)
             {
                 string name = methodInfo.Name;
-                List<IProxyMethodInfo> list;
-                if (!methods.TryGetValue(name, out list))
+                if (!methods.TryGetValue(name, out var list))
                     return;
 
                 list.Remove(methodInfo);
@@ -220,8 +218,7 @@ namespace Fusion.Mvvm
 
         public IProxyEventInfo GetEvent(string name)
         {
-            IProxyEventInfo info;
-            if (events.TryGetValue(name, out info))
+            if (events.TryGetValue(name, out var info))
                 return info;
 
             return FindEventInfo(name, DEFAULT_LOOKUP, true);
@@ -275,8 +272,7 @@ namespace Fusion.Mvvm
 
         public IProxyFieldInfo GetField(string name)
         {
-            IProxyFieldInfo info;
-            if (fields.TryGetValue(name, out info))
+            if (fields.TryGetValue(name, out var info))
                 return info;
 
             return FindFieldInfo(name, DEFAULT_LOOKUP, true);
@@ -334,8 +330,7 @@ namespace Fusion.Mvvm
 
         public IProxyPropertyInfo GetProperty(string name)
         {
-            IProxyPropertyInfo info;
-            if (properties.TryGetValue(name, out info))
+            if (properties.TryGetValue(name, out var info))
                 return info;
 
             return FindPropertyInfo(name, DEFAULT_LOOKUP, true);

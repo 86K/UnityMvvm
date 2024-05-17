@@ -1,5 +1,3 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
@@ -11,7 +9,7 @@ namespace Fusion.Mvvm
         Type GetValueType();
     }
 
-    public interface ICommandParameter<T> : ICommandParameter
+    public interface ICommandParameter<out T> : ICommandParameter
     {
         new T GetValue();
     }

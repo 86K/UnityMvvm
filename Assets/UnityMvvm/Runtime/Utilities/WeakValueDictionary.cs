@@ -83,8 +83,7 @@ namespace Fusion.Mvvm
         {
             CleanupCheck();
 
-            WeakReference<TValue> item;
-            if (dictionary.TryGetValue(key, out item))
+            if (dictionary.TryGetValue(key, out var item))
                 value = item.Target;
             else
                 value = null;
@@ -95,8 +94,7 @@ namespace Fusion.Mvvm
         {
             CleanupCheck();
 
-            WeakReference<TValue> item;
-            if (dictionary.TryGetValue(key, out item) && item.IsAlive)
+            if (dictionary.TryGetValue(key, out var item) && item.IsAlive)
                 return true;
             return false;
         }
@@ -113,8 +111,7 @@ namespace Fusion.Mvvm
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            WeakReference<TValue> value;
-            if (!dictionary.TryGetValue(item.Key, out value))
+            if (!dictionary.TryGetValue(item.Key, out var value))
                 return false;
 
             if (value.IsAlive && EqualityComparer<TValue>.Default.Equals(value.Target, item.Value))
@@ -190,8 +187,7 @@ namespace Fusion.Mvvm
 
             if (add)
             {
-                WeakReference<TValue> item;
-                if (dictionary.TryGetValue(key, out item) && item.IsAlive)
+                if (dictionary.TryGetValue(key, out var item) && item.IsAlive)
                     throw new ArgumentException("An item with the same key has already been added.");
             }
 

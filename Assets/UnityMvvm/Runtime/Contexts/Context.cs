@@ -48,8 +48,7 @@ namespace Fusion.Mvvm
 
         public static Context GetContext(string key)
         {
-            Context context = null;
-            contexts.TryGetValue(key, out context);
+            contexts.TryGetValue(key, out var context);
             return context;
         }
 
@@ -107,8 +106,7 @@ namespace Fusion.Mvvm
 
         public virtual T Get<T>(string name, bool cascade = true)
         {
-            object v;
-            if (attributes.TryGetValue(name, out v))
+            if (attributes.TryGetValue(name, out var v))
                 return (T)v;
 
             if (cascade && contextBase != null)
