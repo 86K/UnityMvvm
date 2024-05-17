@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Reflection;
 using UnityEngine;
@@ -8,115 +6,95 @@ namespace Fusion.Mvvm
 {
     public class ProxyPropertyInfo : IProxyPropertyInfo
     {
-        //private static readonly ILog log = LogManager.GetLogger(typeof(ProxyPropertyInfo));
-
-        private readonly bool isValueType;
-        private TypeCode typeCode;
-        protected PropertyInfo propertyInfo;
-        protected MethodInfo getMethod;
-        protected MethodInfo setMethod;
+        private readonly bool _isValueType;
+        private TypeCode _typeCode;
+        protected readonly PropertyInfo _propertyInfo;
+        private readonly MethodInfo _getMethod;
+        private readonly MethodInfo _setMethod;
 
         public ProxyPropertyInfo(PropertyInfo propertyInfo)
         {
             if (propertyInfo == null)
                 throw new ArgumentNullException("propertyInfo");
 
-            this.propertyInfo = propertyInfo;
-            //this.isValueType = this.propertyInfo.DeclaringType.GetTypeInfo().IsValueType;
-            isValueType = this.propertyInfo.DeclaringType.IsValueType;
+            _propertyInfo = propertyInfo;
+            _isValueType = _propertyInfo.DeclaringType.GetTypeInfo().IsValueType;
 
-            if (this.propertyInfo.CanRead)
-                getMethod = propertyInfo.GetGetMethod();
+            if (_propertyInfo.CanRead)
+                _getMethod = propertyInfo.GetGetMethod();
 
-            if (this.propertyInfo.CanWrite && !isValueType)
-                setMethod = propertyInfo.GetSetMethod();
+            if (_propertyInfo.CanWrite && !_isValueType)
+                _setMethod = propertyInfo.GetSetMethod();
         }
 
-        public virtual bool IsValueType => isValueType;
+        public virtual bool IsValueType => _isValueType;
 
-        public virtual Type ValueType => propertyInfo.PropertyType;
+        public virtual Type ValueType => _propertyInfo.PropertyType;
 
         public TypeCode ValueTypeCode
         {
             get
             {
-                if (typeCode == TypeCode.Empty)
+                if (_typeCode == TypeCode.Empty)
                 {
-#if NETFX_CORE
-                    typeCode = WinRTLegacy.TypeExtensions.GetTypeCode(ValueType);
-#else
-                    typeCode = Type.GetTypeCode(ValueType);
-#endif
+                    _typeCode = Type.GetTypeCode(ValueType);
                 }
-                return typeCode;
+
+                return _typeCode;
             }
         }
 
-        public virtual Type DeclaringType => propertyInfo.DeclaringType;
+        public virtual Type DeclaringType => _propertyInfo.DeclaringType;
 
-        public virtual string Name => propertyInfo.Name;
+        public string Name => _propertyInfo.Name;
 
-        public virtual bool IsStatic => propertyInfo.IsStatic();
+        public bool IsStatic => _propertyInfo.IsStatic();
 
         public virtual object GetValue(object target)
         {
-            if (getMethod == null)
-                throw new MemberAccessException($"The property \"{propertyInfo.DeclaringType}.{Name}\" is not public");
+            if (_getMethod == null)
+                throw new MemberAccessException($"The property \"{_propertyInfo.DeclaringType}.{Name}\" is not public");
 
-            return getMethod.Invoke(target, null);
+            return _getMethod.Invoke(target, null);
         }
 
         public virtual void SetValue(object target, object value)
         {
-            if (!propertyInfo.CanWrite)
-                throw new MemberAccessException($"The property \"{propertyInfo.DeclaringType}.{Name}\" is read-only.");
+            if (!_propertyInfo.CanWrite)
+                throw new MemberAccessException($"The property \"{_propertyInfo.DeclaringType}.{Name}\" is read-only.");
 
             if (IsValueType)
-                throw new NotSupportedException($"The type \"{propertyInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
+                throw new NotSupportedException(
+                    $"The type \"{_propertyInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
 
-            if (setMethod == null)
-                throw new MemberAccessException($"The property \"{propertyInfo.DeclaringType}.{Name}\" is not public");
+            if (_setMethod == null)
+                throw new MemberAccessException($"The property \"{_propertyInfo.DeclaringType}.{Name}\" is not public");
 
-            setMethod.Invoke(target, new object[] { value });
+            _setMethod.Invoke(target, new object[] { value });
         }
     }
 
-    public class ProxyPropertyInfo<T, TValue> : ProxyPropertyInfo, IProxyPropertyInfo<T, TValue>
+    public class ProxyPropertyInfo<T, TValue> : ProxyPropertyInfo
     {
-        
         private readonly Func<T, TValue> getter;
         private readonly Action<T, TValue> setter;
 
-        public ProxyPropertyInfo(string propertyName) : this(typeof(T).GetProperty(propertyName))
+        public ProxyPropertyInfo(string propertyName, Func<T, TValue> getter, Action<T, TValue> setter) : this(typeof(T).GetProperty(propertyName),
+            getter, setter)
         {
         }
 
-        public ProxyPropertyInfo(PropertyInfo propertyInfo) : base(propertyInfo)
+        private ProxyPropertyInfo(PropertyInfo propertyInfo, Func<T, TValue> getter = null, Action<T, TValue> setter = null) : base(propertyInfo)
         {
-            if (!(typeof(TValue) == this.propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TValue) == _propertyInfo.PropertyType) ||
+                (propertyInfo.DeclaringType != null && !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The property types do not match!");
 
             if (IsStatic)
                 throw new ArgumentException($"The property \"{propertyInfo.DeclaringType}.{Name}\" is static.");
 
-            getter = MakeGetter(propertyInfo);
-            setter = MakeSetter(propertyInfo);
-        }
-
-        public ProxyPropertyInfo(string propertyName, Func<T, TValue> getter, Action<T, TValue> setter) : this(typeof(T).GetProperty(propertyName), getter, setter)
-        {
-        }
-
-        public ProxyPropertyInfo(PropertyInfo propertyInfo, Func<T, TValue> getter, Action<T, TValue> setter) : base(propertyInfo)
-        {
-            if (!(typeof(TValue) == this.propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
-                throw new ArgumentException("The property types do not match!");
-
-            if (IsStatic)
-                throw new ArgumentException($"The property \"{propertyInfo.DeclaringType}.{Name}\" is static.");
-
-            this.getter = getter;
-            this.setter = setter;
+            this.getter = getter ?? MakeGetter(propertyInfo);
+            this.setter = setter ?? MakeSetter(propertyInfo);
         }
 
         public override Type DeclaringType => typeof(T);
@@ -159,6 +137,7 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
@@ -168,11 +147,6 @@ namespace Fusion.Mvvm
                 return getter(target);
 
             return (TValue)base.GetValue(target);
-        }
-
-        TValue IProxyPropertyInfo<TValue>.GetValue(object target)
-        {
-            return GetValue((T)target);
         }
 
         public override object GetValue(object target)
@@ -186,7 +160,8 @@ namespace Fusion.Mvvm
         public void SetValue(T target, TValue value)
         {
             if (IsValueType)
-                throw new NotSupportedException($"The type \"{propertyInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
+                throw new NotSupportedException(
+                    $"The type \"{_propertyInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
 
             if (setter != null)
             {
@@ -205,7 +180,8 @@ namespace Fusion.Mvvm
         public override void SetValue(object target, object value)
         {
             if (IsValueType)
-                throw new NotSupportedException($"The type \"{propertyInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
+                throw new NotSupportedException(
+                    $"The type \"{_propertyInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
 
             if (setter != null)
             {
@@ -215,6 +191,5 @@ namespace Fusion.Mvvm
 
             base.SetValue(target, value);
         }
-
     }
 }

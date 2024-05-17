@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Reflection;
 
@@ -7,28 +5,29 @@ namespace Fusion.Mvvm
 {
     public class ProxyEventInfo : IProxyEventInfo
     {
-        protected EventInfo eventInfo;
+        private readonly EventInfo _eventInfo;
+
         public ProxyEventInfo(EventInfo eventInfo)
         {
-            this.eventInfo = eventInfo;
+            _eventInfo = eventInfo;
         }
 
-        public Type DeclaringType => eventInfo.DeclaringType;
+        public Type DeclaringType => _eventInfo.DeclaringType;
 
-        public string Name => eventInfo.Name;
+        public string Name => _eventInfo.Name;
 
-        public bool IsStatic => eventInfo.IsStatic();
+        public bool IsStatic => _eventInfo.IsStatic();
 
-        public Type HandlerType => eventInfo.EventHandlerType;
+        public Type HandlerType => _eventInfo.EventHandlerType;
 
         public void Add(object target, Delegate handler)
         {
-            eventInfo.AddEventHandler(target, handler);
+            _eventInfo.AddEventHandler(target, handler);
         }
 
         public void Remove(object target, Delegate handler)
         {
-            eventInfo.RemoveEventHandler(target, handler);
+            _eventInfo.RemoveEventHandler(target, handler);
         }
     }
 }

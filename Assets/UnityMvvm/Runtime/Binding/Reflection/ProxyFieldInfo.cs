@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Reflection;
 using System.Linq.Expressions;
@@ -7,96 +5,78 @@ using UnityEngine;
 
 namespace Fusion.Mvvm
 {
-#pragma warning disable 0414
     public class ProxyFieldInfo : IProxyFieldInfo
     {
-        private readonly bool isValueType;
-        private TypeCode typeCode;
-        protected FieldInfo fieldInfo;
+        private TypeCode _typeCode;
+        protected readonly FieldInfo _fieldInfo;
 
         public ProxyFieldInfo(FieldInfo fieldInfo)
         {
             if (fieldInfo == null)
                 throw new ArgumentNullException("fieldInfo");
 
-            this.fieldInfo = fieldInfo;
-            //this.isValueType = this.fieldInfo.DeclaringType.GetTypeInfo().IsValueType;
-            isValueType = this.fieldInfo.DeclaringType.IsValueType;
+            _fieldInfo = fieldInfo;
+            IsValueType = _fieldInfo.DeclaringType.GetTypeInfo().IsValueType;
         }
 
-        public virtual bool IsValueType => isValueType;
+        protected bool IsValueType { get; }
 
-        public virtual Type ValueType => fieldInfo.FieldType;
+        public virtual Type ValueType => _fieldInfo.FieldType;
 
         public TypeCode ValueTypeCode
         {
             get
             {
-                if (typeCode == TypeCode.Empty)
+                if (_typeCode == TypeCode.Empty)
                 {
-#if NETFX_CORE
-                    typeCode = WinRTLegacy.TypeExtensions.GetTypeCode(ValueType);
-#else
-                    typeCode = Type.GetTypeCode(ValueType);
-#endif
+                    _typeCode = Type.GetTypeCode(ValueType);
                 }
-                return typeCode;
+
+                return _typeCode;
             }
         }
 
-        public virtual Type DeclaringType => fieldInfo.DeclaringType;
+        public virtual Type DeclaringType => _fieldInfo.DeclaringType;
 
-        public virtual string Name => fieldInfo.Name;
+        public virtual string Name => _fieldInfo.Name;
 
-        public virtual bool IsStatic => fieldInfo.IsStatic();
+        public virtual bool IsStatic => _fieldInfo.IsStatic();
 
         public virtual object GetValue(object target)
         {
-            return fieldInfo.GetValue(target);
+            return _fieldInfo.GetValue(target);
         }
 
         public virtual void SetValue(object target, object value)
         {
-            if (fieldInfo.IsInitOnly)
-                throw new MemberAccessException($"The field \"{fieldInfo.DeclaringType}.{Name}\" is read-only.");
+            if (_fieldInfo.IsInitOnly)
+                throw new MemberAccessException($"The field \"{_fieldInfo.DeclaringType}.{Name}\" is read-only.");
 
             if (IsValueType)
-                throw new NotSupportedException($"The type \"{fieldInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
+                throw new NotSupportedException(
+                    $"The type \"{_fieldInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
 
-            fieldInfo.SetValue(target, value);
+            _fieldInfo.SetValue(target, value);
         }
     }
-
-#pragma warning disable 0414
-    public class ProxyFieldInfo<T, TValue> : ProxyFieldInfo, IProxyFieldInfo<T, TValue>
+    
+    public class ProxyFieldInfo<T, TValue> : ProxyFieldInfo
     {
-        private readonly Func<T, TValue> getter;
-        private readonly Action<T, TValue> setter;
+        private readonly Func<T, TValue> _getter;
+        private readonly Action<T, TValue> _setter;
 
-        public ProxyFieldInfo(string fieldName) : this(typeof(T).GetField(fieldName))
+        public ProxyFieldInfo(string fieldName, Func<T, TValue> getter, Action<T, TValue> setter) : this(typeof(T).GetField(fieldName), getter,
+            setter)
         {
         }
 
-        public ProxyFieldInfo(FieldInfo fieldInfo) : base(fieldInfo)
+        private ProxyFieldInfo(FieldInfo fieldInfo, Func<T, TValue> getter, Action<T, TValue> setter) : base(fieldInfo)
         {
-            if (!(typeof(TValue) == this.fieldInfo.FieldType) || !DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TValue) == _fieldInfo.FieldType) || !DeclaringType.IsAssignableFrom(typeof(T)))
                 throw new ArgumentException("The field types do not match!");
 
-            getter = MakeGetter(fieldInfo);
-            setter = MakeSetter(fieldInfo);
-        }
-
-        public ProxyFieldInfo(string fieldName, Func<T, TValue> getter, Action<T, TValue> setter) : this(typeof(T).GetField(fieldName), getter, setter)
-        {
-        }
-
-        public ProxyFieldInfo(FieldInfo fieldInfo, Func<T, TValue> getter, Action<T, TValue> setter) : base(fieldInfo)
-        {
-            if (!(typeof(TValue) == this.fieldInfo.FieldType) || !DeclaringType.IsAssignableFrom(typeof(T)))
-                throw new ArgumentException("The field types do not match!");
-
-            this.getter = getter;
-            this.setter = setter;
+            _getter = getter;
+            _setter = setter;
         }
 
         private Action<T, TValue> MakeSetter(FieldInfo fieldInfo)
@@ -109,12 +89,7 @@ namespace Fusion.Mvvm
 
             try
             {
-                bool expressionSupportRestricted = false;
-#if ENABLE_IL2CPP
-                //Only reference types are supported; value types are not supported
-                expressionSupportRestricted = true;
-#endif
-                if (!expressionSupportRestricted || !(typeof(T).IsValueType || typeof(TValue).IsValueType))
+                if (!(typeof(T).IsValueType || typeof(TValue).IsValueType))
                 {
                     var targetExp = Expression.Parameter(typeof(T), "target");
                     var paramExp = Expression.Parameter(typeof(TValue), "value");
@@ -128,6 +103,7 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
@@ -135,12 +111,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                bool expressionSupportRestricted = false;
-#if ENABLE_IL2CPP
-                //Only reference types are supported; value types are not supported
-                expressionSupportRestricted = true;
-#endif
-                if (!expressionSupportRestricted || !(typeof(T).IsValueType || typeof(TValue).IsValueType))
+                if (!(typeof(T).IsValueType || typeof(TValue).IsValueType))
                 {
                     var targetExp = Expression.Parameter(typeof(T), "target");
                     var fieldExp = Expression.Field(fieldInfo.IsStatic ? null : targetExp, fieldInfo);
@@ -152,6 +123,7 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
@@ -159,57 +131,54 @@ namespace Fusion.Mvvm
 
         public TValue GetValue(T target)
         {
-            if (getter != null)
-                return getter(target);
+            if (_getter != null)
+                return _getter(target);
 
-            return (TValue)fieldInfo.GetValue(target);
+            return (TValue)_fieldInfo.GetValue(target);
         }
 
         public override object GetValue(object target)
         {
-            if (getter != null)
-                return getter((T)target);
+            if (_getter != null)
+                return _getter((T)target);
 
-            return fieldInfo.GetValue(target);
-        }
-
-        TValue IProxyFieldInfo<TValue>.GetValue(object target)
-        {
-            return GetValue((T)target);
+            return _fieldInfo.GetValue(target);
         }
 
         public void SetValue(T target, TValue value)
         {
-            if (fieldInfo.IsInitOnly)
-                throw new MemberAccessException($"The field \"{fieldInfo.DeclaringType}.{Name}\" is read-only.");
+            if (_fieldInfo.IsInitOnly)
+                throw new MemberAccessException($"The field \"{_fieldInfo.DeclaringType}.{Name}\" is read-only.");
 
             if (IsValueType)
-                throw new NotSupportedException($"The type \"{fieldInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
+                throw new NotSupportedException(
+                    $"The type \"{_fieldInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
 
-            if (setter != null)
+            if (_setter != null)
             {
-                setter(target, value);
+                _setter(target, value);
                 return;
             }
 
-            fieldInfo.SetValue(target, value);
+            _fieldInfo.SetValue(target, value);
         }
 
         public override void SetValue(object target, object value)
         {
-            if (fieldInfo.IsInitOnly)
-                throw new MemberAccessException($"The field \"{fieldInfo.DeclaringType}.{Name}\" is read-only.");
+            if (_fieldInfo.IsInitOnly)
+                throw new MemberAccessException($"The field \"{_fieldInfo.DeclaringType}.{Name}\" is read-only.");
 
             if (IsValueType)
-                throw new NotSupportedException($"The type \"{fieldInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
+                throw new NotSupportedException(
+                    $"The type \"{_fieldInfo.DeclaringType}\" is a value type, and non-reference types cannot support assignment operations.");
 
-            if (setter != null)
+            if (_setter != null)
             {
-                setter((T)target, (TValue)value);
+                _setter((T)target, (TValue)value);
                 return;
             }
 
-            fieldInfo.SetValue(target, value);
+            _fieldInfo.SetValue(target, value);
         }
 
         public void SetValue(object target, TValue value)

@@ -1,5 +1,3 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
@@ -15,17 +13,17 @@ namespace Fusion.Mvvm
         void SetValue(object target, object key, object value);
     }
 
-    public interface IProxyItemInfo<TKey, TValue> : IProxyItemInfo
+    public interface IProxyItemInfo<in TKey, TValue> : IProxyItemInfo
     {
         TValue GetValue(object target, TKey key);
 
         void SetValue(object target, TKey key, TValue value);
     }
-
-    public interface IProxyItemInfo<T, TKey, TValue> : IProxyItemInfo<TKey, TValue>
+    
+    public interface IProxyItemInfo<in T, in TKey, TValue> : IProxyItemInfo<TKey, TValue>
     {
         TValue GetValue(T target, TKey key);
-
+    
         void SetValue(T target, TKey key, TValue value);
     }
 }

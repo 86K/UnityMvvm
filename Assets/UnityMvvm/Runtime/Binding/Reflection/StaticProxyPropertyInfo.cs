@@ -1,23 +1,18 @@
-
-
 using System;
 using System.Reflection;
 using UnityEngine;
 
 namespace Fusion.Mvvm
 {
-    public class StaticProxyPropertyInfo<T, TValue> : ProxyPropertyInfo, IProxyPropertyInfo<T, TValue>
+    // NOTE：从这个开始往后优化...
+    public class StaticProxyPropertyInfo<T, TValue> : ProxyPropertyInfo
     {
         private readonly Func<TValue> getter;
         private readonly Action<TValue> setter;
 
-        public StaticProxyPropertyInfo(string propertyName) : this(typeof(T).GetProperty(propertyName))
-        {
-        }
-
         public StaticProxyPropertyInfo(PropertyInfo propertyInfo) : base(propertyInfo)
         {
-            if (!(typeof(TValue) == this.propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TValue) == _propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
                 throw new ArgumentException("The property types do not match!");
 
             if (!IsStatic)
@@ -27,13 +22,14 @@ namespace Fusion.Mvvm
             setter = MakeSetter(propertyInfo);
         }
 
-        public StaticProxyPropertyInfo(string propertyName, Func<TValue> getter, Action<TValue> setter) : this(typeof(T).GetProperty(propertyName), getter, setter)
+        public StaticProxyPropertyInfo(string propertyName, Func<TValue> getter, Action<TValue> setter) : this(typeof(T).GetProperty(propertyName),
+            getter, setter)
         {
         }
 
         public StaticProxyPropertyInfo(PropertyInfo propertyInfo, Func<TValue> getter, Action<TValue> setter) : base(propertyInfo)
         {
-            if (!(typeof(TValue) == this.propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TValue) == _propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
                 throw new ArgumentException("The property types do not match!");
 
             if (!IsStatic)
@@ -81,6 +77,7 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
@@ -90,11 +87,6 @@ namespace Fusion.Mvvm
                 return getter();
 
             return (TValue)base.GetValue(null);
-        }
-
-        TValue IProxyPropertyInfo<TValue>.GetValue(object target)
-        {
-            return GetValue((T)target);
         }
 
         public override object GetValue(object target)
@@ -113,7 +105,7 @@ namespace Fusion.Mvvm
                 return;
             }
 
-            base.SetValue(null,value);
+            base.SetValue(null, value);
         }
 
         public void SetValue(object target, TValue value)

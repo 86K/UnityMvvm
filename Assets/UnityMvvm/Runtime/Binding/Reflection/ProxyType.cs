@@ -1,10 +1,7 @@
-
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-
 using UnityEngine;
 using Object = System.Object;
 
@@ -12,75 +9,74 @@ namespace Fusion.Mvvm
 {
     public class ProxyType : IProxyType
     {
-        private static readonly BindingFlags DEFAULT_LOOKUP = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+        private static readonly BindingFlags DEFAULT_LOOKUP =
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
-        private readonly Dictionary<string, IProxyEventInfo> events = new Dictionary<string, IProxyEventInfo>();
-
-        private readonly Dictionary<string, IProxyFieldInfo> fields = new Dictionary<string, IProxyFieldInfo>();
-
-        private readonly Dictionary<string, IProxyPropertyInfo> properties = new Dictionary<string, IProxyPropertyInfo>();
-
-        private readonly Dictionary<string, List<IProxyMethodInfo>> methods = new Dictionary<string, List<IProxyMethodInfo>>();
-
-        private IProxyItemInfo itemInfo;
+        private readonly Dictionary<string, IProxyEventInfo> _events = new Dictionary<string, IProxyEventInfo>();
+        private readonly Dictionary<string, IProxyFieldInfo> _fields = new Dictionary<string, IProxyFieldInfo>();
+        private readonly Dictionary<string, IProxyPropertyInfo> _properties = new Dictionary<string, IProxyPropertyInfo>();
+        private readonly Dictionary<string, List<IProxyMethodInfo>> _methods = new Dictionary<string, List<IProxyMethodInfo>>();
+        private IProxyItemInfo _itemInfo;
 
         private readonly object _lock = new object();
-        private readonly ProxyFactory factory;
-        private readonly Type type;
-        private ProxyType baseType;
+        private readonly ProxyFactory _factory;
+        private readonly Type _type;
+        private ProxyType _baseType;
 
         public ProxyType(Type type, ProxyFactory factory)
         {
-            this.factory = factory;
-            this.type = type;
+            _factory = factory;
+            _type = type;
         }
 
-        public Type Type => type;
+        public Type Type => _type;
 
-        protected void AddMethodInfo(IProxyMethodInfo methodInfo)
+        private void AddMethodInfo(IProxyMethodInfo methodInfo)
         {
             lock (_lock)
             {
                 string name = methodInfo.Name;
-                if (!methods.TryGetValue(name, out var list))
+                if (!_methods.TryGetValue(name, out var list))
                 {
                     list = new List<IProxyMethodInfo>();
-                    methods.Add(name, list);
+                    _methods.Add(name, list);
                 }
+
                 list.Add(methodInfo);
             }
         }
 
-        protected void RemoveMethodInfo(IProxyMethodInfo methodInfo)
+        private void RemoveMethodInfo(IProxyMethodInfo methodInfo)
         {
             lock (_lock)
             {
                 string name = methodInfo.Name;
-                if (!methods.TryGetValue(name, out var list))
+                if (!_methods.TryGetValue(name, out var list))
                     return;
 
                 list.Remove(methodInfo);
             }
         }
 
-        protected IProxyMethodInfo GetMethodInfo(string name, Type[] parameterTypes)
+        private IProxyMethodInfo GetMethodInfo(string name, Type[] parameterTypes)
         {
             lock (_lock)
             {
-                if (!methods.ContainsKey(name))
+                if (!_methods.ContainsKey(name))
                     return null;
 
-                List<IProxyMethodInfo> list = methods[name];
+                List<IProxyMethodInfo> list = _methods[name];
                 foreach (IProxyMethodInfo info in list)
                 {
                     if (IsParameterMatch(info, parameterTypes))
                         return info;
                 }
+
                 return null;
             }
         }
 
-        protected bool IsParameterMatch(IProxyMethodInfo proxyMethodInfo, Type[] parameterTypes)
+        private bool IsParameterMatch(IProxyMethodInfo proxyMethodInfo, Type[] parameterTypes)
         {
             ParameterInfo[] parameters = proxyMethodInfo.Parameters;
             if ((parameters == null || parameters.Length == 0) && (parameterTypes == null || parameterTypes.Length == 0))
@@ -93,20 +89,22 @@ namespace Fusion.Mvvm
                     if (parameters[i].ParameterType != parameterTypes[i])
                         return false;
                 }
+
                 return true;
             }
+
             return false;
         }
 
         public void Register(IProxyMemberInfo memberInfo)
         {
-            if (!(memberInfo.DeclaringType == type))
+            if (!(memberInfo.DeclaringType == _type))
                 throw new ArgumentException();
 
             string name = memberInfo.Name;
             if (memberInfo is IProxyPropertyInfo info)
             {
-                properties.Add(name, info);
+                _properties.Add(name, info);
             }
             else if (memberInfo is IProxyMethodInfo methodInfo)
             {
@@ -114,27 +112,27 @@ namespace Fusion.Mvvm
             }
             else if (memberInfo is IProxyFieldInfo fieldInfo)
             {
-                fields.Add(name, fieldInfo);
+                _fields.Add(name, fieldInfo);
             }
             else if (memberInfo is IProxyEventInfo eventInfo)
             {
-                events.Add(name, eventInfo);
+                _events.Add(name, eventInfo);
             }
             else if (memberInfo is IProxyItemInfo proxyItemInfo)
             {
-                itemInfo = proxyItemInfo;
+                _itemInfo = proxyItemInfo;
             }
         }
 
         public void Unregister(IProxyMemberInfo memberInfo)
         {
-            if (!(memberInfo.DeclaringType == type))
+            if (!(memberInfo.DeclaringType == _type))
                 throw new ArgumentException();
 
             string name = memberInfo.Name;
             if (memberInfo is IProxyPropertyInfo)
             {
-                properties.Remove(name);
+                _properties.Remove(name);
             }
             else if (memberInfo is IProxyMethodInfo info)
             {
@@ -142,34 +140,35 @@ namespace Fusion.Mvvm
             }
             else if (memberInfo is IProxyFieldInfo)
             {
-                fields.Remove(name);
+                _fields.Remove(name);
             }
             else if (memberInfo is IProxyEventInfo)
             {
-                events.Remove(name);
+                _events.Remove(name);
             }
             else if (memberInfo is IProxyItemInfo)
             {
-                if (itemInfo == memberInfo)
-                    itemInfo = null;
+                if (_itemInfo == memberInfo)
+                    _itemInfo = null;
             }
         }
 
         private IProxyType GetBase()
         {
-            if (baseType != null)
-                return baseType;
+            if (_baseType != null)
+                return _baseType;
 
-            Type _baseType = type.BaseType;
-            if (_baseType == null)
+            Type baseType = _type.BaseType;
+            if (baseType == null)
                 return null;
 
-            baseType = factory.GetType(_baseType, true);
-            return baseType;
+            _baseType = _factory.GetType(baseType);
+            return _baseType;
         }
+
         public IProxyMemberInfo GetMember(string name)
         {
-            if (name.Equals("Item") && typeof(ICollection).IsAssignableFrom(type))
+            if (name.Equals("Item") && typeof(ICollection).IsAssignableFrom(_type))
             {
                 return GetItem();
             }
@@ -195,7 +194,7 @@ namespace Fusion.Mvvm
 
         public IProxyMemberInfo GetMember(string name, BindingFlags flags)
         {
-            if (name.Equals("Item") && typeof(ICollection).IsAssignableFrom(type))
+            if (name.Equals("Item") && typeof(ICollection).IsAssignableFrom(_type))
                 return GetItem();
 
             IProxyMemberInfo info = GetProperty(name, flags);
@@ -219,7 +218,7 @@ namespace Fusion.Mvvm
 
         public IProxyEventInfo GetEvent(string name)
         {
-            if (events.TryGetValue(name, out var info))
+            if (_events.TryGetValue(name, out var info))
                 return info;
 
             return FindEventInfo(name, DEFAULT_LOOKUP, true);
@@ -228,37 +227,38 @@ namespace Fusion.Mvvm
         private IProxyEventInfo FindEventInfo(string name, BindingFlags flags, bool includeInterface)
         {
             IProxyEventInfo info = null;
-            EventInfo eventInfo = type.GetEvent(name, flags | BindingFlags.DeclaredOnly);
+            EventInfo eventInfo = _type.GetEvent(name, flags | BindingFlags.DeclaredOnly);
             if (eventInfo != null)
             {
-                if (events.TryGetValue(eventInfo.Name, out info))
+                if (_events.TryGetValue(eventInfo.Name, out info))
                     return info;
                 return CreateProxyEventInfo(eventInfo);
             }
 
-            if (type.BaseType != null && !(type.BaseType == typeof(Object)))
+            if (_type.BaseType != null && !(_type.BaseType == typeof(Object)))
             {
-                if (baseType != null)
+                if (_baseType != null)
                 {
-                    info = baseType.FindEventInfo(name, flags, false);
+                    info = _baseType.FindEventInfo(name, flags, false);
                 }
-                else if (type.BaseType.GetEvent(name, flags & ~BindingFlags.DeclaredOnly) != null)
+                else if (_type.BaseType.GetEvent(name, flags & ~BindingFlags.DeclaredOnly) != null)
                 {
-                    baseType = factory.GetType(type.BaseType, true);
-                    info = baseType.FindEventInfo(name, flags, false);
+                    _baseType = _factory.GetType(_type.BaseType, true);
+                    info = _baseType.FindEventInfo(name, flags, false);
                 }
+
                 if (info != null)
                     return info;
             }
 
             if (includeInterface)
             {
-                Type[] types = type.GetInterfaces();
+                Type[] types = _type.GetInterfaces();
                 foreach (Type interfaceType in types)
                 {
-                    ProxyType proxyType = factory.GetType(interfaceType, false);
+                    ProxyType proxyType = _factory.GetType(interfaceType, false);
                     if (proxyType == null && interfaceType.GetEvent(name, flags | BindingFlags.DeclaredOnly) != null)
-                        proxyType = factory.GetType(interfaceType, true);
+                        proxyType = _factory.GetType(interfaceType, true);
 
                     if (proxyType == null)
                         continue;
@@ -268,16 +268,18 @@ namespace Fusion.Mvvm
                         return info;
                 }
             }
+
             return null;
         }
 
         public IProxyFieldInfo GetField(string name)
         {
-            if (fields.TryGetValue(name, out var info))
+            if (_fields.TryGetValue(name, out var info))
                 return info;
 
             return FindFieldInfo(name, DEFAULT_LOOKUP, true);
         }
+
         public IProxyFieldInfo GetField(string name, BindingFlags flags)
         {
             return FindFieldInfo(name, flags, true);
@@ -286,37 +288,38 @@ namespace Fusion.Mvvm
         private IProxyFieldInfo FindFieldInfo(string name, BindingFlags flags, bool includeInterface)
         {
             IProxyFieldInfo info = null;
-            FieldInfo fieldInfo = type.GetField(name, flags | BindingFlags.DeclaredOnly);
+            FieldInfo fieldInfo = _type.GetField(name, flags | BindingFlags.DeclaredOnly);
             if (fieldInfo != null)
             {
-                if (fields.TryGetValue(fieldInfo.Name, out info))
+                if (_fields.TryGetValue(fieldInfo.Name, out info))
                     return info;
                 return CreateProxyFieldInfo(fieldInfo);
             }
 
-            if (type.BaseType != null && !(type.BaseType == typeof(Object)))
+            if (_type.BaseType != null && !(_type.BaseType == typeof(Object)))
             {
-                if (baseType != null)
+                if (_baseType != null)
                 {
-                    info = baseType.FindFieldInfo(name, flags, false);
+                    info = _baseType.FindFieldInfo(name, flags, false);
                 }
-                else if (type.BaseType.GetField(name, flags & ~BindingFlags.DeclaredOnly) != null)
+                else if (_type.BaseType.GetField(name, flags & ~BindingFlags.DeclaredOnly) != null)
                 {
-                    baseType = factory.GetType(type.BaseType, true);
-                    info = baseType.FindFieldInfo(name, flags, false);
+                    _baseType = _factory.GetType(_type.BaseType, true);
+                    info = _baseType.FindFieldInfo(name, flags, false);
                 }
+
                 if (info != null)
                     return info;
             }
 
             if (includeInterface)
             {
-                Type[] types = type.GetInterfaces();
+                Type[] types = _type.GetInterfaces();
                 foreach (Type interfaceType in types)
                 {
-                    ProxyType proxyType = factory.GetType(interfaceType, false);
+                    ProxyType proxyType = _factory.GetType(interfaceType, false);
                     if (proxyType == null && interfaceType.GetField(name, flags | BindingFlags.DeclaredOnly) != null)
-                        proxyType = factory.GetType(interfaceType, true);
+                        proxyType = _factory.GetType(interfaceType, true);
 
                     if (proxyType == null)
                         continue;
@@ -326,12 +329,13 @@ namespace Fusion.Mvvm
                         return info;
                 }
             }
+
             return null;
         }
 
         public IProxyPropertyInfo GetProperty(string name)
         {
-            if (properties.TryGetValue(name, out var info))
+            if (_properties.TryGetValue(name, out var info))
                 return info;
 
             return FindPropertyInfo(name, DEFAULT_LOOKUP, true);
@@ -345,38 +349,39 @@ namespace Fusion.Mvvm
         private IProxyPropertyInfo FindPropertyInfo(string name, BindingFlags flags, bool includeInterface)
         {
             IProxyPropertyInfo info = null;
-            PropertyInfo propertyInfo = type.GetProperty(name, flags | BindingFlags.DeclaredOnly);
+            PropertyInfo propertyInfo = _type.GetProperty(name, flags | BindingFlags.DeclaredOnly);
 
             if (propertyInfo != null)
             {
-                if (properties.TryGetValue(propertyInfo.Name, out info))
+                if (_properties.TryGetValue(propertyInfo.Name, out info))
                     return info;
                 return CreateProxyPropertyInfo(propertyInfo);
             }
 
-            if (type.BaseType != null && !(type.BaseType == typeof(Object)))
+            if (_type.BaseType != null && !(_type.BaseType == typeof(Object)))
             {
-                if (baseType != null)
+                if (_baseType != null)
                 {
-                    info = baseType.FindPropertyInfo(name, flags, false);
+                    info = _baseType.FindPropertyInfo(name, flags, false);
                 }
-                else if (type.BaseType.GetProperty(name, flags & ~BindingFlags.DeclaredOnly) != null)
+                else if (_type.BaseType.GetProperty(name, flags & ~BindingFlags.DeclaredOnly) != null)
                 {
-                    baseType = factory.GetType(type.BaseType, true);
-                    info = baseType.FindPropertyInfo(name, flags, false);
+                    _baseType = _factory.GetType(_type.BaseType, true);
+                    info = _baseType.FindPropertyInfo(name, flags, false);
                 }
+
                 if (info != null)
                     return info;
             }
 
             if (includeInterface)
             {
-                Type[] types = type.GetInterfaces();
+                Type[] types = _type.GetInterfaces();
                 foreach (Type interfaceType in types)
                 {
-                    ProxyType proxyType = factory.GetType(interfaceType, false);
+                    ProxyType proxyType = _factory.GetType(interfaceType, false);
                     if (proxyType == null && interfaceType.GetProperty(name, flags | BindingFlags.DeclaredOnly) != null)
-                        proxyType = factory.GetType(interfaceType, true);
+                        proxyType = _factory.GetType(interfaceType, true);
 
                     if (proxyType == null)
                         continue;
@@ -386,20 +391,21 @@ namespace Fusion.Mvvm
                         return info;
                 }
             }
+
             return null;
         }
 
         public IProxyItemInfo GetItem()
         {
-            if (itemInfo != null)
-                return itemInfo;
+            if (_itemInfo != null)
+                return _itemInfo;
 
-            if (type.IsArray)
+            if (_type.IsArray)
             {
-                return CreateArrayProxyItemInfo(type);
+                return CreateArrayProxyItemInfo(_type);
             }
 
-            PropertyInfo propertyInfo = type.GetProperty("Item", BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+            PropertyInfo propertyInfo = _type.GetProperty("Item", BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
             if (propertyInfo != null)
                 return CreateProxyItemInfo(propertyInfo);
 
@@ -412,14 +418,14 @@ namespace Fusion.Mvvm
 
         public IProxyMethodInfo GetMethod(string name)
         {
-            MethodInfo methodInfo = type.GetMethod(name);
+            MethodInfo methodInfo = _type.GetMethod(name);
             if (methodInfo == null)
                 return null;
 
             return GetMethod(name, methodInfo.GetParameterTypes().ToArray());
         }
 
-        public virtual IProxyMethodInfo GetMethod(string name, Type[] parameterTypes)
+        public IProxyMethodInfo GetMethod(string name, Type[] parameterTypes)
         {
             IProxyMethodInfo info = GetMethodInfo(name, parameterTypes);
             if (info != null)
@@ -430,7 +436,7 @@ namespace Fusion.Mvvm
 
         public IProxyMethodInfo GetMethod(string name, BindingFlags flags)
         {
-            MethodInfo methodInfo = type.GetMethod(name, flags);
+            MethodInfo methodInfo = _type.GetMethod(name, flags);
             if (methodInfo == null)
                 return null;
 
@@ -445,7 +451,7 @@ namespace Fusion.Mvvm
         private IProxyMethodInfo FindMethodInfo(string name, Type[] parameterTypes, BindingFlags flags, bool includeInterface)
         {
             IProxyMethodInfo info = null;
-            MethodInfo methodInfo = type.GetMethod(name, flags | BindingFlags.DeclaredOnly, null, parameterTypes, null);
+            MethodInfo methodInfo = _type.GetMethod(name, flags | BindingFlags.DeclaredOnly, null, parameterTypes, null);
             if (methodInfo != null)
             {
                 info = GetMethodInfo(name, parameterTypes);
@@ -454,29 +460,30 @@ namespace Fusion.Mvvm
                 return CreateProxyMethodInfo(methodInfo);
             }
 
-            if (type.BaseType != null)
+            if (_type.BaseType != null)
             {
-                if (baseType != null)
+                if (_baseType != null)
                 {
-                    info = baseType.FindMethodInfo(name, parameterTypes, flags, false);
+                    info = _baseType.FindMethodInfo(name, parameterTypes, flags, false);
                 }
-                else if (type.BaseType.GetMethod(name, flags & ~BindingFlags.DeclaredOnly) != null)
+                else if (_type.BaseType.GetMethod(name, flags & ~BindingFlags.DeclaredOnly) != null)
                 {
-                    baseType = factory.GetType(type.BaseType, true);
-                    info = baseType.FindMethodInfo(name, parameterTypes, flags, false);
+                    _baseType = _factory.GetType(_type.BaseType, true);
+                    info = _baseType.FindMethodInfo(name, parameterTypes, flags, false);
                 }
+
                 if (info != null)
                     return info;
             }
 
             if (includeInterface)
             {
-                Type[] types = type.GetInterfaces();
+                Type[] types = _type.GetInterfaces();
                 foreach (Type interfaceType in types)
                 {
-                    ProxyType proxyType = factory.GetType(interfaceType, false);
+                    ProxyType proxyType = _factory.GetType(interfaceType, false);
                     if (proxyType == null && interfaceType.GetMethod(name, flags | BindingFlags.DeclaredOnly, null, parameterTypes, null) != null)
-                        proxyType = factory.GetType(interfaceType, true);
+                        proxyType = _factory.GetType(interfaceType, true);
 
                     if (proxyType == null)
                         continue;
@@ -486,33 +493,36 @@ namespace Fusion.Mvvm
                         return info;
                 }
             }
+
             return null;
         }
 
-        protected IProxyEventInfo CreateProxyEventInfo(EventInfo eventInfo)
+        private IProxyEventInfo CreateProxyEventInfo(EventInfo eventInfo)
         {
             ProxyEventInfo info = new ProxyEventInfo(eventInfo);
-            events.Add(info.Name, info);
+            _events.Add(info.Name, info);
             return info;
         }
 
-        protected IProxyFieldInfo CreateProxyFieldInfo(FieldInfo fieldInfo)
+        private IProxyFieldInfo CreateProxyFieldInfo(FieldInfo fieldInfo)
         {
             IProxyFieldInfo info = null;
             try
             {
-                info = (IProxyFieldInfo)Activator.CreateInstance(typeof(ProxyFieldInfo<,>).MakeGenericType(fieldInfo.DeclaringType, fieldInfo.FieldType), fieldInfo);
+                info = (IProxyFieldInfo)Activator.CreateInstance(
+                    typeof(ProxyFieldInfo<,>).MakeGenericType(fieldInfo.DeclaringType, fieldInfo.FieldType), fieldInfo);
             }
             catch (Exception)
             {
                 info = new ProxyFieldInfo(fieldInfo);
             }
+
             if (info != null)
-                fields.Add(info.Name, info);
+                _fields.Add(info.Name, info);
             return info;
         }
 
-        internal IProxyPropertyInfo CreateProxyPropertyInfo(PropertyInfo propertyInfo)
+        private IProxyPropertyInfo CreateProxyPropertyInfo(PropertyInfo propertyInfo)
         {
             IProxyPropertyInfo info = null;
             try
@@ -522,33 +532,32 @@ namespace Fusion.Mvvm
                 {
                     ParameterInfo[] parameters = propertyInfo.GetIndexParameters();
                     if (parameters != null && parameters.Length > 0)
-                        throw new ParameterMismatchException();
+                        throw new Exception();
 
-                    info = (IProxyPropertyInfo)Activator.CreateInstance(typeof(StaticProxyPropertyInfo<,>).MakeGenericType(type, propertyInfo.PropertyType), propertyInfo);
+                    info = (IProxyPropertyInfo)Activator.CreateInstance(
+                        typeof(StaticProxyPropertyInfo<,>).MakeGenericType(type, propertyInfo.PropertyType), propertyInfo);
                 }
                 else
                 {
                     ParameterInfo[] parameters = propertyInfo.GetIndexParameters();
                     if (parameters != null && parameters.Length == 1)
-                        throw new ParameterMismatchException();
+                        throw new Exception();
 
-                    info = (IProxyPropertyInfo)Activator.CreateInstance(typeof(ProxyPropertyInfo<,>).MakeGenericType(type, propertyInfo.PropertyType), propertyInfo);
+                    info = (IProxyPropertyInfo)Activator.CreateInstance(typeof(ProxyPropertyInfo<,>).MakeGenericType(type, propertyInfo.PropertyType),
+                        propertyInfo);
                 }
-            }
-            catch (ParameterMismatchException e)
-            {
-                throw e;
             }
             catch (Exception)
             {
                 info = new ProxyPropertyInfo(propertyInfo);
             }
+
             if (info != null)
-                properties.Add(info.Name, info);
+                _properties.Add(info.Name, info);
             return info;
         }
 
-        protected IProxyMethodInfo CreateProxyMethodInfo(MethodInfo methodInfo)
+        private IProxyMethodInfo CreateProxyMethodInfo(MethodInfo methodInfo)
         {
             IProxyMethodInfo info = null;
             try
@@ -560,21 +569,26 @@ namespace Fusion.Mvvm
                 {
                     if (methodInfo.IsStatic)
                     {
-                        if (parameters == null || parameters.Length == 0)
+                        if (parameters.Length == 0)
                         {
                             info = (IProxyMethodInfo)Activator.CreateInstance(typeof(StaticProxyActionInfo<>).MakeGenericType(type), methodInfo);
                         }
                         else if (parameters.Length == 1)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(StaticProxyActionInfo<,>).MakeGenericType(type, parameters[0].ParameterType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(StaticProxyActionInfo<,>).MakeGenericType(type, parameters[0].ParameterType), methodInfo);
                         }
                         else if (parameters.Length == 2)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(StaticProxyActionInfo<,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(StaticProxyActionInfo<,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType),
+                                methodInfo);
                         }
                         else if (parameters.Length == 3)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(StaticProxyActionInfo<,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(StaticProxyActionInfo<,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType,
+                                    parameters[2].ParameterType), methodInfo);
                         }
                         else
                         {
@@ -583,21 +597,26 @@ namespace Fusion.Mvvm
                     }
                     else
                     {
-                        if (parameters == null || parameters.Length == 0)
+                        if (parameters.Length == 0)
                         {
                             info = (IProxyMethodInfo)Activator.CreateInstance(typeof(ProxyActionInfo<>).MakeGenericType(type), methodInfo);
                         }
                         else if (parameters.Length == 1)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(ProxyActionInfo<,>).MakeGenericType(type, parameters[0].ParameterType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(ProxyActionInfo<,>).MakeGenericType(type, parameters[0].ParameterType), methodInfo);
                         }
                         else if (parameters.Length == 2)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(ProxyActionInfo<,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(ProxyActionInfo<,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType),
+                                methodInfo);
                         }
                         else if (parameters.Length == 3)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(ProxyActionInfo<,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(ProxyActionInfo<,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType,
+                                    parameters[2].ParameterType), methodInfo);
                         }
                         else
                         {
@@ -609,21 +628,27 @@ namespace Fusion.Mvvm
                 {
                     if (methodInfo.IsStatic)
                     {
-                        if (parameters == null || parameters.Length == 0)
+                        if (parameters.Length == 0)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(StaticProxyFuncInfo<,>).MakeGenericType(type, returnType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(StaticProxyFuncInfo<,>).MakeGenericType(type, returnType),
+                                methodInfo);
                         }
                         else if (parameters.Length == 1)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(StaticProxyFuncInfo<,,>).MakeGenericType(type, parameters[0].ParameterType, returnType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(StaticProxyFuncInfo<,,>).MakeGenericType(type, parameters[0].ParameterType, returnType), methodInfo);
                         }
                         else if (parameters.Length == 2)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(StaticProxyFuncInfo<,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType, returnType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(StaticProxyFuncInfo<,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType,
+                                    returnType), methodInfo);
                         }
                         else if (parameters.Length == 3)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(StaticProxyFuncInfo<,,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, returnType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(StaticProxyFuncInfo<,,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType,
+                                    parameters[2].ParameterType, returnType), methodInfo);
                         }
                         else
                         {
@@ -632,21 +657,26 @@ namespace Fusion.Mvvm
                     }
                     else
                     {
-                        if (parameters == null || parameters.Length == 0)
+                        if (parameters.Length == 0)
                         {
                             info = (IProxyMethodInfo)Activator.CreateInstance(typeof(ProxyFuncInfo<,>).MakeGenericType(type, returnType), methodInfo);
                         }
                         else if (parameters.Length == 1)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(ProxyFuncInfo<,,>).MakeGenericType(type, parameters[0].ParameterType, returnType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(ProxyFuncInfo<,,>).MakeGenericType(type, parameters[0].ParameterType, returnType), methodInfo);
                         }
                         else if (parameters.Length == 2)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(ProxyFuncInfo<,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType, returnType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(ProxyFuncInfo<,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType,
+                                    returnType), methodInfo);
                         }
                         else if (parameters.Length == 3)
                         {
-                            info = (IProxyMethodInfo)Activator.CreateInstance(typeof(ProxyFuncInfo<,,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, returnType), methodInfo);
+                            info = (IProxyMethodInfo)Activator.CreateInstance(
+                                typeof(ProxyFuncInfo<,,,,>).MakeGenericType(type, parameters[0].ParameterType, parameters[1].ParameterType,
+                                    parameters[2].ParameterType, returnType), methodInfo);
                         }
                         else
                         {
@@ -659,13 +689,14 @@ namespace Fusion.Mvvm
             {
                 info = new ProxyMethodInfo(methodInfo);
             }
+
             if (info != null)
                 AddMethodInfo(info);
 
             return info;
         }
 
-        protected IProxyItemInfo CreateArrayProxyItemInfo(Type type)
+        private IProxyItemInfo CreateArrayProxyItemInfo(Type type)
         {
             var elementType = type.GetElementType();
 
@@ -725,25 +756,25 @@ namespace Fusion.Mvvm
                         info = new ArrayProxyItemInfo<UInt64[], UInt64>();
                         break;
                     case TypeCode.Object:
-                        {
-                            if (type == typeof(Vector2))
-                                info = new ArrayProxyItemInfo<Vector2[], Vector2>();
-                            else if (type == typeof(Vector3))
-                                info = new ArrayProxyItemInfo<Vector3[], Vector3>();
-                            else if (type == typeof(Vector4))
-                                info = new ArrayProxyItemInfo<Vector4[], Vector4>();
-                            else if (type == typeof(Color))
-                                info = new ArrayProxyItemInfo<Color[], Color>();
-                            else if (type == typeof(Rect))
-                                info = new ArrayProxyItemInfo<Rect[], Rect>();
-                            else if (type == typeof(Quaternion))
-                                info = new ArrayProxyItemInfo<Quaternion[], Quaternion>();
-                            else if (type == typeof(Version))
-                                info = new ArrayProxyItemInfo<Version[], Version>();
-                            else
-                                info = new ArrayProxyItemInfo(type);
-                            break;
-                        }
+                    {
+                        if (type == typeof(Vector2))
+                            info = new ArrayProxyItemInfo<Vector2[], Vector2>();
+                        else if (type == typeof(Vector3))
+                            info = new ArrayProxyItemInfo<Vector3[], Vector3>();
+                        else if (type == typeof(Vector4))
+                            info = new ArrayProxyItemInfo<Vector4[], Vector4>();
+                        else if (type == typeof(Color))
+                            info = new ArrayProxyItemInfo<Color[], Color>();
+                        else if (type == typeof(Rect))
+                            info = new ArrayProxyItemInfo<Rect[], Rect>();
+                        else if (type == typeof(Quaternion))
+                            info = new ArrayProxyItemInfo<Quaternion[], Quaternion>();
+                        else if (type == typeof(Version))
+                            info = new ArrayProxyItemInfo<Version[], Version>();
+                        else
+                            info = new ArrayProxyItemInfo(type);
+                        break;
+                    }
                     default:
                         info = new ArrayProxyItemInfo(type);
                         break;
@@ -751,11 +782,11 @@ namespace Fusion.Mvvm
             }
 
             if (info != null)
-                itemInfo = info;
+                _itemInfo = info;
             return info;
         }
 
-        protected IProxyItemInfo CreateProxyItemInfo(PropertyInfo propertyInfo)
+        private IProxyItemInfo CreateProxyItemInfo(PropertyInfo propertyInfo)
         {
             Type type = propertyInfo.DeclaringType;
             ParameterInfo[] parameters = propertyInfo.GetIndexParameters();
@@ -771,7 +802,8 @@ namespace Fusion.Mvvm
             {
                 if (typeFlag == 1)
                 {
-                    info = (IProxyItemInfo)Activator.CreateInstance(typeof(DictionaryProxyItemInfo<,,>).MakeGenericType(type, keyType, valueType), propertyInfo);
+                    info = (IProxyItemInfo)Activator.CreateInstance(typeof(DictionaryProxyItemInfo<,,>).MakeGenericType(type, keyType, valueType),
+                        propertyInfo);
                 }
                 else if (typeFlag == 2)
                 {
@@ -781,7 +813,6 @@ namespace Fusion.Mvvm
                 {
                     info = new ProxyItemInfo(propertyInfo);
                 }
-
             }
             catch (Exception)
             {
@@ -800,11 +831,11 @@ namespace Fusion.Mvvm
             }
 
             if (info != null)
-                itemInfo = info;
+                _itemInfo = info;
             return info;
         }
 
-        protected int TypeFlag(Type type, Type keyType, Type valueType)
+        private int TypeFlag(Type type, Type keyType, Type valueType)
         {
             try
             {
@@ -820,14 +851,10 @@ namespace Fusion.Mvvm
             }
         }
 
-        protected virtual IProxyItemInfo CreateListProxyItemInfo(PropertyInfo propertyInfo)
+        private IProxyItemInfo CreateListProxyItemInfo(PropertyInfo propertyInfo)
         {
             var type = propertyInfo.PropertyType;
-#if NETFX_CORE
-            TypeCode typeCode = WinRTLegacy.TypeExtensions.GetTypeCode(type);
-#else
             TypeCode typeCode = Type.GetTypeCode(type);
-#endif
             switch (typeCode)
             {
                 case TypeCode.Boolean:
@@ -861,39 +888,34 @@ namespace Fusion.Mvvm
                 case TypeCode.UInt64:
                     return new ListProxyItemInfo<IList<UInt64>, UInt64>(propertyInfo);
                 case TypeCode.Object:
-                    {
-                        if (type == typeof(Vector2))
-                            return new ListProxyItemInfo<IList<Vector2>, Vector2>(propertyInfo);
-                        if (type == typeof(Vector3))
-                            return new ListProxyItemInfo<IList<Vector3>, Vector3>(propertyInfo);
-                        if (type == typeof(Vector4))
-                            return new ListProxyItemInfo<IList<Vector4>, Vector4>(propertyInfo);
-                        if (type == typeof(Color))
-                            return new ListProxyItemInfo<IList<Color>, Color>(propertyInfo);
-                        if (type == typeof(Rect))
-                            return new ListProxyItemInfo<IList<Rect>, Rect>(propertyInfo);
-                        if (type == typeof(Quaternion))
-                            return new ListProxyItemInfo<IList<Quaternion>, Quaternion>(propertyInfo);
-                        if (type == typeof(Version))
-                            return new ListProxyItemInfo<IList<Version>, Version>(propertyInfo);
+                {
+                    if (type == typeof(Vector2))
+                        return new ListProxyItemInfo<IList<Vector2>, Vector2>(propertyInfo);
+                    if (type == typeof(Vector3))
+                        return new ListProxyItemInfo<IList<Vector3>, Vector3>(propertyInfo);
+                    if (type == typeof(Vector4))
+                        return new ListProxyItemInfo<IList<Vector4>, Vector4>(propertyInfo);
+                    if (type == typeof(Color))
+                        return new ListProxyItemInfo<IList<Color>, Color>(propertyInfo);
+                    if (type == typeof(Rect))
+                        return new ListProxyItemInfo<IList<Rect>, Rect>(propertyInfo);
+                    if (type == typeof(Quaternion))
+                        return new ListProxyItemInfo<IList<Quaternion>, Quaternion>(propertyInfo);
+                    if (type == typeof(Version))
+                        return new ListProxyItemInfo<IList<Version>, Version>(propertyInfo);
 
-                        return new ProxyItemInfo(propertyInfo);
-                    }
+                    return new ProxyItemInfo(propertyInfo);
+                }
                 default:
                     return new ProxyItemInfo(propertyInfo);
             }
         }
 
-        protected virtual IProxyItemInfo CreateDictionaryProxyItemInfo(PropertyInfo propertyInfo)
+        private IProxyItemInfo CreateDictionaryProxyItemInfo(PropertyInfo propertyInfo)
         {
             ParameterInfo[] parameters = propertyInfo.GetIndexParameters();
             var type = propertyInfo.PropertyType;
-#if NETFX_CORE
-            TypeCode typeCode = WinRTLegacy.TypeExtensions.GetTypeCode(type);
-#else
             TypeCode typeCode = Type.GetTypeCode(type);
-#endif
-
             if (parameters[0].ParameterType == typeof(string))
             {
                 switch (typeCode)
@@ -929,24 +951,24 @@ namespace Fusion.Mvvm
                     case TypeCode.UInt64:
                         return new DictionaryProxyItemInfo<IDictionary<string, UInt64>, string, UInt64>(propertyInfo);
                     case TypeCode.Object:
-                        {
-                            if (type == typeof(Vector2))
-                                return new DictionaryProxyItemInfo<IDictionary<string, Vector2>, string, Vector2>(propertyInfo);
-                            if (type == typeof(Vector3))
-                                return new DictionaryProxyItemInfo<IDictionary<string, Vector3>, string, Vector3>(propertyInfo);
-                            if (type == typeof(Vector4))
-                                return new DictionaryProxyItemInfo<IDictionary<string, Vector4>, string, Vector4>(propertyInfo);
-                            if (type == typeof(Color))
-                                return new DictionaryProxyItemInfo<IDictionary<string, Color>, string, Color>(propertyInfo);
-                            if (type == typeof(Rect))
-                                return new DictionaryProxyItemInfo<IDictionary<string, Rect>, string, Rect>(propertyInfo);
-                            if (type == typeof(Quaternion))
-                                return new DictionaryProxyItemInfo<IDictionary<string, Quaternion>, string, Quaternion>(propertyInfo);
-                            if (type == typeof(Version))
-                                return new DictionaryProxyItemInfo<IDictionary<string, Version>, string, Version>(propertyInfo);
+                    {
+                        if (type == typeof(Vector2))
+                            return new DictionaryProxyItemInfo<IDictionary<string, Vector2>, string, Vector2>(propertyInfo);
+                        if (type == typeof(Vector3))
+                            return new DictionaryProxyItemInfo<IDictionary<string, Vector3>, string, Vector3>(propertyInfo);
+                        if (type == typeof(Vector4))
+                            return new DictionaryProxyItemInfo<IDictionary<string, Vector4>, string, Vector4>(propertyInfo);
+                        if (type == typeof(Color))
+                            return new DictionaryProxyItemInfo<IDictionary<string, Color>, string, Color>(propertyInfo);
+                        if (type == typeof(Rect))
+                            return new DictionaryProxyItemInfo<IDictionary<string, Rect>, string, Rect>(propertyInfo);
+                        if (type == typeof(Quaternion))
+                            return new DictionaryProxyItemInfo<IDictionary<string, Quaternion>, string, Quaternion>(propertyInfo);
+                        if (type == typeof(Version))
+                            return new DictionaryProxyItemInfo<IDictionary<string, Version>, string, Version>(propertyInfo);
 
-                            return new ProxyItemInfo(propertyInfo);
-                        }
+                        return new ProxyItemInfo(propertyInfo);
+                    }
                     default:
                         return new ProxyItemInfo(propertyInfo);
                 }
@@ -1009,6 +1031,7 @@ namespace Fusion.Mvvm
                         return new ProxyItemInfo(propertyInfo);
                 }
             }
+
             return new ProxyItemInfo(propertyInfo);
         }
     }

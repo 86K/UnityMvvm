@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Reflection;
 using UnityEngine;
@@ -8,97 +6,77 @@ namespace Fusion.Mvvm
 {
     public class ProxyMethodInfo : IProxyMethodInfo
     {
-        protected bool isValueType;
-        protected MethodInfo methodInfo;
+        protected readonly bool _isValueType;
+        protected readonly MethodInfo _methodInfo;
+
         public ProxyMethodInfo(MethodInfo methodInfo)
         {
             if (methodInfo == null)
                 throw new ArgumentNullException("methodInfo");
 
-            this.methodInfo = methodInfo;
-            //this.isValueType = methodInfo.DeclaringType.GetTypeInfo().IsValueType;
-            isValueType = methodInfo.DeclaringType.IsValueType;
+            _methodInfo = methodInfo;
+            _isValueType = methodInfo.DeclaringType.GetTypeInfo().IsValueType;
         }
 
-        public virtual Type DeclaringType => methodInfo.DeclaringType;
+        public virtual Type DeclaringType => _methodInfo.DeclaringType;
 
-        public virtual string Name => methodInfo.Name;
+        public virtual string Name => _methodInfo.Name;
 
-        public virtual bool IsStatic => methodInfo.IsStatic;
+        public bool IsStatic => _methodInfo.IsStatic;
 
-        public virtual Type ReturnType => methodInfo.ReturnType;
+        public virtual Type ReturnType => _methodInfo.ReturnType;
 
-        public virtual ParameterInfo[] Parameters => methodInfo.GetParameters();
+        public virtual ParameterInfo[] Parameters => _methodInfo.GetParameters();
 
-        public virtual ParameterInfo ReturnParameter => methodInfo.ReturnParameter;
+        public virtual ParameterInfo ReturnParameter => _methodInfo.ReturnParameter;
 
         public virtual object Invoke(object target, params object[] args)
         {
-            return methodInfo.Invoke(target, args);
+            return _methodInfo.Invoke(target, args);
         }
     }
 
-    public class ProxyFuncInfo<T, TResult> : ProxyMethodInfo, IProxyFuncInfo<T, TResult>
+    public class ProxyFuncInfo<T, TResult> : ProxyMethodInfo
     {
         private readonly Func<T, TResult> function;
-
-        public ProxyFuncInfo(string methodName) : this(typeof(T).GetMethod(methodName), null)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Type[] parameterTypes) : this(typeof(T).GetMethod(methodName, parameterTypes), null)
-        {
-        }
-
-        public ProxyFuncInfo(MethodInfo info) : this(info, null)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Func<T, TResult> function) : this(typeof(T).GetMethod(methodName), function)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Type[] parameterTypes, Func<T, TResult> function) : this(typeof(T).GetMethod(methodName, parameterTypes), function)
-        {
-        }
 
         public ProxyFuncInfo(MethodInfo info, Func<T, TResult> function) : base(info)
         {
             if (IsStatic)
                 throw new ArgumentException("The method is static!");
 
-            if (!(typeof(TResult) == methodInfo.ReturnType) || !methodInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TResult) == _methodInfo.ReturnType) ||
+                (_methodInfo.DeclaringType != null && !_methodInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The method types do not match!");
 
-            this.function = function;
-            if (this.function == null)
-                this.function = MakeFunc(methodInfo);
+            this.function = function ?? MakeFunc();
         }
 
         public override Type DeclaringType => typeof(T);
 
-        private Func<T, TResult> MakeFunc(MethodInfo methodInfo)
+        private Func<T, TResult> MakeFunc()
         {
             try
             {
-                if (isValueType)
+                if (_isValueType)
                     return null;
 
-                return (Func<T, TResult>)this.methodInfo.CreateDelegate(typeof(Func<T, TResult>));
+                return (Func<T, TResult>)_methodInfo.CreateDelegate(typeof(Func<T, TResult>));
             }
             catch (Exception e)
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
-        public virtual TResult Invoke(T target)
+        private TResult Invoke(T target)
         {
             if (function != null)
                 return function(target);
 
-            return (TResult)methodInfo.Invoke(target, null);
+            return (TResult)_methodInfo.Invoke(target, null);
         }
 
         public override object Invoke(object target, params object[] args)
@@ -107,45 +85,24 @@ namespace Fusion.Mvvm
         }
     }
 
-    public class ProxyFuncInfo<T, P1, TResult> : ProxyMethodInfo, IProxyFuncInfo<T, P1, TResult>
+    public class ProxyFuncInfo<T, P1, TResult> : ProxyMethodInfo
     {
         private readonly Func<T, P1, TResult> function;
-        public ProxyFuncInfo(string methodName) : this(typeof(T).GetMethod(methodName), null)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Type[] parameterTypes) : this(typeof(T).GetMethod(methodName, parameterTypes), null)
-        {
-        }
-
-        public ProxyFuncInfo(MethodInfo info) : this(info, null)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Type[] parameterTypes, Func<T, P1, TResult> function) : this(typeof(T).GetMethod(methodName, parameterTypes), function)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Func<T, P1, TResult> function) : this(typeof(T).GetMethod(methodName), function)
-        {
-        }
-
 
         public ProxyFuncInfo(MethodInfo info, Func<T, P1, TResult> function) : base(info)
         {
             if (IsStatic)
                 throw new ArgumentException("The method is static!");
 
-            if (!(typeof(TResult) == methodInfo.ReturnType) || !methodInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TResult) == _methodInfo.ReturnType) ||
+                (_methodInfo.DeclaringType != null && !_methodInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The method types do not match!");
 
-            ParameterInfo[] parameters = methodInfo.GetParameters();
+            ParameterInfo[] parameters = _methodInfo.GetParameters();
             if (parameters.Length != 1 || !(typeof(P1) == parameters[0].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
-            this.function = function;
-            if (this.function == null)
-                this.function = MakeFunc(methodInfo);
+            this.function = function ?? MakeFunc(_methodInfo);
         }
 
         public override Type DeclaringType => typeof(T);
@@ -154,7 +111,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                if (isValueType)
+                if (_isValueType)
                     return null;
 
                 return (Func<T, P1, TResult>)methodInfo.CreateDelegate(typeof(Func<T, P1, TResult>));
@@ -163,15 +120,16 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
-        public virtual TResult Invoke(T target, P1 p1)
+        private TResult Invoke(T target, P1 p1)
         {
             if (function != null)
                 return function(target, p1);
 
-            return (TResult)methodInfo.Invoke(target, new object[] { p1 });
+            return (TResult)_methodInfo.Invoke(target, new object[] { p1 });
         }
 
         public override object Invoke(object target, params object[] args)
@@ -180,46 +138,24 @@ namespace Fusion.Mvvm
         }
     }
 
-    public class ProxyFuncInfo<T, P1, P2, TResult> : ProxyMethodInfo, IProxyFuncInfo<T, P1, P2, TResult>
+    public class ProxyFuncInfo<T, P1, P2, TResult> : ProxyMethodInfo
     {
         private readonly Func<T, P1, P2, TResult> function;
-
-        public ProxyFuncInfo(string methodName) : this(typeof(T).GetMethod(methodName), null)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Type[] parameterTypes) : this(typeof(T).GetMethod(methodName, parameterTypes), null)
-        {
-        }
-
-
-        public ProxyFuncInfo(MethodInfo info) : this(info, null)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Func<T, P1, P2, TResult> function) : this(typeof(T).GetMethod(methodName), function)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Type[] parameterTypes, Func<T, P1, P2, TResult> function) : this(typeof(T).GetMethod(methodName, parameterTypes), function)
-        {
-        }
 
         public ProxyFuncInfo(MethodInfo info, Func<T, P1, P2, TResult> function) : base(info)
         {
             if (IsStatic)
                 throw new ArgumentException("The method is static!");
 
-            if (!(typeof(TResult) == methodInfo.ReturnType) || !methodInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TResult) == _methodInfo.ReturnType) ||
+                (_methodInfo.DeclaringType != null && !_methodInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The method types do not match!");
 
-            ParameterInfo[] parameters = methodInfo.GetParameters();
+            ParameterInfo[] parameters = _methodInfo.GetParameters();
             if (parameters.Length != 2 || !(typeof(P1) == parameters[0].ParameterType) || !(typeof(P2) == parameters[1].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
-            this.function = function;
-            if (this.function == null)
-                this.function = MakeFunc(methodInfo);
+            this.function = function ?? MakeFunc(_methodInfo);
         }
 
         public override Type DeclaringType => typeof(T);
@@ -228,7 +164,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                if (isValueType)
+                if (_isValueType)
                     return null;
 
                 return (Func<T, P1, P2, TResult>)methodInfo.CreateDelegate(typeof(Func<T, P1, P2, TResult>));
@@ -237,15 +173,16 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
-        public virtual TResult Invoke(T target, P1 p1, P2 p2)
+        private TResult Invoke(T target, P1 p1, P2 p2)
         {
             if (function != null)
                 return function(target, p1, p2);
 
-            return (TResult)methodInfo.Invoke(target, new object[] { p1, p2 });
+            return (TResult)_methodInfo.Invoke(target, new object[] { p1, p2 });
         }
 
         public override object Invoke(object target, params object[] args)
@@ -254,45 +191,25 @@ namespace Fusion.Mvvm
         }
     }
 
-    public class ProxyFuncInfo<T, P1, P2, P3, TResult> : ProxyMethodInfo, IProxyFuncInfo<T, P1, P2, P3, TResult>
+    public class ProxyFuncInfo<T, P1, P2, P3, TResult> : ProxyMethodInfo
     {
         private readonly Func<T, P1, P2, P3, TResult> function;
-
-        public ProxyFuncInfo(string methodName) : this(typeof(T).GetMethod(methodName), null)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Type[] parameterTypes) : this(typeof(T).GetMethod(methodName, parameterTypes), null)
-        {
-
-        }
-        public ProxyFuncInfo(MethodInfo info) : this(info, null)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Func<T, P1, P2, P3, TResult> function) : this(typeof(T).GetMethod(methodName), function)
-        {
-        }
-
-        public ProxyFuncInfo(string methodName, Type[] parameterTypes, Func<T, P1, P2, P3, TResult> function) : this(typeof(T).GetMethod(methodName, parameterTypes), function)
-        {
-        }
 
         public ProxyFuncInfo(MethodInfo info, Func<T, P1, P2, P3, TResult> function) : base(info)
         {
             if (IsStatic)
                 throw new ArgumentException("The method is static!");
 
-            if (!(typeof(TResult) == methodInfo.ReturnType) || !methodInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(TResult) == _methodInfo.ReturnType) ||
+                (_methodInfo.DeclaringType != null && !_methodInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The method types do not match!");
 
-            ParameterInfo[] parameters = methodInfo.GetParameters();
-            if (parameters.Length != 3 || !(typeof(P1) == parameters[0].ParameterType) || !(typeof(P2) == parameters[1].ParameterType) || !(typeof(P3) == parameters[2].ParameterType))
+            ParameterInfo[] parameters = _methodInfo.GetParameters();
+            if (parameters.Length != 3 || !(typeof(P1) == parameters[0].ParameterType) || !(typeof(P2) == parameters[1].ParameterType) ||
+                !(typeof(P3) == parameters[2].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
-            this.function = function;
-            if (this.function == null)
-                this.function = MakeFunc(methodInfo);
+            this.function = function ?? MakeFunc(_methodInfo);
         }
 
         public override Type DeclaringType => typeof(T);
@@ -301,7 +218,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                if (isValueType)
+                if (_isValueType)
                     return null;
 
                 return (Func<T, P1, P2, P3, TResult>)methodInfo.CreateDelegate(typeof(Func<T, P1, P2, P3, TResult>));
@@ -310,15 +227,16 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
-        public virtual TResult Invoke(T target, P1 p1, P2 p2, P3 p3)
+        private TResult Invoke(T target, P1 p1, P2 p2, P3 p3)
         {
             if (function != null)
                 return function(target, p1, p2, p3);
 
-            return (TResult)methodInfo.Invoke(target, new object[] { p1, p2, p3 });
+            return (TResult)_methodInfo.Invoke(target, new object[] { p1, p2, p3 });
         }
 
         public override object Invoke(object target, params object[] args)
@@ -327,30 +245,9 @@ namespace Fusion.Mvvm
         }
     }
 
-    public class ProxyActionInfo<T> : ProxyMethodInfo, IProxyActionInfo<T>
+    public class ProxyActionInfo<T> : ProxyMethodInfo
     {
         private readonly Action<T> action;
-
-        public ProxyActionInfo(string methodName) : this(typeof(T).GetMethod(methodName), null)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Type[] parameterTypes) : this(typeof(T).GetMethod(methodName, parameterTypes), null)
-        {
-        }
-
-        public ProxyActionInfo(MethodInfo info) : this(info, null)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Action<T> action) : this(typeof(T).GetMethod(methodName), action)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Type[] parameterTypes, Action<T> action) : this(typeof(T).GetMethod(methodName, parameterTypes), action)
-        {
-        }
-
         public override Type DeclaringType => typeof(T);
 
         public ProxyActionInfo(MethodInfo info, Action<T> action) : base(info)
@@ -358,19 +255,18 @@ namespace Fusion.Mvvm
             if (IsStatic)
                 throw new ArgumentException("The method is static!");
 
-            if (!(typeof(void) == methodInfo.ReturnType) || !methodInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(void) == _methodInfo.ReturnType) ||
+                (_methodInfo.DeclaringType != null && !_methodInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The method types do not match!");
 
-            this.action = action;
-            if (this.action == null)
-                this.action = MakeAction(methodInfo);
+            this.action = action ?? MakeAction(_methodInfo);
         }
 
         private Action<T> MakeAction(MethodInfo methodInfo)
         {
             try
             {
-                if (isValueType)
+                if (_isValueType)
                     return null;
 
                 return (Action<T>)methodInfo.CreateDelegate(typeof(Action<T>));
@@ -379,10 +275,11 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
-        public virtual void Invoke(T target)
+        private void Invoke(T target)
         {
             if (action != null)
             {
@@ -390,7 +287,7 @@ namespace Fusion.Mvvm
                 return;
             }
 
-            methodInfo.Invoke(target, null);
+            _methodInfo.Invoke(target, null);
         }
 
         public override object Invoke(object target, params object[] args)
@@ -400,45 +297,24 @@ namespace Fusion.Mvvm
         }
     }
 
-    public class ProxyActionInfo<T, P1> : ProxyMethodInfo, IProxyActionInfo<T, P1>
+    public class ProxyActionInfo<T, P1> : ProxyMethodInfo
     {
         private readonly Action<T, P1> action;
-
-        public ProxyActionInfo(string methodName) : this(typeof(T).GetMethod(methodName), null)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Type[] parameterTypes) : this(typeof(T).GetMethod(methodName, parameterTypes), null)
-        {
-        }
-
-        public ProxyActionInfo(MethodInfo info) : this(info, null)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Action<T, P1> action) : this(typeof(T).GetMethod(methodName), action)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Type[] parameterTypes, Action<T, P1> action) : this(typeof(T).GetMethod(methodName, parameterTypes), action)
-        {
-        }
 
         public ProxyActionInfo(MethodInfo info, Action<T, P1> action) : base(info)
         {
             if (IsStatic)
                 throw new ArgumentException("The method is static!");
 
-            if (!(typeof(void) == methodInfo.ReturnType) || !methodInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(void) == _methodInfo.ReturnType) ||
+                (_methodInfo.DeclaringType != null && !_methodInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The method types do not match!");
 
-            ParameterInfo[] parameters = methodInfo.GetParameters();
+            ParameterInfo[] parameters = _methodInfo.GetParameters();
             if (parameters.Length != 1 || !(typeof(P1) == parameters[0].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
-            this.action = action;
-            if (this.action == null)
-                this.action = MakeAction(methodInfo);
+            this.action = action ?? MakeAction(_methodInfo);
         }
 
         public override Type DeclaringType => typeof(T);
@@ -447,7 +323,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                if (isValueType)
+                if (_isValueType)
                     return null;
 
                 return (Action<T, P1>)methodInfo.CreateDelegate(typeof(Action<T, P1>));
@@ -456,10 +332,11 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
-        public virtual void Invoke(T target, P1 p1)
+        private void Invoke(T target, P1 p1)
         {
             if (action != null)
             {
@@ -467,7 +344,7 @@ namespace Fusion.Mvvm
                 return;
             }
 
-            methodInfo.Invoke(target, new object[] { p1 });
+            _methodInfo.Invoke(target, new object[] { p1 });
         }
 
         public override object Invoke(object target, params object[] args)
@@ -477,45 +354,24 @@ namespace Fusion.Mvvm
         }
     }
 
-    public class ProxyActionInfo<T, P1, P2> : ProxyMethodInfo, IProxyActionInfo<T, P1, P2>
+    public class ProxyActionInfo<T, P1, P2> : ProxyMethodInfo
     {
         private readonly Action<T, P1, P2> action;
-
-        public ProxyActionInfo(string methodName) : this(typeof(T).GetMethod(methodName), null)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Type[] parameterTypes) : this(typeof(T).GetMethod(methodName, parameterTypes), null)
-        {
-        }
-
-        public ProxyActionInfo(MethodInfo info) : this(info, null)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Action<T, P1, P2> action) : this(typeof(T).GetMethod(methodName), action)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Type[] parameterTypes, Action<T, P1, P2> action) : this(typeof(T).GetMethod(methodName, parameterTypes), action)
-        {
-        }
 
         public ProxyActionInfo(MethodInfo info, Action<T, P1, P2> action) : base(info)
         {
             if (IsStatic)
                 throw new ArgumentException("The method is static!");
 
-            if (!(typeof(void) == methodInfo.ReturnType) || !methodInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(void) == _methodInfo.ReturnType) ||
+                (_methodInfo.DeclaringType != null && !_methodInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The method types do not match!");
 
-            ParameterInfo[] parameters = methodInfo.GetParameters();
+            ParameterInfo[] parameters = _methodInfo.GetParameters();
             if (parameters.Length != 2 || !(typeof(P1) == parameters[0].ParameterType) || !(typeof(P2) == parameters[1].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
-            this.action = action;
-            if (this.action == null)
-                this.action = MakeAction(methodInfo);
+            this.action = action ?? MakeAction(_methodInfo);
         }
 
         public override Type DeclaringType => typeof(T);
@@ -524,7 +380,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                if (isValueType)
+                if (_isValueType)
                     return null;
 
                 return (Action<T, P1, P2>)methodInfo.CreateDelegate(typeof(Action<T, P1, P2>));
@@ -533,19 +389,19 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
-        public virtual void Invoke(T target, P1 p1, P2 p2)
+        private void Invoke(T target, P1 p1, P2 p2)
         {
             if (action != null)
             {
                 action(target, p1, p2);
                 return;
-
             }
 
-            methodInfo.Invoke(target, new object[] { p1, p2 });
+            _methodInfo.Invoke(target, new object[] { p1, p2 });
         }
 
         public override object Invoke(object target, params object[] args)
@@ -555,45 +411,25 @@ namespace Fusion.Mvvm
         }
     }
 
-    public class ProxyActionInfo<T, P1, P2, P3> : ProxyMethodInfo, IProxyActionInfo<T, P1, P2, P3>
+    public class ProxyActionInfo<T, P1, P2, P3> : ProxyMethodInfo
     {
-        private readonly Action<T, P1, P2, P3> action;
-
-        public ProxyActionInfo(string methodName) : this(typeof(T).GetMethod(methodName), null)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Type[] parameterTypes) : this(typeof(T).GetMethod(methodName, parameterTypes), null)
-        {
-        }
-
-        public ProxyActionInfo(MethodInfo info) : this(info, null)
-        {
-        }
-
-        public ProxyActionInfo(string methodName, Action<T, P1, P2, P3> action) : this(typeof(T).GetMethod(methodName), action)
-        {
-        }
-        public ProxyActionInfo(string methodName, Type[] parameterTypes, Action<T, P1, P2, P3> action) : this(typeof(T).GetMethod(methodName, parameterTypes), action)
-        {
-        }
+        private readonly Action<T, P1, P2, P3> _action;
 
         public ProxyActionInfo(MethodInfo info, Action<T, P1, P2, P3> action) : base(info)
         {
             if (IsStatic)
                 throw new ArgumentException("The method is static!");
 
-            if (!(typeof(void) == methodInfo.ReturnType) || !methodInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (!(typeof(void) == _methodInfo.ReturnType) ||
+                (_methodInfo.DeclaringType != null && !_methodInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The method types do not match!");
 
-            ParameterInfo[] parameters = methodInfo.GetParameters();
-            if (parameters.Length != 3 || !(typeof(P1) == parameters[0].ParameterType) || !(typeof(P2) == parameters[1].ParameterType) || !(typeof(P3) == parameters[2].ParameterType))
+            ParameterInfo[] parameters = _methodInfo.GetParameters();
+            if (parameters.Length != 3 || !(typeof(P1) == parameters[0].ParameterType) || !(typeof(P2) == parameters[1].ParameterType) ||
+                !(typeof(P3) == parameters[2].ParameterType))
                 throw new ArgumentException("The method types do not match!");
 
-            this.action = action;
-            if (this.action == null)
-                this.action = MakeAction(methodInfo);
-
+            _action = action ?? MakeAction(_methodInfo);
         }
 
         public override Type DeclaringType => typeof(T);
@@ -602,7 +438,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                if (isValueType)
+                if (_isValueType)
                     return null;
 
                 return (Action<T, P1, P2, P3>)methodInfo.CreateDelegate(typeof(Action<T, P1, P2, P3>));
@@ -611,18 +447,19 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"{e}");
             }
+
             return null;
         }
 
-        public virtual void Invoke(T target, P1 p1, P2 p2, P3 p3)
+        private void Invoke(T target, P1 p1, P2 p2, P3 p3)
         {
-            if (action != null)
+            if (_action != null)
             {
-                action(target, p1, p2, p3);
+                _action(target, p1, p2, p3);
                 return;
             }
 
-            methodInfo.Invoke(target, new object[] { p1, p2, p3 });
+            _methodInfo.Invoke(target, new object[] { p1, p2, p3 });
         }
 
         public override object Invoke(object target, params object[] args)

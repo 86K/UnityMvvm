@@ -1,5 +1,3 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
@@ -20,12 +18,5 @@ namespace Fusion.Mvvm
         new TValue GetValue(object target);
 
         void SetValue(object target, TValue value);
-    }
-
-    public interface IProxyFieldInfo<T, TValue> : IProxyFieldInfo<TValue>
-    {
-        TValue GetValue(T target);
-
-        void SetValue(T target, TValue value);
     }
 }

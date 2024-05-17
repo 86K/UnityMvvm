@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,11 +7,10 @@ namespace Fusion.Mvvm
 {
     public class ProxyItemInfo : IProxyItemInfo
     {
-        private readonly bool isValueType;
-        private TypeCode typeCode;
-        protected PropertyInfo propertyInfo;
-        protected MethodInfo getMethod;
-        protected MethodInfo setMethod;
+        private TypeCode _typeCode;
+        protected readonly PropertyInfo _propertyInfo;
+        private readonly MethodInfo _getMethod;
+        private readonly MethodInfo _setMethod;
 
         public ProxyItemInfo(PropertyInfo propertyInfo)
         {
@@ -23,42 +20,35 @@ namespace Fusion.Mvvm
             if (!propertyInfo.Name.Equals("Item"))
                 throw new ArgumentException("The property types do not match!");
 
-            this.propertyInfo = propertyInfo;
-            //this.isValueType = this.propertyInfo.DeclaringType.GetTypeInfo().IsValueType;
-            isValueType = this.propertyInfo.DeclaringType.IsValueType;
+            _propertyInfo = propertyInfo;
 
-            if (this.propertyInfo.CanRead)
-                getMethod = propertyInfo.GetGetMethod();
+            if (_propertyInfo.CanRead)
+                _getMethod = propertyInfo.GetGetMethod();
 
-            if (this.propertyInfo.CanWrite)
-                setMethod = propertyInfo.GetSetMethod();
+            if (_propertyInfo.CanWrite)
+                _setMethod = propertyInfo.GetSetMethod();
         }
-
-        public bool IsValueType => isValueType;
-
-        public Type ValueType => propertyInfo.PropertyType;
+        
+        public Type ValueType => _propertyInfo.PropertyType;
 
         public TypeCode ValueTypeCode
         {
             get
             {
-                if (typeCode == TypeCode.Empty)
+                if (_typeCode == TypeCode.Empty)
                 {
-#if NETFX_CORE
-                    typeCode = WinRTLegacy.TypeExtensions.GetTypeCode(ValueType);
-#else
-                    typeCode = Type.GetTypeCode(ValueType);
-#endif
+                    _typeCode = Type.GetTypeCode(ValueType);
                 }
-                return typeCode;
+
+                return _typeCode;
             }
         }
 
-        public Type DeclaringType => propertyInfo.DeclaringType;
+        public Type DeclaringType => _propertyInfo.DeclaringType;
 
-        public string Name => propertyInfo.Name;
+        public string Name => _propertyInfo.Name;
 
-        public bool IsStatic => propertyInfo.IsStatic();
+        public bool IsStatic => _propertyInfo.IsStatic();
 
         public object GetValue(object target, object key)
         {
@@ -81,10 +71,10 @@ namespace Fusion.Mvvm
                 return dict[key];
             }
 
-            if (getMethod == null)
+            if (_getMethod == null)
                 throw new MemberAccessException();
 
-            return getMethod.Invoke(target, new object[] { key });
+            return _getMethod.Invoke(target, new object[] { key });
         }
 
         public void SetValue(object target, object key, object value)
@@ -107,10 +97,10 @@ namespace Fusion.Mvvm
                 return;
             }
 
-            if (setMethod == null)
+            if (_setMethod == null)
                 throw new MemberAccessException();
 
-            setMethod.Invoke(target, new object[] { key, value });
+            _setMethod.Invoke(target, new object[] { key, value });
         }
     }
 
@@ -118,7 +108,7 @@ namespace Fusion.Mvvm
     {
         public ListProxyItemInfo(PropertyInfo propertyInfo) : base(propertyInfo)
         {
-            if (!(typeof(TValue) == this.propertyInfo.PropertyType) || !typeof(IList<TValue>).IsAssignableFrom(propertyInfo.DeclaringType))
+            if (!(typeof(TValue) == _propertyInfo.PropertyType) || !typeof(IList<TValue>).IsAssignableFrom(propertyInfo.DeclaringType))
                 throw new ArgumentException("The property types do not match!");
         }
 
@@ -155,7 +145,8 @@ namespace Fusion.Mvvm
     {
         public DictionaryProxyItemInfo(PropertyInfo propertyInfo) : base(propertyInfo)
         {
-            if (!(typeof(TValue) == this.propertyInfo.PropertyType) || !typeof(IDictionary<TKey, TValue>).IsAssignableFrom(propertyInfo.DeclaringType))
+            if (!(typeof(TValue) == _propertyInfo.PropertyType) ||
+                !typeof(IDictionary<TKey, TValue>).IsAssignableFrom(propertyInfo.DeclaringType))
                 throw new ArgumentException("The property types do not match!");
         }
 
@@ -185,34 +176,32 @@ namespace Fusion.Mvvm
 
     public class ArrayProxyItemInfo : IProxyItemInfo
     {
-        private TypeCode typeCode;
-        protected readonly Type type;
+        private TypeCode _typeCode;
+        private readonly Type _type;
+
         public ArrayProxyItemInfo(Type type)
         {
-            this.type = type;
-            if (this.type == null || !this.type.IsArray)
+            _type = type;
+            if (_type == null || !_type.IsArray)
                 throw new ArgumentException();
         }
 
-        public Type ValueType => type.HasElementType ? type.GetElementType() : typeof(object);
+        public Type ValueType => _type.HasElementType ? _type.GetElementType() : typeof(object);
 
         public TypeCode ValueTypeCode
         {
             get
             {
-                if (typeCode == TypeCode.Empty)
+                if (_typeCode == TypeCode.Empty)
                 {
-#if NETFX_CORE
-                    typeCode = WinRTLegacy.TypeExtensions.GetTypeCode(ValueType);
-#else
-                    typeCode = Type.GetTypeCode(ValueType);
-#endif
+                    _typeCode = Type.GetTypeCode(ValueType);
                 }
-                return typeCode;
+
+                return _typeCode;
             }
         }
 
-        public Type DeclaringType => type;
+        public Type DeclaringType => _type;
 
         public string Name => "Item";
 

@@ -1,13 +1,9 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
 {
     public interface IProxyPropertyInfo : IProxyMemberInfo
     {
-        bool IsValueType { get; }
-
         Type ValueType { get; }
 
         TypeCode ValueTypeCode { get; }
@@ -22,12 +18,5 @@ namespace Fusion.Mvvm
         new TValue GetValue(object target);
 
         void SetValue(object target, TValue value);
-    }
-
-    public interface IProxyPropertyInfo<T, TValue> : IProxyPropertyInfo<TValue>
-    {
-        TValue GetValue(T target);
-
-        void SetValue(T target, TValue value);
     }
 }

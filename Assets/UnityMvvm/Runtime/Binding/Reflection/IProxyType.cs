@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Reflection;
 
@@ -22,10 +20,6 @@ namespace Fusion.Mvvm
         IProxyPropertyInfo GetProperty(string name, BindingFlags flags);
 
         IProxyItemInfo GetItem();
-
-        IProxyMethodInfo GetMethod(string name);
-
-        IProxyMethodInfo GetMethod(string name, BindingFlags flags);
 
         IProxyMethodInfo GetMethod(string name, Type[] parameterTypes);
 
