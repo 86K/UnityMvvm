@@ -136,7 +136,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("{0}", e));
+                Debug.LogWarning($"{e}");
             }
 
             return null;
@@ -157,7 +157,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("{0}", e));
+                Debug.LogWarning($"{e}");
             }
             return null;
         }

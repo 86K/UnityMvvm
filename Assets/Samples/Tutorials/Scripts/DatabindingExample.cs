@@ -185,13 +185,17 @@ namespace Fusion.Mvvm
             bindingSet.Bind(emailEdit).For(v => v.onValueChanged).To<string>(vm => vm.OnEmailValueChanged);
             bindingSet.Bind(rememberEdit).For(v => v.isOn, v => v.onValueChanged).To(vm => vm.Remember).TwoWay();
             bindingSet.Bind(submit).For(v => v.onClick).To(vm => vm.OnSubmit);
+            
             bindingSet.Build();
 
-            BindingSet<DatabindingExample> staticBindingSet = this.CreateBindingSet<DatabindingExample>();
-            // staticBindingSet.Bind(title).For(v => v.text).To(() => Res.databinding_tutorials_title).OneTime();
-            //staticBindingSet.Bind(this.title).For(v => v.text).To("Res.databinding_tutorials_title").OneTime();
-            staticBindingSet.Build();
+            // BindingSet<DatabindingExample> staticBindingSet = this.CreateBindingSet<DatabindingExample>();
+            //  staticBindingSet.Bind(title).For(v => v.text).To(()=>TestStaticField).OneTime();
+            // staticBindingSet.Build();
         }
+
+        private static string TestStaticField = "测试BindingSet<TTarget>进行静态绑定";
+        // private static string TestStaticProperty => "测试BindingSet<TTarget>进行静态绑定"; ()=>TestStaticProperty 报错
+        static void TestStaticMethod(){}// ()=>TestStaticMethod  Fusion.Mvvm.ProxyInvoker
     }
 
 }

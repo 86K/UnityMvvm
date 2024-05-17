@@ -71,7 +71,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogWarning(string.Format("Set property '{0}', raise PropertyChanged failure.Exception:{1}", eventArgs.PropertyName, e));
+                UnityEngine.Debug.LogWarning($"Set property '{eventArgs.PropertyName}', raise PropertyChanged failure.Exception:{e}");
             }
         }
 
@@ -92,7 +92,7 @@ namespace Fusion.Mvvm
                 }
                 catch (Exception e)
                 {
-                    UnityEngine.Debug.LogWarning(string.Format("Set property '{0}', raise PropertyChanged failure.Exception:{1}", args.PropertyName, e));
+                    UnityEngine.Debug.LogWarning($"Set property '{args.PropertyName}', raise PropertyChanged failure.Exception:{e}");
                 }
             }
         }

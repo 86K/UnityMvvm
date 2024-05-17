@@ -104,7 +104,7 @@ namespace Fusion.Mvvm
         {
             try
             {
-                Debug.LogWarning(string.Format("login start. username:{0} password:{1}", username, password));
+                Debug.LogWarning($"login start. username:{username} password:{password}");
 
                 this.account = null;
                 loginCommand.Enabled = false;
@@ -126,7 +126,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("Exception:{0}", e));
+                Debug.LogWarning($"Exception:{e}");
 
                 // var tipContent = localization.GetText("login.exception.tip", "Login exception.");
                 toastRequest.Raise(new ToastNotification("", 2f));

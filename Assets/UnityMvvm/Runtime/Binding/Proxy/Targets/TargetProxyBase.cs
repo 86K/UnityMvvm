@@ -129,7 +129,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("{0} Subscribe Exception:{1}", targetName, e));
+                Debug.LogWarning($"{targetName} Subscribe Exception:{e}");
             }
         }
 
@@ -153,7 +153,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("{0} Unsubscribe Exception:{1}", targetName, e));
+                Debug.LogWarning($"{targetName} Unsubscribe Exception:{e}");
             }
         }
         protected virtual void DoUnsubscribeForValueChange(object target)
@@ -178,7 +178,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("{0}", e));
+                Debug.LogWarning($"{e}");
             }
         }
 

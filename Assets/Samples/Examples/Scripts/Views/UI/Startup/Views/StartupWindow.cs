@@ -31,7 +31,7 @@ namespace Fusion.Mvvm
             bindingSet.Bind().For(v => v.sceneInteractionAction).To(vm => vm.LoadSceneRequest);
 
             // bindingSet.Bind(progressBarSlider).For("value", "onValueChanged").To("ProgressBar.Progress").TwoWay();// 不推荐的写法
-            bindingSet.Bind(this.progressBarSlider).For(v => v.value, v => v.onValueChanged).To(vm => vm.ProgressBar.Progress).TwoWay();
+            bindingSet.Bind(progressBarSlider).For(v => v.value, v => v.onValueChanged).To(vm => vm.ProgressBar.Progress).TwoWay();
 
 
             bindingSet.Bind(progressBarSlider.gameObject).For(v => v.activeSelf).To(vm => vm.ProgressBar.Enable).OneWay();

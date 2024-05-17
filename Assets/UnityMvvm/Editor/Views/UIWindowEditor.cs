@@ -6,7 +6,7 @@ namespace Fusion.Mvvm
 {
     [CustomEditor(typeof(Window), true)]
 
-    public class UIWindowEditor : UnityEditor.Editor
+    public class UIWindowEditor : Editor
     {
         [SerializeField]
         private bool foldout = true;

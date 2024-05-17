@@ -9,7 +9,8 @@ namespace Fusion.Mvvm
     public static class BehaviourBindingExtension
     {
         private static IBinder binder;
-        public static IBinder Binder
+
+        private static IBinder Binder
         {
             get
             {
@@ -17,7 +18,7 @@ namespace Fusion.Mvvm
                     binder = Context.GetApplicationContext().GetService<IBinder>();
 
                 if (binder == null)
-                    throw new Exception("Data binding service is not initialized,please create a BindingServiceBundle service before using it.");
+                    throw new Exception("Data binding service is not initialized, please create a BindingServiceBundle service before using it.");
 
                 return binder;
             }
@@ -53,13 +54,7 @@ namespace Fusion.Mvvm
             context.DataContext = dataContext;
             return new BindingSet<TBehaviour, TSource>(context, behaviour);
         }
-
-        public static BindingSet<TBehaviour> CreateBindingSet<TBehaviour>(this TBehaviour behaviour) where TBehaviour : Behaviour
-        {
-            IBindingContext context = behaviour.BindingContext();
-            return new BindingSet<TBehaviour>(context, behaviour);
-        }
-
+        
         public static void SetDataContext(this Behaviour behaviour, object dataContext)
         {
             behaviour.BindingContext().DataContext = dataContext;

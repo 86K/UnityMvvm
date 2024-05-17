@@ -99,7 +99,7 @@ namespace Fusion.Mvvm
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning(string.Format("Start Executors failure.Exception:{0}", e));
+                    Debug.LogWarning($"Start Executors failure.Exception:{e}");
                 }
             }
         }
@@ -677,7 +677,7 @@ namespace Fusion.Mvvm
                     }
                     catch (Exception e)
                     {
-                        Debug.LogWarning(string.Format("Task stop exception! error:{0}", e));
+                        Debug.LogWarning($"Task stop exception! error:{e}");
                     }
                 }
                 stopingTempQueue.Clear();
@@ -714,14 +714,15 @@ namespace Fusion.Mvvm
                     }
                     catch (Exception e)
                     {
-                        Debug.LogWarning(string.Format("Task execution exception! error:{0}", e));
+                        Debug.LogWarning($"Task execution exception! error:{e}");
                     }
                 }
                 runningQueue.Clear();
 
                 float time = Time.realtimeSinceStartup - startTime;
                 if (time > 0.15f)
-                    Debug.LogWarning(string.Format("The running time of tasks in the main thread executor is too long.these tasks take {0} milliseconds.", (int)(time * 1000)));
+                    Debug.LogWarning(
+                        $"The running time of tasks in the main thread executor is too long.these tasks take {(int)(time * 1000)} milliseconds.");
             }
 
             public void Execute(Action action)

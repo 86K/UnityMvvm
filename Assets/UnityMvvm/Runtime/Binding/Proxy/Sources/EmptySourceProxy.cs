@@ -42,7 +42,8 @@ namespace Fusion.Mvvm
         [Conditional("DEBUG")]
         private void DebugWarning()
         {
-            UnityEngine.Debug.LogWarning(string.Format("this is an empty source proxy,If you see this, then the DataContext is null.The SourceDescription is \"{0}\"", description.ToString()));
+            UnityEngine.Debug.LogWarning(
+                $"this is an empty source proxy,If you see this, then the DataContext is null.The SourceDescription is \"{description.ToString()}\"");
         }
     }
 }

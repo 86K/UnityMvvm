@@ -53,7 +53,8 @@ namespace Fusion.Mvvm
                 }
                 catch (Exception e)
                 {
-                    UnityEngine.Debug.LogWarning(string.Format("An exception occurred when using the \"{0}\" factory to create a proxy for the \"{1}\";exception:{2}", factory.GetType().Name, description.ToString(), e));
+                    UnityEngine.Debug.LogWarning(
+                        $"An exception occurred when using the \"{factory.GetType().Name}\" factory to create a proxy for the \"{description.ToString()}\";exception:{e}");
                 }
             }
 

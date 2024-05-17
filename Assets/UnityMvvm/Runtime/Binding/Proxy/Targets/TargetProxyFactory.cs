@@ -53,7 +53,8 @@ namespace Fusion.Mvvm
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning(string.Format("An exception occurred when using the \"{0}\" factory to create a proxy for the \"{1}\" property of class \"{2}\";exception:{3}", factory.GetType().Name, description.TargetName, target.GetType().Name, e));
+                    Debug.LogWarning(
+                        $"An exception occurred when using the \"{factory.GetType().Name}\" factory to create a proxy for the \"{description.TargetName}\" property of class \"{target.GetType().Name}\";exception:{e}");
                 }
             }
 

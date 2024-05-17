@@ -154,7 +154,7 @@ namespace Fusion.Mvvm
             AlertDialogWindowBase window = locator.LoadView<AlertDialogWindowBase>(ViewName);
             if (window == null)
             {
-                Debug.LogWarning(string.Format("Not found the dialog window named \"{0}\".", viewName));
+                Debug.LogWarning($"Not found the dialog window named \"{viewName}\".");
 
                 throw new NotFoundException($"Not found the dialog window named \"{viewName}\".");
             }
@@ -205,7 +205,7 @@ namespace Fusion.Mvvm
                 window = locator.LoadView<AlertDialogWindowBase>(viewName);
                 if (window == null)
                 {
-                    Debug.LogWarning(string.Format("Not found the dialog window named \"{0}\".", viewName));
+                    Debug.LogWarning($"Not found the dialog window named \"{viewName}\".");
 
                     throw new NotFoundException($"Not found the dialog window named \"{viewName}\".");
                 }

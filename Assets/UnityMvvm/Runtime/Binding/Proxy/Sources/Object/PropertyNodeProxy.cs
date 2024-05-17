@@ -27,7 +27,8 @@ namespace Fusion.Mvvm
             }
             else
             {
-                UnityEngine.Debug.LogWarning(string.Format("The type {0} does not inherit the INotifyPropertyChanged interface and does not support the PropertyChanged event.", propertyInfo.DeclaringType.Name));
+                UnityEngine.Debug.LogWarning(
+                    $"The type {propertyInfo.DeclaringType.Name} does not inherit the INotifyPropertyChanged interface and does not support the PropertyChanged event.");
             }
         }
 

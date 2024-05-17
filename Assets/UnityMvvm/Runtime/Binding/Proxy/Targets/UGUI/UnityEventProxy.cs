@@ -239,7 +239,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("{0}", e));
+                Debug.LogWarning($"{e}");
             }
         }
     }
@@ -330,7 +330,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("{0}", e));
+                Debug.LogWarning($"{e}");
             }
         }
     }
@@ -421,7 +421,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("{0}", e));
+                Debug.LogWarning($"{e}");
             }
         }
     }
@@ -514,7 +514,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("{0}", e));
+                Debug.LogWarning($"{e}");
             }
         }
     }
@@ -609,7 +609,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("{0}", e));
+                Debug.LogWarning($"{e}");
             }
         }
     }

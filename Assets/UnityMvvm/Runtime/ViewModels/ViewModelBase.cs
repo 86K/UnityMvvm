@@ -37,7 +37,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("Set property '{0}', broadcast messages failure.Exception:{1}", propertyName, e));
+                Debug.LogWarning($"Set property '{propertyName}', broadcast messages failure.Exception:{e}");
             }
         }
 

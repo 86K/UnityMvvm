@@ -382,7 +382,7 @@ namespace Fusion.Mvvm
             {
                 result.SetException(e);
 
-                Debug.LogWarning(string.Format("The window named \"{0}\" failed to open!Error:{1}", Name, e));
+                Debug.LogWarning($"The window named \"{Name}\" failed to open!Error:{e}");
             }
 
             return result;
@@ -437,7 +437,7 @@ namespace Fusion.Mvvm
             {
                 result.SetException(e);
 
-                Debug.LogWarning(string.Format("The window named \"{0}\" failed to hide!Error:{1}", Name, e));
+                Debug.LogWarning($"The window named \"{Name}\" failed to hide!Error:{e}");
             }
 
             return result;
@@ -482,7 +482,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("The window named \"{0}\" failed to dismiss!Error:{1}", Name, e));
+                Debug.LogWarning($"The window named \"{Name}\" failed to dismiss!Error:{e}");
             }
         }
 

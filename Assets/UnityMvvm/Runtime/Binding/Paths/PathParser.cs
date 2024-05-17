@@ -346,39 +346,5 @@ namespace Fusion.Mvvm
 
             return body.Member.Name;
         }
-
-        //public virtual string ParseMemberName(LambdaExpression expression)
-        //{
-        //    if (expression == null)
-        //        throw new ArgumentNullException("expression");
-
-        //    var method = expression.Body as MethodCallExpression;
-        //    if (method != null)
-        //        return method.Method.Name;
-
-        //    //Delegate.CreateDelegate(Type type, object firstArgument, MethodInfo method)
-        //    var unary = expression.Body as UnaryExpression;
-        //    if (unary != null && unary.NodeType == ExpressionType.Convert)
-        //    {
-        //        MethodCallExpression methodCall = (MethodCallExpression)unary.Operand;
-        //        if (methodCall.Method.Name.Equals("CreateDelegate"))
-        //        {
-        //            var info = this.GetDelegateMethodInfo(methodCall);
-        //            if (info != null)
-        //                return info.Name;
-        //        }
-
-        //        throw new ArgumentException(string.Format("Invalid expression:{0}", expression));
-        //    }
-
-        //    var body = expression.Body as MemberExpression;
-        //    if (body == null)
-        //        throw new ArgumentException(string.Format("Invalid expression:{0}", expression));
-
-        //    if (!(body.Expression is ParameterExpression))
-        //        throw new ArgumentException(string.Format("Invalid expression:{0}", expression));
-
-        //    return body.Member.Name;
-        //}
     }
 }

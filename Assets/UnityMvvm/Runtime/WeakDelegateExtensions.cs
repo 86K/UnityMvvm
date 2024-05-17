@@ -27,7 +27,8 @@ namespace Fusion.Mvvm
                 object target = targetRef.Target;
                 if (target == null)
                 {
-                    Debug.LogWarning(string.Format("You are trying to invoke a weak reference delegate({0}.{1}), and the target object has been destroyed.", type, method));
+                    Debug.LogWarning(
+                        $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
                     return;
                 }
 
@@ -52,7 +53,8 @@ namespace Fusion.Mvvm
                 object target = targetRef.Target;
                 if (target == null)
                 {
-                    Debug.LogWarning(string.Format("You are trying to invoke a weak reference delegate({0}.{1}), and the target object has been destroyed.", type, method));
+                    Debug.LogWarning(
+                        $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
                     return;
                 }
 
@@ -77,7 +79,8 @@ namespace Fusion.Mvvm
                 object target = targetRef.Target;
                 if (target == null)
                 {
-                    Debug.LogWarning(string.Format("You are trying to invoke a weak reference delegate({0}.{1}), and the target object has been destroyed.", type, method));
+                    Debug.LogWarning(
+                        $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
                     return;
                 }
 
@@ -102,7 +105,8 @@ namespace Fusion.Mvvm
                 object target = targetRef.Target;
                 if (target == null)
                 {
-                    Debug.LogWarning(string.Format("You are trying to invoke a weak reference delegate({0}.{1}), and the target object has been destroyed.", type, method));
+                    Debug.LogWarning(
+                        $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
                     return;
                 }
 
@@ -127,7 +131,8 @@ namespace Fusion.Mvvm
                 object target = targetRef.Target;
                 if (target == null)
                 {
-                    Debug.LogWarning(string.Format("You are trying to invoke a weak reference delegate({0}.{1}), and the target object has been destroyed.", type, method));
+                    Debug.LogWarning(
+                        $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
                     return;
                 }
 
@@ -152,7 +157,8 @@ namespace Fusion.Mvvm
                 object target = targetRef.Target;
                 if (target == null)
                 {
-                    Debug.LogWarning(string.Format("You are trying to invoke a weak reference delegate({0}.{1}), and the target object has been destroyed.", type, method));
+                    Debug.LogWarning(
+                        $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
 
                     throw new Exception(
                         $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
@@ -179,7 +185,8 @@ namespace Fusion.Mvvm
                 object target = targetRef.Target;
                 if (target == null)
                 {
-                    Debug.LogWarning(string.Format("You are trying to invoke a weak reference delegate({0}.{1}), and the target object has been destroyed.", type, method));
+                    Debug.LogWarning(
+                        $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
 
                     throw new Exception(
                         $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
@@ -206,7 +213,8 @@ namespace Fusion.Mvvm
                 object target = targetRef.Target;
                 if (target == null)
                 {
-                    Debug.LogWarning(string.Format("You are trying to invoke a weak reference delegate({0}.{1}), and the target object has been destroyed.", type, method));
+                    Debug.LogWarning(
+                        $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
 
                     throw new Exception(
                         $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
@@ -234,7 +242,8 @@ namespace Fusion.Mvvm
                 object target = targetRef.Target;
                 if (target == null)
                 {
-                    Debug.LogWarning(string.Format("You are trying to invoke a weak reference delegate({0}.{1}), and the target object has been destroyed.", type, method));
+                    Debug.LogWarning(
+                        $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
 
                     throw new Exception(
                         $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
@@ -261,7 +270,8 @@ namespace Fusion.Mvvm
                 object target = targetRef.Target;
                 if (target == null)
                 {
-                    Debug.LogWarning(string.Format("You are trying to invoke a weak reference delegate({0}.{1}), and the target object has been destroyed.", type, method));
+                    Debug.LogWarning(
+                        $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");
 
                     throw new Exception(
                         $"You are trying to invoke a weak reference delegate({type}.{method}), and the target object has been destroyed.");

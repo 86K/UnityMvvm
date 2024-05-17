@@ -30,14 +30,14 @@ namespace Fusion.Mvvm
         public Binding(IBindingContext bindingContext, object source, object target, TargetDescription targetDescription, ISourceProxyFactory sourceProxyFactory, ITargetProxyFactory targetProxyFactory) : base(bindingContext, source, target)
         {
             targetTypeName = target.GetType().Name;
-            this._targetDescription = targetDescription;
+            _targetDescription = targetDescription;
 
             converter = targetDescription.Converter;
             this.sourceProxyFactory = sourceProxyFactory;
             this.targetProxyFactory = targetProxyFactory;
 
-            CreateTargetProxy(target, this._targetDescription);
-            CreateSourceProxy(DataContext, this._targetDescription.Source);
+            CreateTargetProxy(target, _targetDescription);
+            CreateSourceProxy(DataContext, _targetDescription.Source);
             UpdateDataOnBind();
         }
 
@@ -98,7 +98,7 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("An exception occurs in UpdateTargetOnBind.exception: {0}", e));
+                Debug.LogWarning($"An exception occurs in UpdateTargetOnBind.exception: {e}");
             }
         }
 
@@ -351,7 +351,8 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("An exception occurs when the target property is updated.Please check the binding \"{0}{1}\" in the view \"{2}\".exception: {3}", targetTypeName, _targetDescription.ToString(), GetViewName(), e));
+                Debug.LogWarning(
+                    $"An exception occurs when the target property is updated.Please check the binding \"{targetTypeName}{_targetDescription.ToString()}\" in the view \"{GetViewName()}\".exception: {e}");
             }
             finally
             {
@@ -525,7 +526,8 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("An exception occurs when the source property is updated.Please check the binding \"{0}{1}\" in the view \"{2}\".exception: {3}", targetTypeName, _targetDescription.ToString(), GetViewName(), e));
+                Debug.LogWarning(
+                    $"An exception occurs when the source property is updated.Please check the binding \"{targetTypeName}{_targetDescription.ToString()}\" in the view \"{GetViewName()}\".exception: {e}");
             }
             finally
             {

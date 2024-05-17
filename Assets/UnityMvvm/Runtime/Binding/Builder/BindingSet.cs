@@ -4,75 +4,26 @@ using UnityEngine;
 
 namespace Fusion.Mvvm
 {
-    public abstract class BindingSetBase : IBindingBuilder
-    {
-        protected IBindingContext context;
-        protected readonly List<IBindingBuilder> builders = new List<IBindingBuilder>();
-
-        public BindingSetBase(IBindingContext context)
-        {
-            this.context = context;
-        }
-
-        public virtual void Build()
-        {
-            foreach (var builder in builders)
-            {
-                try
-                {
-                    builder.Build();
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning(string.Format("{0}", e));
-                }
-            }
-            builders.Clear();
-        }
-    }
-
     public class BindingSet<TTarget, TSource> : BindingSetBase where TTarget : class
     {
-        private readonly TTarget target;
-        public BindingSet(IBindingContext context, TTarget target) : base(context)
+        private readonly TTarget _target;
+
+        public BindingSet(IBindingContext bindingContext, TTarget target) : base(bindingContext)
         {
-            this.target = target;
+            _target = target;
         }
 
-        public virtual BindingBuilder<TTarget, TSource> Bind()
+        public BindingBuilder<TTarget, TSource> Bind()
         {
-            var builder = new BindingBuilder<TTarget, TSource>(context, target);
-            builders.Add(builder);
+            var builder = new BindingBuilder<TTarget, TSource>(_bindingContext, _target);
+            _bindingBuilders.Add(builder);
             return builder;
         }
 
-        public virtual BindingBuilder<TChildTarget, TSource> Bind<TChildTarget>(TChildTarget target) where TChildTarget : class
+        public BindingBuilder<TChildTarget, TSource> Bind<TChildTarget>(TChildTarget target) where TChildTarget : class
         {
-            var builder = new BindingBuilder<TChildTarget, TSource>(context, target);
-            builders.Add(builder);
-            return builder;
-        }
-    }
-
-    public class BindingSet<TTarget> : BindingSetBase where TTarget : class
-    {
-        private readonly TTarget target;
-        public BindingSet(IBindingContext context, TTarget target) : base(context)
-        {
-            this.target = target;
-        }
-
-        public virtual BindingBuilder<TTarget> Bind()
-        {
-            var builder = new BindingBuilder<TTarget>(context, target);
-            builders.Add(builder);
-            return builder;
-        }
-
-        public virtual BindingBuilder<TChildTarget> Bind<TChildTarget>(TChildTarget target) where TChildTarget : class
-        {
-            var builder = new BindingBuilder<TChildTarget>(context, target);
-            builders.Add(builder);
+            var builder = new BindingBuilder<TChildTarget, TSource>(_bindingContext, target);
+            _bindingBuilders.Add(builder);
             return builder;
         }
     }

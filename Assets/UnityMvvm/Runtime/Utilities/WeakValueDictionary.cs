@@ -298,7 +298,8 @@ namespace Fusion.Mvvm
             }
             catch (Exception e)
             {
-                Debug.LogWarning(string.Format("Removes the left-over weak references for entries in the dictionary whose value has already been reclaimed by the garbage collector.Error:{0}", e));
+                Debug.LogWarning(
+                    $"Removes the left-over weak references for entries in the dictionary whose value has already been reclaimed by the garbage collector.Error:{e}");
             }
         }
 

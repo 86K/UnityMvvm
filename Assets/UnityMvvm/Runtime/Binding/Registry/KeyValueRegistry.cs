@@ -30,7 +30,7 @@ namespace Fusion.Mvvm
         {
             if (lookups.ContainsKey(key))
             {
-                Debug.LogWarning(string.Format("The Key({0}) already exists", key));
+                Debug.LogWarning($"The Key({key}) already exists");
             }
             lookups[key] = value;
         }
