@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace Fusion.Mvvm
 {
     public class BindingSet<TTarget, TSource> : BindingSetBase where TTarget : class

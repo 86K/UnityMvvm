@@ -6,6 +6,7 @@ namespace Fusion.Mvvm
     public class BindingBuilderBase : IBindingBuilder
     {
         private bool _isBuilded;
+        // NOTE：这个没有用？
         private object _scopeKey;
         private readonly object _target;
         private readonly IBindingContext _bindingContext;
@@ -49,31 +50,9 @@ namespace Fusion.Mvvm
             SetMode(BindingMode.OneTime);
         }
 
-        protected void SetLiteral(object value)
-        {
-            if (_targetDescription.Source != null)
-                throw new Exception("You cannot set the source path of a Fluent binding more than once");
-
-            _targetDescription.Source = new LiteralSourceDescription()
-            {
-                Literal = value
-            };
-        }
-
         void SetMode(BindingMode mode)
         {
             _targetDescription.Mode = mode;
-        }
-
-        protected void SetScopeKey(object scopeKey)
-        {
-            _scopeKey = scopeKey;
-        }
-
-        protected void SetMemberPath(string pathText)
-        {
-            Path path = PathParser.Parse(pathText);
-            SetMemberPath(path);
         }
 
         protected void SetMemberPath(Path path)
@@ -84,46 +63,13 @@ namespace Fusion.Mvvm
             if (path == null)
                 throw new ArgumentException("the path is null.");
 
+            // NOTE：这个条件有必要吗？
             if (path.IsStatic)
                 throw new ArgumentException("Need a non-static path in here.");
 
             _targetDescription.Source = new ObjectSourceDescription()
             {
                 Path = path
-            };
-        }
-
-        protected void SetStaticMemberPath(string pathText)
-        {
-            Path path = PathParser.ParseStaticPath(pathText);
-            SetStaticMemberPath(path);
-        }
-
-        protected void SetStaticMemberPath(Path path)
-        {
-            if (_targetDescription.Source != null)
-                throw new Exception("You cannot set the source path of a Fluent binding more than once");
-
-            if (path == null)
-                throw new ArgumentException("the path is null.");
-
-            if (!path.IsStatic)
-                throw new ArgumentException("Need a static path in here.");
-
-            _targetDescription.Source = new ObjectSourceDescription()
-            {
-                Path = path
-            };
-        }
-
-        protected void SetExpression<TResult>(Expression<Func<TResult>> expression)
-        {
-            if (_targetDescription.Source != null)
-                throw new Exception("You cannot set the source path of a Fluent binding more than once");
-
-            _targetDescription.Source = new ExpressionSourceDescription()
-            {
-                Expression = expression
             };
         }
 
@@ -138,24 +84,6 @@ namespace Fusion.Mvvm
             };
         }
 
-        [Obsolete("Never used..")]
-        protected void SetExpression(LambdaExpression expression)
-        {
-            if (_targetDescription.Source != null)
-                throw new Exception("You cannot set the source path of a Fluent binding more than once");
-
-            _targetDescription.Source = new ExpressionSourceDescription()
-            {
-                Expression = expression
-            };
-        }
-
-        protected void SetCommandParameter(object parameter)
-        {
-            _targetDescription.CommandParameter = parameter;
-            _targetDescription.Converter = new ParameterWrapConverter(new ConstantCommandParameter(parameter));
-        }
-
         protected void SetCommandParameter<T>(T parameter)
         {
             _targetDescription.CommandParameter = parameter;
@@ -167,24 +95,7 @@ namespace Fusion.Mvvm
             _targetDescription.CommandParameter = parameter;
             _targetDescription.Converter = new ParameterWrapConverter<TParam>(new ExpressionCommandParameter<TParam>(parameter));
         }
-
-        protected void SetSourceDescription(SourceDescription source)
-        {
-            if (_targetDescription.Source != null)
-                throw new Exception("You cannot set the source path of a Fluent binding more than once");
-            _targetDescription.Source = source;
-        }
-
-        public void SetDescription(TargetDescription targetDescription)
-        {
-            _targetDescription.Mode = targetDescription.Mode;
-            _targetDescription.TargetName = targetDescription.TargetName;
-            _targetDescription.TargetType = targetDescription.TargetType;
-            _targetDescription.UpdateTrigger = targetDescription.UpdateTrigger;
-            _targetDescription.Converter = targetDescription.Converter;
-            _targetDescription.Source = targetDescription.Source;
-        }
-
+        
         protected IConverter ConverterByName(string name)
         {
             return ConverterRegistry.Find(name);

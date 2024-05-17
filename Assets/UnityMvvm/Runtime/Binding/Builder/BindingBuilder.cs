@@ -49,12 +49,6 @@ namespace Fusion.Mvvm
             return ForInternal(targetName);
         }
 
-        public BindingBuilder<TTarget, TSource> To(string path)
-        {
-            SetMemberPath(path);
-            return this;
-        }
-
         public BindingBuilder<TTarget, TSource> To<TResult>(Expression<Func<TSource, TResult>> path)
         {
             SetMemberPath(PathParser.Parse(path));
@@ -80,6 +74,7 @@ namespace Fusion.Mvvm
             return this;
         }
         
+        [Obsolete("Never used.")]
         public BindingBuilder<TTarget, TSource> CommandParameter<T>(T parameter)
         {
             SetCommandParameter(parameter);
@@ -101,12 +96,6 @@ namespace Fusion.Mvvm
         public BindingBuilder<TTarget, TSource> WithConversion(IConverter converter)
         {
             _targetDescription.Converter = converter;
-            return this;
-        }
-
-        public BindingBuilder<TTarget, TSource> WithScopeKey(object scopeKey)
-        {
-            SetScopeKey(scopeKey);
             return this;
         }
     }

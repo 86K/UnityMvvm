@@ -1,5 +1,3 @@
-
-
 using UnityEngine;
 using System.Collections.Generic;
 using System;
@@ -24,6 +22,13 @@ namespace Fusion.Mvvm
             }
         }
 
+        /// <summary>
+        /// 绑定上下文。（调用的Behaviour和注册的IBinder）
+        /// 
+        /// 在UI上附加一个BindingContextLifecycle，其持有一个BindingContext。
+        /// </summary>
+        /// <param name="behaviour"></param>
+        /// <returns></returns>
         public static IBindingContext BindingContext(this Behaviour behaviour)
         {
             if (behaviour == null || behaviour.gameObject == null)

@@ -16,9 +16,8 @@ namespace Fusion.Mvvm
             objectSourceProxyFactory.Register(new UniversalNodeProxyFactory(), 0);
 
             SourceProxyFactory sourceFactory = new SourceProxyFactory();
-            sourceFactory.Register(new LiteralSourceProxyFactory(), 0);
-            sourceFactory.Register(new ExpressionSourceProxyFactory(sourceFactory, expressionPathFinder), 1);
-            sourceFactory.Register(objectSourceProxyFactory, 2);
+            sourceFactory.Register(new ExpressionSourceProxyFactory(sourceFactory, expressionPathFinder), 0);
+            sourceFactory.Register(objectSourceProxyFactory, 1);
 
             TargetProxyFactory targetFactory = new TargetProxyFactory();
             targetFactory.Register(new UniversalTargetProxyFactory(pathParser), 0);

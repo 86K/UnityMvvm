@@ -10,12 +10,6 @@ namespace Fusion.Mvvm
         {
             proxy = null;
             var path = description.Path;
-            if (path.Count <= 0)
-            {
-                proxy = new LiteralSourceProxy(source);
-                return true;
-            }
-
             if (path.Count == 1)
             {
                 proxy = Create(source, path.AsPathToken());
