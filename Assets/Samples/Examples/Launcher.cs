@@ -1,5 +1,3 @@
-
-
 using UnityEngine;
 using System.Globalization;
 using System.Collections;
@@ -9,7 +7,7 @@ namespace Fusion.Mvvm
     public class Launcher : MonoBehaviour
     {
         private Context context;
-        ISubscription<WindowStateEventArgs> subscription;
+
         void Awake()
         {
             GlobalWindowManagerBase windowManager = FindObjectOfType<GlobalWindowManagerBase>();
@@ -20,32 +18,25 @@ namespace Fusion.Mvvm
 
             IServiceContainer container = context.GetContainer();
 
-            
+
             BindingServiceBundle bundle = new BindingServiceBundle(context.GetContainer());
             bundle.Start();
 
-            
+
             container.Register<IUIViewLocator>(new ResourcesViewLocator());
 
-            
+
             IAccountRepository accountRepository = new AccountRepository();
             container.Register<IAccountService>(new AccountService(accountRepository));
 
-            
-            GlobalSetting.enableWindowStateBroadcast = true;
-            
-            GlobalSetting.useBlocksRaycastsInsteadOfInteractable = true;
 
-            
-            subscription = Window.Messenger.Subscribe<WindowStateEventArgs>(e =>
-            {
-                Debug.LogFormat("The window[{0}] state changed from {1} to {2}", e.Window.Name, e.OldState, e.State);
-            });
+            GlobalSetting.enableWindowStateBroadcast = true;
+
+            GlobalSetting.useBlocksRaycastsInsteadOfInteractable = true;
         }
 
         IEnumerator Start()
         {
-            
             WindowContainer winContainer = WindowContainer.Create("MAIN");
 
             yield return null;
@@ -60,6 +51,5 @@ namespace Fusion.Mvvm
 
             yield return transition.WaitForDone();
         }
-
     }
 }

@@ -24,8 +24,6 @@ namespace Fusion.Mvvm
 
     public interface IAccountService
     {
-        IMessenger Messenger { get; }
-
         Task<Account> Register(Account account);
 
         Task<Account> Update(Account account);

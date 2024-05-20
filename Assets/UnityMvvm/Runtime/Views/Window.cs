@@ -8,8 +8,6 @@ namespace Fusion.Mvvm
     [DisallowMultipleComponent]
     public abstract class Window : WindowView, IWindow, IManageable
     {
-        public static readonly IMessenger Messenger = new Messenger();
-
         [SerializeField] private WindowType windowType = WindowType.FULL;
         [SerializeField] [Range(0, 10)] private int windowPriority;
         [SerializeField] private bool stateBroadcast = true;
@@ -212,8 +210,8 @@ namespace Fusion.Mvvm
             try
             {
                 WindowStateEventArgs eventArgs = new WindowStateEventArgs(this, oldState, newState);
-                if (GlobalSetting.enableWindowStateBroadcast && stateBroadcast)
-                    Messenger.Publish(eventArgs);
+                // if (GlobalSetting.enableWindowStateBroadcast && stateBroadcast)
+                //     Messenger.Publish(eventArgs);
 
                 if (stateChanged != null)
                     stateChanged(this, eventArgs);
