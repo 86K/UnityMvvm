@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +19,6 @@ namespace Fusion.Mvvm
         T Remove<T>();
 
         IEnumerator GetEnumerator();
-
     }
 
     public class Attributes : IAttributes

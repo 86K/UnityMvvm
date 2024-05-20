@@ -16,7 +16,7 @@ namespace Fusion.Mvvm
             Window window = null;
             try
             {
-                ApplicationContext context = Context.GetApplicationContext();
+                Context context = Context.GetGlobalContext();
                 IUIViewLocator locator = context.GetService<IUIViewLocator>();
                 if (locator == null)
                     throw new NotFoundException("Not found the \"IUIViewLocator\".");

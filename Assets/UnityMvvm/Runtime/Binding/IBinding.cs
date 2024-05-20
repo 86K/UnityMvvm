@@ -6,8 +6,6 @@ namespace Fusion.Mvvm
     {
         IBindingContext BindingContext { get; set; }
 
-        object Target { get; }
-
         object DataContext { get; set; }
     }
 }

@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +10,9 @@ namespace Fusion.Mvvm
     /// </summary>
     public class CompositeCommand : CommandBase
     {
-        private readonly List<ICommand> commands = new List<ICommand>();
-        private readonly bool monitorCommandActivity;
-        private readonly EventHandler onCanExecuteChangedHandler;
+        private readonly List<ICommand> _commands = new List<ICommand>();
+        private readonly bool _monitorCommandActivity;
+        private readonly EventHandler _onCanExecuteChangedHandler;
 
         /// <summary>
         /// Initializes a new instance of <see cref="CompositeCommand"/>.
@@ -29,8 +27,8 @@ namespace Fusion.Mvvm
         /// <param name="monitorCommandActivity">Indicates when the command activity is going to be monitored.</param>
         public CompositeCommand(bool monitorCommandActivity)
         {
-            this.monitorCommandActivity = monitorCommandActivity;
-            onCanExecuteChangedHandler = new EventHandler(OnCanExecuteChanged);
+            this._monitorCommandActivity = monitorCommandActivity;
+            _onCanExecuteChangedHandler = new EventHandler(OnCanExecuteChanged);
         }
 
         /// <summary>
@@ -50,18 +48,18 @@ namespace Fusion.Mvvm
             if (command == this)
                 throw new ArgumentException("Cannot register a CompositeCommand in itself.");
 
-            lock (commands)
+            lock (_commands)
             {
-                if (commands.Contains(command))
+                if (_commands.Contains(command))
                     throw new InvalidOperationException("Cannot register the same command twice in the same CompositeCommand.");
 
-                commands.Add(command);
+                _commands.Add(command);
             }
 
-            command.CanExecuteChanged += onCanExecuteChangedHandler;
+            command.CanExecuteChanged += _onCanExecuteChangedHandler;
             RaiseCanExecuteChanged();
 
-            if (monitorCommandActivity)
+            if (_monitorCommandActivity)
             {
                 if (command is IActiveAware activeAwareCommand)
                     activeAwareCommand.IsActiveChanged += OnIsActiveChanged;
@@ -77,16 +75,16 @@ namespace Fusion.Mvvm
             if (command == null)
                 throw new ArgumentNullException("command");
 
-            lock (commands)
+            lock (_commands)
             {
-                if (!commands.Remove(command))
+                if (!_commands.Remove(command))
                     return;
             }
 
-            command.CanExecuteChanged -= onCanExecuteChangedHandler;
+            command.CanExecuteChanged -= _onCanExecuteChangedHandler;
             RaiseCanExecuteChanged();
 
-            if (monitorCommandActivity)
+            if (_monitorCommandActivity)
             {
                 if (command is IActiveAware activeAwareCommand)
                     activeAwareCommand.IsActiveChanged -= OnIsActiveChanged;
@@ -114,9 +112,9 @@ namespace Fusion.Mvvm
         public override bool CanExecute(object parameter)
         {
             ICommand[] commandList;
-            lock (commands)
+            lock (_commands)
             {
-                commandList = commands.ToArray();
+                commandList = _commands.ToArray();
             }
 
             if (commandList.Length <= 0)
@@ -143,9 +141,9 @@ namespace Fusion.Mvvm
         public override void Execute(object parameter)
         {
             Queue<ICommand> commands;
-            lock (this.commands)
+            lock (this._commands)
             {
-                commands = new Queue<ICommand>(this.commands.Where(ShouldExecute).ToList());
+                commands = new Queue<ICommand>(this._commands.Where(ShouldExecute).ToList());
             }
 
             while (commands.Count > 0)
@@ -175,7 +173,7 @@ namespace Fusion.Mvvm
         /// property is <see langword="false" />; otherwise it always returns <see langword="true" />.</remarks>
         protected virtual bool ShouldExecute(ICommand command)
         {
-            if (!monitorCommandActivity)
+            if (!_monitorCommandActivity)
                 return true;
 
             if (!(command is IActiveAware activeAwareCommand))
@@ -194,9 +192,9 @@ namespace Fusion.Mvvm
             get
             {
                 IList<ICommand> commandList;
-                lock (commands)
+                lock (_commands)
                 {
-                    commandList = commands.ToList();
+                    commandList = _commands.ToList();
                 }
 
                 return commandList;

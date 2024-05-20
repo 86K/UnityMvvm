@@ -12,14 +12,9 @@ namespace Fusion.Mvvm
         public AsyncInteractionRequest<ProgressBar> LoadSceneRequest { get; private set; }
         public InteractionRequest DismissRequest { get; private set; }
 
-
-        public StartupViewModel() : this(null)
+        public StartupViewModel()
         {
-        }
-
-        public StartupViewModel(IMessenger messenger) : base(messenger)
-        {
-            ApplicationContext context = Context.GetApplicationContext();
+            Context context = Context.GetGlobalContext();
             var accountService = context.GetService<IAccountService>();
 
             //this.LoginRequest = new InteractionRequest<LoginViewModel>(this);          

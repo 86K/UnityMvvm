@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 
@@ -9,20 +7,32 @@ namespace Fusion.Mvvm
     public abstract class ObservablePropertyBase<T>
     {
         private readonly object _lock = new object();
-        private EventHandler valueChanged;
+        private EventHandler _valueChanged;
         protected T _value;
 
         public event EventHandler ValueChanged
         {
-            add { lock (_lock) { valueChanged += value; } }
-            remove { lock (_lock) { valueChanged -= value; } }
+            add
+            {
+                lock (_lock)
+                {
+                    _valueChanged += value;
+                }
+            }
+            remove
+            {
+                lock (_lock)
+                {
+                    _valueChanged -= value;
+                }
+            }
         }
 
-        public ObservablePropertyBase() : this(default)
+        protected ObservablePropertyBase() : this(default)
         {
         }
 
-        public ObservablePropertyBase(T value)
+        protected ObservablePropertyBase(T value)
         {
             _value = value;
         }
@@ -31,23 +41,12 @@ namespace Fusion.Mvvm
 
         protected void RaiseValueChanged()
         {
-            valueChanged?.Invoke(this, EventArgs.Empty);
+            _valueChanged?.Invoke(this, EventArgs.Empty);
         }
 
         protected virtual bool Equals(T x, T y)
         {
             return EqualityComparer<T>.Default.Equals(x, y);
-            //if (x != null)
-            //{
-            //    if (y != null)
-            //        return x.Equals(y);
-            //    return false;
-            //}
-
-            //if (y != null)
-            //    return false;
-
-            //return true;
         }
     }
 
@@ -93,6 +92,7 @@ namespace Fusion.Mvvm
         public ObservableProperty() : this(default)
         {
         }
+
         public ObservableProperty(T value) : base(value)
         {
         }

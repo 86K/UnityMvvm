@@ -1,10 +1,7 @@
-
-
 using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-
 using NotifyCollectionChangedEventHandler = System.Collections.Specialized.NotifyCollectionChangedEventHandler;
 using INotifyCollectionChanged = System.Collections.Specialized.INotifyCollectionChanged;
 using NotifyCollectionChangedAction = System.Collections.Specialized.NotifyCollectionChangedAction;
@@ -18,69 +15,98 @@ namespace Fusion.Mvvm
     [Serializable]
     public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, INotifyCollectionChanged, INotifyPropertyChanged
     {
-        private static readonly PropertyChangedEventArgs CountEventArgs = new PropertyChangedEventArgs("Count");
-        private static readonly PropertyChangedEventArgs IndexerEventArgs = new PropertyChangedEventArgs("Item[]");
-        private static readonly PropertyChangedEventArgs KeysEventArgs = new PropertyChangedEventArgs("Keys");
-        private static readonly PropertyChangedEventArgs ValuesEventArgs = new PropertyChangedEventArgs("Values");
+        private readonly PropertyChangedEventArgs _countEventArgs = new PropertyChangedEventArgs("Count");
+        private readonly PropertyChangedEventArgs _indexerEventArgs = new PropertyChangedEventArgs("Item[]");
+        private readonly PropertyChangedEventArgs _keysEventArgs = new PropertyChangedEventArgs("Keys");
+        private readonly PropertyChangedEventArgs _valuesEventArgs = new PropertyChangedEventArgs("Values");
 
-        private readonly object propertyChangedLock = new object();
-        private readonly object collectionChangedLock = new object();
-        private PropertyChangedEventHandler propertyChanged;
-        private NotifyCollectionChangedEventHandler collectionChanged;
+        private readonly object _propertyChangedLock = new object();
+        private readonly object _collectionChangedLock = new object();
+        private PropertyChangedEventHandler _propertyChanged;
+        private NotifyCollectionChangedEventHandler _collectionChanged;
 
-        protected Dictionary<TKey, TValue> dictionary;
+        protected Dictionary<TKey, TValue> _dictionary;
 
         public event PropertyChangedEventHandler PropertyChanged
         {
-            add { lock (propertyChangedLock) { propertyChanged += value; } }
-            remove { lock (propertyChangedLock) { propertyChanged -= value; } }
+            add
+            {
+                lock (_propertyChangedLock)
+                {
+                    _propertyChanged += value;
+                }
+            }
+            remove
+            {
+                lock (_propertyChangedLock)
+                {
+                    _propertyChanged -= value;
+                }
+            }
         }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged
         {
-            add { lock (collectionChangedLock) { collectionChanged += value; } }
-            remove { lock (collectionChangedLock) { collectionChanged -= value; } }
+            add
+            {
+                lock (_collectionChangedLock)
+                {
+                    _collectionChanged += value;
+                }
+            }
+            remove
+            {
+                lock (_collectionChangedLock)
+                {
+                    _collectionChanged -= value;
+                }
+            }
         }
 
         public ObservableDictionary()
         {
-            dictionary = new Dictionary<TKey, TValue>();
+            _dictionary = new Dictionary<TKey, TValue>();
         }
+
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
         {
-            this.dictionary = new Dictionary<TKey, TValue>(dictionary);
+            this._dictionary = new Dictionary<TKey, TValue>(dictionary);
         }
+
         public ObservableDictionary(IEqualityComparer<TKey> comparer)
         {
-            dictionary = new Dictionary<TKey, TValue>(comparer);
+            _dictionary = new Dictionary<TKey, TValue>(comparer);
         }
+
         public ObservableDictionary(int capacity)
         {
-            dictionary = new Dictionary<TKey, TValue>(capacity);
+            _dictionary = new Dictionary<TKey, TValue>(capacity);
         }
+
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
         {
-            this.dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
+            this._dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
         }
+
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> comparer)
         {
-            dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
+            _dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
         }
 
         public TValue this[TKey key]
         {
             get
             {
-                if (!dictionary.ContainsKey(key))
+                if (!_dictionary.ContainsKey(key))
                     return default;
-                return dictionary[key];
+                return _dictionary[key];
             }
             set => Insert(key, value, false);
         }
 
-        public ICollection<TKey> Keys => dictionary.Keys;
+        public ICollection<TKey> Keys => _dictionary.Keys;
 
-        public ICollection<TValue> Values => dictionary.Values;
+        public ICollection<TValue> Values => _dictionary.Values;
 
         public void Add(TKey key, TValue value)
         {
@@ -92,12 +118,12 @@ namespace Fusion.Mvvm
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            dictionary.TryGetValue(key, out var value);
-            var removed = dictionary.Remove(key);
+            _dictionary.TryGetValue(key, out var value);
+            var removed = _dictionary.Remove(key);
             if (removed)
             {
                 OnPropertyChanged(NotifyCollectionChangedAction.Remove);
-                if (collectionChanged != null)
+                if (_collectionChanged != null)
                     OnCollectionChanged(NotifyCollectionChangedAction.Remove, new KeyValuePair<TKey, TValue>(key, value));
             }
 
@@ -106,12 +132,12 @@ namespace Fusion.Mvvm
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            return dictionary.TryGetValue(key, out value);
+            return _dictionary.TryGetValue(key, out value);
         }
 
         public bool ContainsKey(TKey key)
         {
-            return dictionary.ContainsKey(key);
+            return _dictionary.ContainsKey(key);
         }
 
         public void Add(KeyValuePair<TKey, TValue> item)
@@ -121,28 +147,28 @@ namespace Fusion.Mvvm
 
         public void Clear()
         {
-            if (dictionary.Count > 0)
+            if (_dictionary.Count > 0)
             {
-                dictionary.Clear();
+                _dictionary.Clear();
                 OnPropertyChanged(NotifyCollectionChangedAction.Reset);
-                if (collectionChanged != null)
+                if (_collectionChanged != null)
                     OnCollectionChanged();
             }
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return dictionary.Contains(item);
+            return _dictionary.Contains(item);
         }
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            ((IDictionary)dictionary).CopyTo(array, arrayIndex);
+            ((IDictionary)_dictionary).CopyTo(array, arrayIndex);
         }
 
-        public int Count => dictionary.Count;
+        public int Count => _dictionary.Count;
 
-        public bool IsReadOnly => ((IDictionary)dictionary).IsReadOnly;
+        public bool IsReadOnly => ((IDictionary)_dictionary).IsReadOnly;
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
@@ -151,17 +177,17 @@ namespace Fusion.Mvvm
 
         public Dictionary<TKey, TValue>.Enumerator GetEnumerator()
         {
-            return dictionary.GetEnumerator();
+            return _dictionary.GetEnumerator();
         }
 
         IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
         {
-            return dictionary.GetEnumerator();
+            return _dictionary.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)dictionary).GetEnumerator();
+            return ((IEnumerable)_dictionary).GetEnumerator();
         }
 
         public void AddRange(IDictionary<TKey, TValue> items)
@@ -171,20 +197,20 @@ namespace Fusion.Mvvm
 
             if (items.Count > 0)
             {
-                if (dictionary.Count > 0)
+                if (_dictionary.Count > 0)
                 {
-                    if (items.Keys.Any((k) => dictionary.ContainsKey(k)))
+                    if (items.Keys.Any((k) => _dictionary.ContainsKey(k)))
                         throw new ArgumentException("An item with the same key has already been added.");
                     foreach (var item in items)
-                        ((IDictionary<TKey, TValue>)dictionary).Add(item);
+                        ((IDictionary<TKey, TValue>)_dictionary).Add(item);
                 }
                 else
                 {
-                    dictionary = new Dictionary<TKey, TValue>(items);
+                    _dictionary = new Dictionary<TKey, TValue>(items);
                 }
 
                 OnPropertyChanged(NotifyCollectionChangedAction.Add);
-                if (collectionChanged != null)
+                if (_collectionChanged != null)
                     OnCollectionChanged(NotifyCollectionChangedAction.Add, items.ToArray());
             }
         }
@@ -194,7 +220,7 @@ namespace Fusion.Mvvm
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            if (dictionary.TryGetValue(key, out var item))
+            if (_dictionary.TryGetValue(key, out var item))
             {
                 if (add)
                     throw new ArgumentException("An item with the same key has already been added.");
@@ -202,16 +228,17 @@ namespace Fusion.Mvvm
                 if (EqualityComparer<TValue>.Default.Equals(item, value))
                     return;
 
-                dictionary[key] = value;
+                _dictionary[key] = value;
                 OnPropertyChanged(NotifyCollectionChangedAction.Replace);
-                if (collectionChanged != null)
-                    OnCollectionChanged(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value), new KeyValuePair<TKey, TValue>(key, item));
+                if (_collectionChanged != null)
+                    OnCollectionChanged(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value),
+                        new KeyValuePair<TKey, TValue>(key, item));
             }
             else
             {
-                dictionary[key] = value;
+                _dictionary[key] = value;
                 OnPropertyChanged(NotifyCollectionChangedAction.Add);
-                if (collectionChanged != null)
+                if (_collectionChanged != null)
                     OnCollectionChanged(NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue>(key, value));
             }
         }
@@ -223,74 +250,74 @@ namespace Fusion.Mvvm
                 case NotifyCollectionChangedAction.Reset:
                 case NotifyCollectionChangedAction.Add:
                 case NotifyCollectionChangedAction.Remove:
-                    {
-                        OnPropertyChanged(CountEventArgs);
-                        OnPropertyChanged(IndexerEventArgs);
-                        OnPropertyChanged(KeysEventArgs);
-                        OnPropertyChanged(ValuesEventArgs);
-                        break;
-                    }
+                {
+                    OnPropertyChanged(_countEventArgs);
+                    OnPropertyChanged(_indexerEventArgs);
+                    OnPropertyChanged(_keysEventArgs);
+                    OnPropertyChanged(_valuesEventArgs);
+                    break;
+                }
                 case NotifyCollectionChangedAction.Replace:
-                    {
-                        OnPropertyChanged(IndexerEventArgs);
-                        OnPropertyChanged(ValuesEventArgs);
-                        break;
-                    }
+                {
+                    OnPropertyChanged(_indexerEventArgs);
+                    OnPropertyChanged(_valuesEventArgs);
+                    break;
+                }
                 case NotifyCollectionChangedAction.Move:
                 default:
-                    {
-                        OnPropertyChanged(CountEventArgs);
-                        OnPropertyChanged(IndexerEventArgs);
-                        OnPropertyChanged(KeysEventArgs);
-                        OnPropertyChanged(ValuesEventArgs);
-                        break;
-                    }
+                {
+                    OnPropertyChanged(_countEventArgs);
+                    OnPropertyChanged(_indexerEventArgs);
+                    OnPropertyChanged(_keysEventArgs);
+                    OnPropertyChanged(_valuesEventArgs);
+                    break;
+                }
             }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs eventArgs)
         {
-            if (propertyChanged != null)
-                propertyChanged(this, eventArgs);
+            if (_propertyChanged != null)
+                _propertyChanged(this, eventArgs);
         }
 
         private void OnCollectionChanged()
         {
-            if (collectionChanged != null)
-                collectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            if (_collectionChanged != null)
+                _collectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> changedItem)
         {
-            if (collectionChanged != null)
-                collectionChanged(this, new NotifyCollectionChangedEventArgs(action, changedItem));
+            if (_collectionChanged != null)
+                _collectionChanged(this, new NotifyCollectionChangedEventArgs(action, changedItem));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> newItem, KeyValuePair<TKey, TValue> oldItem)
         {
-            if (collectionChanged != null)
-                collectionChanged(this, new NotifyCollectionChangedEventArgs(action, newItem, oldItem));
+            if (_collectionChanged != null)
+                _collectionChanged(this, new NotifyCollectionChangedEventArgs(action, newItem, oldItem));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, IList newItems)
         {
-            if (collectionChanged != null)
-                collectionChanged(this, new NotifyCollectionChangedEventArgs(action, newItems));
+            if (_collectionChanged != null)
+                _collectionChanged(this, new NotifyCollectionChangedEventArgs(action, newItems));
         }
 
         object IDictionary.this[object key]
         {
-            get => ((IDictionary)dictionary)[key];
+            get => ((IDictionary)_dictionary)[key];
             set => Insert((TKey)key, (TValue)value, false);
         }
 
-        ICollection IDictionary.Keys => ((IDictionary)dictionary).Keys;
+        ICollection IDictionary.Keys => ((IDictionary)_dictionary).Keys;
 
-        ICollection IDictionary.Values => ((IDictionary)dictionary).Values;
+        ICollection IDictionary.Values => ((IDictionary)_dictionary).Values;
 
         bool IDictionary.Contains(object key)
         {
-            return ((IDictionary)dictionary).Contains(key);
+            return ((IDictionary)_dictionary).Contains(key);
         }
 
         void IDictionary.Add(object key, object value)
@@ -300,7 +327,7 @@ namespace Fusion.Mvvm
 
         IDictionaryEnumerator IDictionary.GetEnumerator()
         {
-            return ((IDictionary)dictionary).GetEnumerator();
+            return ((IDictionary)_dictionary).GetEnumerator();
         }
 
         void IDictionary.Remove(object key)
@@ -308,15 +335,15 @@ namespace Fusion.Mvvm
             Remove((TKey)key);
         }
 
-        bool IDictionary.IsFixedSize => ((IDictionary)dictionary).IsFixedSize;
+        bool IDictionary.IsFixedSize => ((IDictionary)_dictionary).IsFixedSize;
 
         void ICollection.CopyTo(Array array, int index)
         {
-            ((IDictionary)dictionary).CopyTo(array, index);
+            ((IDictionary)_dictionary).CopyTo(array, index);
         }
 
-        object ICollection.SyncRoot => ((IDictionary)dictionary).SyncRoot;
+        object ICollection.SyncRoot => ((IDictionary)_dictionary).SyncRoot;
 
-        bool ICollection.IsSynchronized => ((IDictionary)dictionary).IsSynchronized;
+        bool ICollection.IsSynchronized => ((IDictionary)_dictionary).IsSynchronized;
     }
 }

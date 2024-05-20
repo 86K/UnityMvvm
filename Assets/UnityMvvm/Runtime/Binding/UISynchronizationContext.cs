@@ -1,37 +1,40 @@
-
-
 using System.Threading;
 using UnityEngine;
 
 namespace Fusion.Mvvm
 {
-    public class UISynchronizationContext
+    /// <summary>
+    /// UI同步上下文。
+    /// 用于在unity的主线程中抛出或者发出事件。
+    /// </summary>
+    public static class UISynchronizationContext
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnInitialize()
         {
-            context = SynchronizationContext.Current;
-            threadId = Thread.CurrentThread.ManagedThreadId;
+            _context = SynchronizationContext.Current;
+            _threadId = Thread.CurrentThread.ManagedThreadId;
         }
 
-        private static int threadId;
-        private static SynchronizationContext context;
+        private static int _threadId;
+        private static SynchronizationContext _context;
 
-        public static bool InThread => threadId == Thread.CurrentThread.ManagedThreadId;
+        public static bool InThread => _threadId == Thread.CurrentThread.ManagedThreadId;
 
         public static void Post(SendOrPostCallback callback, object state)
         {
-            if (threadId == Thread.CurrentThread.ManagedThreadId)
+            if (_threadId == Thread.CurrentThread.ManagedThreadId)
                 callback(state);
             else
-                context.Post(callback, state);
+                _context.Post(callback, state);
         }
+
         public static void Send(SendOrPostCallback callback, object state)
         {
-            if (threadId == Thread.CurrentThread.ManagedThreadId)
+            if (_threadId == Thread.CurrentThread.ManagedThreadId)
                 callback(state);
             else
-                context.Send(callback, state);
+                _context.Send(callback, state);
         }
     }
 }

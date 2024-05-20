@@ -83,18 +83,6 @@ namespace Fusion.Mvvm
             Unregister0(name);
         }
 
-        //internal void Register0(string name, Type type, IFactory factory)
-        //{
-        //    lock (_lock)
-        //    {
-        //        var entry = new Entry(name, type, factory);
-        //        if (!nameServiceMappings.TryAdd(name, entry))
-        //            throw new DuplicateRegisterServiceException(string.Format("Duplicate key {0}", name));
-
-        //        typeServiceMappings.TryAdd(type, entry);
-        //    }
-        //}
-
         /// <summary>
         /// For services registered with a type, if the type is not a generic type, 
         /// it can be retrieved by type or type name.
@@ -108,7 +96,7 @@ namespace Fusion.Mvvm
                 string name = type.IsGenericType ? null : type.Name;
                 Entry entry = new Entry(name, type, factory);
                 if (!typeServiceMappings.TryAdd(type, entry))
-                    throw new DuplicateRegisterServiceException($"Duplicate key {type}");
+                    throw new Exception($"Duplicate key {type}");
 
                 if (!string.IsNullOrEmpty(name))
                     nameServiceMappings.TryAdd(name, entry);
@@ -125,7 +113,7 @@ namespace Fusion.Mvvm
             lock (_lock)
             {
                 if (!nameServiceMappings.TryAdd(name, new Entry(name, null, factory)))
-                    throw new DuplicateRegisterServiceException($"Duplicate key {name}");
+                    throw new Exception($"Duplicate key {name}");
             }
         }
 
@@ -236,7 +224,7 @@ namespace Fusion.Mvvm
             }
         }
 
-        internal class SingleInstanceFactory : IFactory
+        private class SingleInstanceFactory : IFactory
         {
             private object target;
 
@@ -245,7 +233,7 @@ namespace Fusion.Mvvm
                 this.target = target;
             }
 
-            public virtual object Create()
+            public object Create()
             {
                 return target;
             }

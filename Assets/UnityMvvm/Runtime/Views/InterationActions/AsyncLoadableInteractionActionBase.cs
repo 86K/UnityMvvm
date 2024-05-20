@@ -32,7 +32,7 @@ namespace Fusion.Mvvm
             {
                 if (locator == null)
                 {
-                    ApplicationContext context = Context.GetApplicationContext();
+                    Context context = Context.GetGlobalContext();
                     locator = context.GetService<IUIViewLocator>();
                 }
                 return locator;

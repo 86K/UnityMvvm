@@ -1,5 +1,3 @@
-
-
 using System;
 using UnityEngine.Events;
 using UnityEngine;
@@ -7,41 +5,42 @@ using System.Threading;
 
 namespace Fusion.Mvvm
 {
-    public class Binding : AbstractBinding
+    public class Binding : BindingBase
     {
-        private readonly ISourceProxyFactory sourceProxyFactory;
-        private readonly ITargetProxyFactory targetProxyFactory;
+        private readonly ISourceProxyFactory _sourceProxyFactory;
+        private readonly ITargetProxyFactory _targetProxyFactory;
 
-        private bool disposed;
-        private BindingMode bindingMode = BindingMode.Default;
+        private bool _disposed;
+        private BindingMode _bindingMode = BindingMode.Default;
         private TargetDescription _targetDescription;
-        private ISourceProxy sourceProxy;
-        private ITargetProxy targetProxy;
+        private ISourceProxy _sourceProxy;
+        private ITargetProxy _targetProxy;
 
-        private EventHandler sourceValueChangedHandler;
-        private EventHandler targetValueChangedHandler;
+        private EventHandler _sourceValueChangedHandler;
+        private EventHandler _targetValueChangedHandler;
 
-        private readonly IConverter converter;
-        private bool isUpdatingSource;
-        private bool isUpdatingTarget;
-        private readonly string targetTypeName;
-        private SendOrPostCallback updateTargetAction;
+        private readonly IConverter _converter;
+        private bool _isUpdatingSource;
+        private bool _isUpdatingTarget;
+        private readonly string _targetTypeName;
+        private SendOrPostCallback _updateTargetAction;
 
-        public Binding(IBindingContext bindingContext, object source, object target, TargetDescription targetDescription, ISourceProxyFactory sourceProxyFactory, ITargetProxyFactory targetProxyFactory) : base(bindingContext, source, target)
+        public Binding(IBindingContext bindingContext, object source, object target, TargetDescription targetDescription,
+            ISourceProxyFactory sourceProxyFactory, ITargetProxyFactory targetProxyFactory) : base(bindingContext, source)
         {
-            targetTypeName = target.GetType().Name;
+            _targetTypeName = target.GetType().Name;
             _targetDescription = targetDescription;
 
-            converter = targetDescription.Converter;
-            this.sourceProxyFactory = sourceProxyFactory;
-            this.targetProxyFactory = targetProxyFactory;
+            _converter = targetDescription.Converter;
+            _sourceProxyFactory = sourceProxyFactory;
+            _targetProxyFactory = targetProxyFactory;
 
             CreateTargetProxy(target, _targetDescription);
             CreateSourceProxy(DataContext, _targetDescription.Source);
             UpdateDataOnBind();
         }
 
-        protected virtual string GetViewName()
+        private string GetViewName()
         {
             if (BindingContext == null)
                 return "unknown";
@@ -51,7 +50,7 @@ namespace Fusion.Mvvm
                 return "unknown";
 
             string typeName = owner.GetType().Name;
-            string name = (owner is Behaviour behaviour) ? behaviour.name : "";
+            string name = owner is Behaviour behaviour ? behaviour.name : "";
             return string.IsNullOrEmpty(name) ? typeName : $"{typeName}[{name}]";
         }
 
@@ -64,34 +63,34 @@ namespace Fusion.Mvvm
             UpdateDataOnBind();
         }
 
-        protected BindingMode BindingMode
+        private BindingMode BindingMode
         {
             get
             {
-                if (bindingMode != BindingMode.Default)
-                    return bindingMode;
+                if (_bindingMode != BindingMode.Default)
+                    return _bindingMode;
 
-                bindingMode = _targetDescription.Mode;
-                if (bindingMode == BindingMode.Default)
-                    bindingMode = targetProxy.DefaultMode;
+                _bindingMode = _targetDescription.Mode;
+                if (_bindingMode == BindingMode.Default)
+                    _bindingMode = _targetProxy.DefaultMode;
 
-                if (bindingMode == BindingMode.Default)
+                if (_bindingMode == BindingMode.Default)
                     Debug.Log("Not set the BindingMode!");
 
-                return bindingMode;
+                return _bindingMode;
             }
         }
 
-        protected void UpdateDataOnBind()
+        private void UpdateDataOnBind()
         {
             try
             {
-                if (UpdateTargetOnFirstBind(BindingMode) && sourceProxy != null)
+                if (UpdateTargetOnFirstBind(BindingMode) && _sourceProxy != null)
                 {
                     UpdateTargetFromSource();
                 }
 
-                if (UpdateSourceOnFirstBind(BindingMode) && targetProxy != null && targetProxy is IObtainable)
+                if (UpdateSourceOnFirstBind(BindingMode) && _targetProxy != null && _targetProxy is IObtainable)
                 {
                     UpdateSourceFromTarget();
                 }
@@ -102,71 +101,77 @@ namespace Fusion.Mvvm
             }
         }
 
-        protected void CreateSourceProxy(object source, SourceDescription description)
+        private void CreateSourceProxy(object source, SourceDescription description)
         {
             DisposeSourceProxy();
 
-            sourceProxy = sourceProxyFactory.CreateProxy(description.IsStatic ? null : source, description);
+            _sourceProxy = _sourceProxyFactory.CreateProxy(description.IsStatic ? null : source, description);
 
-            if (IsSubscribeSourceValueChanged(BindingMode) && sourceProxy is INotifiable)
+            if (IsSubscribeSourceValueChanged(BindingMode) && _sourceProxy is INotifiable notifiable)
             {
-                sourceValueChangedHandler = (sender, args) => UpdateTargetFromSource();
-                (sourceProxy as INotifiable).ValueChanged += sourceValueChangedHandler;
+                _sourceValueChangedHandler = (sender, args) => UpdateTargetFromSource();
+                notifiable.ValueChanged += _sourceValueChangedHandler;
             }
         }
 
-        protected void DisposeSourceProxy()
+        private void DisposeSourceProxy()
         {
             try
             {
-                if (sourceProxy != null)
+                if (_sourceProxy != null)
                 {
-                    if (sourceValueChangedHandler != null)
+                    if (_sourceValueChangedHandler != null)
                     {
-                        (sourceProxy as INotifiable).ValueChanged -= sourceValueChangedHandler;
-                        sourceValueChangedHandler = null;
+                        ((INotifiable)_sourceProxy).ValueChanged -= _sourceValueChangedHandler;
+                        _sourceValueChangedHandler = null;
                     }
 
-                    sourceProxy.Dispose();
-                    sourceProxy = null;
+                    _sourceProxy.Dispose();
+                    _sourceProxy = null;
                 }
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
 
-        protected void CreateTargetProxy(object target, TargetDescription description)
+        private void CreateTargetProxy(object target, TargetDescription description)
         {
             DisposeTargetProxy();
 
-            targetProxy = targetProxyFactory.CreateProxy(target, description);
+            _targetProxy = _targetProxyFactory.CreateProxy(target, description);
 
-            if (IsSubscribeTargetValueChanged(BindingMode) && targetProxy is INotifiable)
+            if (IsSubscribeTargetValueChanged(BindingMode) && _targetProxy is INotifiable notifiable)
             {
-                targetValueChangedHandler = (sender, args) => UpdateSourceFromTarget();
-                (targetProxy as INotifiable).ValueChanged += targetValueChangedHandler;
+                _targetValueChangedHandler = (sender, args) => UpdateSourceFromTarget();
+                notifiable.ValueChanged += _targetValueChangedHandler;
             }
         }
 
-        protected void DisposeTargetProxy()
+        private void DisposeTargetProxy()
         {
             try
             {
-                if (targetProxy != null)
+                if (_targetProxy != null)
                 {
-                    if (targetValueChangedHandler != null)
+                    if (_targetValueChangedHandler != null)
                     {
-                        (targetProxy as INotifiable).ValueChanged -= targetValueChangedHandler;
-                        targetValueChangedHandler = null;
+                        ((INotifiable)_targetProxy).ValueChanged -= _targetValueChangedHandler;
+                        _targetValueChangedHandler = null;
                     }
-                    targetProxy.Dispose();
-                    targetProxy = null;
+
+                    _targetProxy.Dispose();
+                    _targetProxy = null;
                 }
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
 
-
-        protected virtual void UpdateTargetFromSource()
+        private void UpdateTargetFromSource()
         {
             if (UISynchronizationContext.InThread)
             {
@@ -178,399 +183,401 @@ namespace Fusion.Mvvm
                 if (updateTargetAction == null)
                     updateTargetAction = DoUpdateTargetFromSource;
 #else
-                if (updateTargetAction == null)
-                    Interlocked.CompareExchange(ref updateTargetAction, DoUpdateTargetFromSource, null);
+                if (_updateTargetAction == null)
+                    Interlocked.CompareExchange(ref _updateTargetAction, DoUpdateTargetFromSource, null);
 #endif
                 //Run on the main thread
-                UISynchronizationContext.Post(updateTargetAction, null);
+                UISynchronizationContext.Post(_updateTargetAction, null);
             }
         }
 
-        protected void DoUpdateTargetFromSource(object state)
+        private void DoUpdateTargetFromSource(object state)
         {
             try
             {
-                if (isUpdatingSource)
+                if (_isUpdatingSource)
                     return;
 
-                isUpdatingTarget = true;
+                _isUpdatingTarget = true;
 
-                IObtainable obtainable = sourceProxy as IObtainable;
+                IObtainable obtainable = _sourceProxy as IObtainable;
                 if (obtainable == null)
                     return;
 
-                IModifiable modifier = targetProxy as IModifiable;
+                IModifiable modifier = _targetProxy as IModifiable;
                 if (modifier == null)
                     return;
 
-                TypeCode typeCode = sourceProxy.TypeCode;
+                TypeCode typeCode = _sourceProxy.TypeCode;
                 switch (typeCode)
                 {
                     case TypeCode.Boolean:
-                        {
-                            var value = obtainable.GetValue<bool>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<bool>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Byte:
-                        {
-                            var value = obtainable.GetValue<byte>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<byte>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Char:
-                        {
-                            var value = obtainable.GetValue<char>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<char>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.DateTime:
-                        {
-                            var value = obtainable.GetValue<DateTime>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<DateTime>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Decimal:
-                        {
-                            var value = obtainable.GetValue<decimal>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<decimal>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Double:
-                        {
-                            var value = obtainable.GetValue<double>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<double>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Int16:
-                        {
-                            var value = obtainable.GetValue<short>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<short>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Int32:
-                        {
-                            var value = obtainable.GetValue<int>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<int>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Int64:
-                        {
-                            var value = obtainable.GetValue<long>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<long>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.SByte:
-                        {
-                            var value = obtainable.GetValue<sbyte>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<sbyte>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Single:
-                        {
-                            var value = obtainable.GetValue<float>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<float>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.String:
-                        {
-                            var value = obtainable.GetValue<string>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<string>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.UInt16:
-                        {
-                            var value = obtainable.GetValue<ushort>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<ushort>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.UInt32:
-                        {
-                            var value = obtainable.GetValue<uint>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<uint>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.UInt64:
-                        {
-                            var value = obtainable.GetValue<ulong>();
-                            SetTargetValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<ulong>();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Object:
+                    {
+                        Type valueType = _sourceProxy.Type;
+                        if (valueType == typeof(Vector2))
                         {
-                            Type valueType = sourceProxy.Type;
-                            if (valueType == typeof(Vector2))
-                            {
-                                var value = obtainable.GetValue<Vector2>();
-                                SetTargetValue(modifier, value);
-                            }
-                            else if (valueType == typeof(Vector3))
-                            {
-                                var value = obtainable.GetValue<Vector3>();
-                                SetTargetValue(modifier, value);
-                            }
-                            else if (valueType == typeof(Vector4))
-                            {
-                                var value = obtainable.GetValue<Vector4>();
-                                SetTargetValue(modifier, value);
-                            }
-                            else if (valueType == typeof(Color))
-                            {
-                                var value = obtainable.GetValue<Color>();
-                                SetTargetValue(modifier, value);
-                            }
-                            else if (valueType == typeof(Rect))
-                            {
-                                var value = obtainable.GetValue<Rect>();
-                                SetTargetValue(modifier, value);
-                            }
-                            else if (valueType == typeof(Quaternion))
-                            {
-                                var value = obtainable.GetValue<Quaternion>();
-                                SetTargetValue(modifier, value);
-                            }
-                            else if (valueType == typeof(TimeSpan))
-                            {
-                                var value = obtainable.GetValue<TimeSpan>();
-                                SetTargetValue(modifier, value);
-                            }
-                            else
-                            {
-                                var value = obtainable.GetValue();
-                                SetTargetValue(modifier, value);
-                            }
-                            break;
+                            var value = obtainable.GetValue<Vector2>();
+                            SetTargetValue(modifier, value);
                         }
-                    default:
+                        else if (valueType == typeof(Vector3))
+                        {
+                            var value = obtainable.GetValue<Vector3>();
+                            SetTargetValue(modifier, value);
+                        }
+                        else if (valueType == typeof(Vector4))
+                        {
+                            var value = obtainable.GetValue<Vector4>();
+                            SetTargetValue(modifier, value);
+                        }
+                        else if (valueType == typeof(Color))
+                        {
+                            var value = obtainable.GetValue<Color>();
+                            SetTargetValue(modifier, value);
+                        }
+                        else if (valueType == typeof(Rect))
+                        {
+                            var value = obtainable.GetValue<Rect>();
+                            SetTargetValue(modifier, value);
+                        }
+                        else if (valueType == typeof(Quaternion))
+                        {
+                            var value = obtainable.GetValue<Quaternion>();
+                            SetTargetValue(modifier, value);
+                        }
+                        else if (valueType == typeof(TimeSpan))
+                        {
+                            var value = obtainable.GetValue<TimeSpan>();
+                            SetTargetValue(modifier, value);
+                        }
+                        else
                         {
                             var value = obtainable.GetValue();
                             SetTargetValue(modifier, value);
-                            break;
                         }
+
+                        break;
+                    }
+                    default:
+                    {
+                        var value = obtainable.GetValue();
+                        SetTargetValue(modifier, value);
+                        break;
+                    }
                 }
             }
             catch (Exception e)
             {
                 Debug.LogWarning(
-                    $"An exception occurs when the target property is updated.Please check the binding \"{targetTypeName}{_targetDescription}\" in the view \"{GetViewName()}\".exception: {e}");
+                    $"An exception occurs when the target property is updated.Please check the binding \"{_targetTypeName}{_targetDescription}\" in the view \"{GetViewName()}\".exception: {e}");
             }
             finally
             {
-                isUpdatingTarget = false;
+                _isUpdatingTarget = false;
             }
         }
 
-        protected virtual void UpdateSourceFromTarget()
+        private void UpdateSourceFromTarget()
         {
             try
             {
-                if (isUpdatingTarget)
+                if (_isUpdatingTarget)
                     return;
 
-                isUpdatingSource = true;
+                _isUpdatingSource = true;
 
 
-                IObtainable obtainable = targetProxy as IObtainable;
+                IObtainable obtainable = _targetProxy as IObtainable;
                 if (obtainable == null)
                     return;
 
-                IModifiable modifier = sourceProxy as IModifiable;
+                IModifiable modifier = _sourceProxy as IModifiable;
                 if (modifier == null)
                     return;
 
-                TypeCode typeCode = targetProxy.TypeCode;
+                TypeCode typeCode = _targetProxy.TypeCode;
                 switch (typeCode)
                 {
                     case TypeCode.Boolean:
-                        {
-                            var value = obtainable.GetValue<bool>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<bool>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Byte:
-                        {
-                            var value = obtainable.GetValue<byte>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<byte>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Char:
-                        {
-                            var value = obtainable.GetValue<char>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<char>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.DateTime:
-                        {
-                            var value = obtainable.GetValue<DateTime>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<DateTime>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Decimal:
-                        {
-                            var value = obtainable.GetValue<decimal>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<decimal>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Double:
-                        {
-                            var value = obtainable.GetValue<double>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<double>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Int16:
-                        {
-                            var value = obtainable.GetValue<short>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<short>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Int32:
-                        {
-                            var value = obtainable.GetValue<int>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<int>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Int64:
-                        {
-                            var value = obtainable.GetValue<long>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<long>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.SByte:
-                        {
-                            var value = obtainable.GetValue<sbyte>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<sbyte>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Single:
-                        {
-                            var value = obtainable.GetValue<float>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<float>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.String:
-                        {
-                            var value = obtainable.GetValue<string>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<string>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.UInt16:
-                        {
-                            var value = obtainable.GetValue<ushort>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<ushort>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.UInt32:
-                        {
-                            var value = obtainable.GetValue<uint>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<uint>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.UInt64:
-                        {
-                            var value = obtainable.GetValue<ulong>();
-                            SetSourceValue(modifier, value);
-                            break;
-                        }
+                    {
+                        var value = obtainable.GetValue<ulong>();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                     case TypeCode.Object:
+                    {
+                        Type valueType = _targetProxy.Type;
+                        if (valueType == typeof(Vector2))
                         {
-                            Type valueType = targetProxy.Type;
-                            if (valueType == typeof(Vector2))
-                            {
-                                var value = obtainable.GetValue<Vector2>();
-                                SetSourceValue(modifier, value);
-                            }
-                            else if (valueType == typeof(Vector3))
-                            {
-                                var value = obtainable.GetValue<Vector3>();
-                                SetSourceValue(modifier, value);
-                            }
-                            else if (valueType == typeof(Vector4))
-                            {
-                                var value = obtainable.GetValue<Vector4>();
-                                SetSourceValue(modifier, value);
-                            }
-                            else if (valueType == typeof(Color))
-                            {
-                                var value = obtainable.GetValue<Color>();
-                                SetSourceValue(modifier, value);
-                            }
-                            else if (valueType == typeof(Rect))
-                            {
-                                var value = obtainable.GetValue<Rect>();
-                                SetSourceValue(modifier, value);
-                            }
-                            else if (valueType == typeof(Quaternion))
-                            {
-                                var value = obtainable.GetValue<Quaternion>();
-                                SetSourceValue(modifier, value);
-                            }
-                            else if (valueType == typeof(TimeSpan))
-                            {
-                                var value = obtainable.GetValue<TimeSpan>();
-                                SetSourceValue(modifier, value);
-                            }
-                            else
-                            {
-                                var value = obtainable.GetValue();
-                                SetSourceValue(modifier, value);
-                            }
-                            break;
+                            var value = obtainable.GetValue<Vector2>();
+                            SetSourceValue(modifier, value);
                         }
-                    default:
+                        else if (valueType == typeof(Vector3))
+                        {
+                            var value = obtainable.GetValue<Vector3>();
+                            SetSourceValue(modifier, value);
+                        }
+                        else if (valueType == typeof(Vector4))
+                        {
+                            var value = obtainable.GetValue<Vector4>();
+                            SetSourceValue(modifier, value);
+                        }
+                        else if (valueType == typeof(Color))
+                        {
+                            var value = obtainable.GetValue<Color>();
+                            SetSourceValue(modifier, value);
+                        }
+                        else if (valueType == typeof(Rect))
+                        {
+                            var value = obtainable.GetValue<Rect>();
+                            SetSourceValue(modifier, value);
+                        }
+                        else if (valueType == typeof(Quaternion))
+                        {
+                            var value = obtainable.GetValue<Quaternion>();
+                            SetSourceValue(modifier, value);
+                        }
+                        else if (valueType == typeof(TimeSpan))
+                        {
+                            var value = obtainable.GetValue<TimeSpan>();
+                            SetSourceValue(modifier, value);
+                        }
+                        else
                         {
                             var value = obtainable.GetValue();
                             SetSourceValue(modifier, value);
-                            break;
                         }
+
+                        break;
+                    }
+                    default:
+                    {
+                        var value = obtainable.GetValue();
+                        SetSourceValue(modifier, value);
+                        break;
+                    }
                 }
             }
             catch (Exception e)
             {
                 Debug.LogWarning(
-                    $"An exception occurs when the source property is updated.Please check the binding \"{targetTypeName}{_targetDescription}\" in the view \"{GetViewName()}\".exception: {e}");
+                    $"An exception occurs when the source property is updated.Please check the binding \"{_targetTypeName}{_targetDescription}\" in the view \"{GetViewName()}\".exception: {e}");
             }
             finally
             {
-                isUpdatingSource = false;
+                _isUpdatingSource = false;
             }
         }
 
-        protected void SetTargetValue<T>(IModifiable modifier, T value)
+        private void SetTargetValue<T>(IModifiable modifier, T value)
         {
-            if (converter == null && typeof(T) == targetProxy.Type)
+            if (_converter == null && typeof(T) == _targetProxy.Type)
             {
                 modifier.SetValue(value);
                 return;
             }
 
             object safeValue = value;
-            if (converter != null)
-                safeValue = converter.Convert(value);
+            if (_converter != null)
+                safeValue = _converter.Convert(value);
 
-            if (!typeof(UnityEventBase).IsAssignableFrom(targetProxy.Type))
-                safeValue = targetProxy.Type.ToSafe(safeValue);
+            if (!typeof(UnityEventBase).IsAssignableFrom(_targetProxy.Type))
+                safeValue = _targetProxy.Type.ToSafe(safeValue);
 
             modifier.SetValue(safeValue);
         }
 
         private void SetSourceValue<T>(IModifiable modifier, T value)
         {
-            if (converter == null && typeof(T) == sourceProxy.Type)
+            if (_converter == null && typeof(T) == _sourceProxy.Type)
             {
                 modifier.SetValue(value);
                 return;
             }
 
             object safeValue = value;
-            if (converter != null)
-                safeValue = converter.ConvertBack(safeValue);
+            if (_converter != null)
+                safeValue = _converter.ConvertBack(safeValue);
 
-            safeValue = sourceProxy.Type.ToSafe(safeValue);
+            safeValue = _sourceProxy.Type.ToSafe(safeValue);
 
             modifier.SetValue(safeValue);
         }
 
-        protected bool IsSubscribeSourceValueChanged(BindingMode bindingMode)
+        private bool IsSubscribeSourceValueChanged(BindingMode bindingMode)
         {
             switch (bindingMode)
             {
@@ -590,7 +597,7 @@ namespace Fusion.Mvvm
             }
         }
 
-        protected bool IsSubscribeTargetValueChanged(BindingMode bindingMode)
+        private bool IsSubscribeTargetValueChanged(BindingMode bindingMode)
         {
             switch (bindingMode)
             {
@@ -610,7 +617,7 @@ namespace Fusion.Mvvm
             }
         }
 
-        protected bool UpdateTargetOnFirstBind(BindingMode bindingMode)
+        private bool UpdateTargetOnFirstBind(BindingMode bindingMode)
         {
             switch (bindingMode)
             {
@@ -630,7 +637,7 @@ namespace Fusion.Mvvm
             }
         }
 
-        protected bool UpdateSourceOnFirstBind(BindingMode bindingMode)
+        private bool UpdateSourceOnFirstBind(BindingMode bindingMode)
         {
             switch (bindingMode)
             {
@@ -652,12 +659,12 @@ namespace Fusion.Mvvm
 
         protected override void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!_disposed)
             {
                 DisposeSourceProxy();
                 DisposeTargetProxy();
                 _targetDescription = null;
-                disposed = true;
+                _disposed = true;
                 base.Dispose(disposing);
             }
         }

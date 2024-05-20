@@ -66,7 +66,7 @@ namespace Fusion.Mvvm
 
         protected override void Awake()
         {
-            ApplicationContext context = Context.GetApplicationContext();
+            Context context = Context.GetGlobalContext();
             BindingServiceBundle bindingService = new BindingServiceBundle(context.GetContainer());
             bindingService.Start();
 
@@ -81,7 +81,7 @@ namespace Fusion.Mvvm
 
         protected override void Start()
         {
-            ApplicationContext context = Context.GetApplicationContext();
+            Context context = Context.GetGlobalContext();
             IDialogService dialogService = context.GetService<IDialogService>();
             DialogServiceExampleViewModel viewModel = new DialogServiceExampleViewModel(dialogService);
             this.SetDataContext(viewModel);

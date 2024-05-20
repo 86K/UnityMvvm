@@ -4,39 +4,35 @@ using UnityEngine;
 
 namespace Fusion.Mvvm
 {
-    // NOTE：从这个开始往后优化...
     public class StaticProxyPropertyInfo<T, TValue> : ProxyPropertyInfo
     {
-        private readonly Func<TValue> getter;
-        private readonly Action<TValue> setter;
+        private readonly Func<TValue> _getter;
+        private readonly Action<TValue> _setter;
 
+        /* 构造函数在ProxyType中创建实例时使用 */
+        
         public StaticProxyPropertyInfo(PropertyInfo propertyInfo) : base(propertyInfo)
         {
-            if (!(typeof(TValue) == _propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (propertyInfo.DeclaringType != null && (!(typeof(TValue) == _propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The property types do not match!");
 
             if (!IsStatic)
                 throw new ArgumentException($"The property \"{propertyInfo.DeclaringType}.{Name}\" isn't static.");
 
-            getter = MakeGetter(propertyInfo);
-            setter = MakeSetter(propertyInfo);
-        }
-
-        public StaticProxyPropertyInfo(string propertyName, Func<TValue> getter, Action<TValue> setter) : this(typeof(T).GetProperty(propertyName),
-            getter, setter)
-        {
+            _getter = MakeGetter(propertyInfo);
+            _setter = MakeSetter(propertyInfo);
         }
 
         public StaticProxyPropertyInfo(PropertyInfo propertyInfo, Func<TValue> getter, Action<TValue> setter) : base(propertyInfo)
         {
-            if (!(typeof(TValue) == _propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T)))
+            if (propertyInfo.DeclaringType != null && (!(typeof(TValue) == _propertyInfo.PropertyType) || !propertyInfo.DeclaringType.IsAssignableFrom(typeof(T))))
                 throw new ArgumentException("The property types do not match!");
 
             if (!IsStatic)
                 throw new ArgumentException($"The property \"{propertyInfo.DeclaringType}.{Name}\" isn't static.");
 
-            this.getter = getter;
-            this.setter = setter;
+            _getter = getter;
+            _setter = setter;
         }
 
         public override Type DeclaringType => typeof(T);
@@ -83,25 +79,25 @@ namespace Fusion.Mvvm
 
         public TValue GetValue(T target)
         {
-            if (getter != null)
-                return getter();
+            if (_getter != null)
+                return _getter();
 
             return (TValue)base.GetValue(null);
         }
 
         public override object GetValue(object target)
         {
-            if (getter != null)
-                return getter();
+            if (_getter != null)
+                return _getter();
 
             return base.GetValue(target);
         }
 
-        public void SetValue(T target, TValue value)
+        private void SetValue(T target, TValue value)
         {
-            if (setter != null)
+            if (_setter != null)
             {
-                setter(value);
+                _setter(value);
                 return;
             }
 
@@ -115,9 +111,9 @@ namespace Fusion.Mvvm
 
         public override void SetValue(object target, object value)
         {
-            if (setter != null)
+            if (_setter != null)
             {
-                setter((TValue)value);
+                _setter((TValue)value);
                 return;
             }
 

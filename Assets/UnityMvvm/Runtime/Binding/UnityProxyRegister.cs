@@ -1,11 +1,14 @@
 using System;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Fusion.Mvvm
 {
-    public class UnityProxyRegister
+    /// <summary>
+    /// NOTE：这个是否可以去掉？
+    /// 如果屏蔽掉，则会影响绑定图片的enable？
+    /// </summary>
+    public static class UnityProxyRegister
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void Initialize()
@@ -39,8 +42,8 @@ namespace Fusion.Mvvm
             Register<GameObject, int>("layer", t => t.layer, (t, v) => t.layer = v);
             Register<GameObject, string>("tag", t => t.tag, (t, v) => t.tag = v);
 
-            Register<Behaviour, bool>("enabled", t => t.enabled, (t, v) => t.enabled = v);
-            Register<Behaviour, bool>("isActiveAndEnabled", t => t.isActiveAndEnabled, null);
+            // Register<Behaviour, bool>("enabled", t => t.enabled, (t, v) => t.enabled = v);
+            // Register<Behaviour, bool>("isActiveAndEnabled", t => t.isActiveAndEnabled, null);
 
             Register<Component, string>("tag", t => t.tag, (t, v) => t.tag = v);
 
@@ -105,14 +108,14 @@ namespace Fusion.Mvvm
         static void Register<T, TValue>(string name, Func<T, TValue> getter, Action<T, TValue> setter)
         {
             var propertyInfo = typeof(T).GetProperty(name);
-            if (propertyInfo is PropertyInfo)
+            if (propertyInfo != null)
             {
                 ProxyFactory.Default.Register(new ProxyPropertyInfo<T, TValue>(name, getter, setter));
                 return;
             }
 
             var fieldInfo = typeof(T).GetField(name);
-            if (fieldInfo is FieldInfo)
+            if (fieldInfo != null)
             {
                 ProxyFactory.Default.Register(new ProxyFieldInfo<T, TValue>(name, getter, setter));
                 return;

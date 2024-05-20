@@ -13,9 +13,9 @@ namespace Fusion.Mvvm
         private IPathParser _pathParser;
         private IConverterRegistry _converterRegistry;
 
-        protected IPathParser PathParser => _pathParser ??= Context.GetApplicationContext().GetService<IPathParser>();
+        protected IPathParser PathParser => _pathParser ??= Context.GetGlobalContext().GetService<IPathParser>();
 
-        private IConverterRegistry ConverterRegistry => _converterRegistry ??= Context.GetApplicationContext().GetService<IConverterRegistry>();
+        private IConverterRegistry ConverterRegistry => _converterRegistry ??= Context.GetGlobalContext().GetService<IConverterRegistry>();
         
         protected BindingBuilderBase(IBindingContext context, object target)
         {

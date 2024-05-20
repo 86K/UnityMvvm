@@ -1,12 +1,7 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
 {
-    /// <summary>
-    /// 
-    /// </summary>
 	public interface ICommand
 	{
 		/// <summary>
@@ -27,11 +22,8 @@ namespace Fusion.Mvvm
 		/// <param name="parameter">Parameter.</param>
 		void Execute (object parameter);
 	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	public interface ICommand<T> : ICommand
+	
+	public interface ICommand<in T> : ICommand
 	{
 		/// <summary>
 		/// Determines whether this instance can execute the specified parameter.

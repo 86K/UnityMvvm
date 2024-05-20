@@ -37,8 +37,6 @@ namespace Fusion.Mvvm
             subscriptionInUIsThread = messenger.Subscribe<TestMessage>(OnMessageInUIThread).ObserveOn(SynchronizationContext.Current);
 
             
-
-            
 #if UNITY_WEBGL && !UNITY_EDITOR
             this.messenger.Publish(new TestMessage(this, "This is a test."));
 #else
@@ -52,11 +50,13 @@ namespace Fusion.Mvvm
         protected void OnMessage(TestMessage message)
         {
             Debug.LogFormat("ThreadID:{0} Received:{1}", Thread.CurrentThread.ManagedThreadId, message.Content);
+            Debug.Log($"{UISynchronizationContext.InThread}");
         }
 
         protected void OnMessageInUIThread(TestMessage message)
         {
             Debug.LogFormat("ThreadID:{0} Received:{1}", Thread.CurrentThread.ManagedThreadId, message.Content);
+            Debug.Log($"{UISynchronizationContext.InThread}");
         }
 
         void OnDestroy()

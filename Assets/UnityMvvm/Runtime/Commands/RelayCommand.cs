@@ -1,13 +1,11 @@
-
-
 using System;
 
 namespace Fusion.Mvvm
 {
     public class RelayCommand : CommandBase
     {
-        private readonly Action execute;
-        private readonly Func<bool> canExecute;
+        private readonly Action _execute;
+        private readonly Func<bool> _canExecute;
 
         public RelayCommand(Action execute) : this(execute, null)
         {
@@ -22,28 +20,28 @@ namespace Fusion.Mvvm
             if (execute == null)
                 throw new ArgumentNullException("execute");
 
-            this.execute = keepStrongRef ? execute : execute.AsWeak();
+            this._execute = keepStrongRef ? execute : execute.AsWeak();
 
             if (canExecute != null)
-                this.canExecute = keepStrongRef ? canExecute : canExecute.AsWeak();
+                this._canExecute = keepStrongRef ? canExecute : canExecute.AsWeak();
         }
 
         public override bool CanExecute(object parameter)
         {
-            return canExecute == null || canExecute();
+            return _canExecute == null || _canExecute();
         }
 
         public override void Execute(object parameter)
         {
-            if (CanExecute(parameter) && execute != null)
-                execute();
+            if (CanExecute(parameter) && _execute != null)
+                _execute();
         }
     }
 
     public class RelayCommand<T> : CommandBase, ICommand<T>
     {
-        private readonly Action<T> execute;
-        private readonly Func<bool> canExecute;
+        private readonly Action<T> _execute;
+        private readonly Func<bool> _canExecute;
 
         public RelayCommand(Action<T> execute) : this(execute, null)
         {
@@ -58,31 +56,31 @@ namespace Fusion.Mvvm
             if (execute == null)
                 throw new ArgumentNullException("execute");
 
-            this.execute = keepStrongRef ? execute : execute.AsWeak();
+            this._execute = keepStrongRef ? execute : execute.AsWeak();
 
             if (canExecute != null)
-                this.canExecute = keepStrongRef ? canExecute : canExecute.AsWeak();
+                this._canExecute = keepStrongRef ? canExecute : canExecute.AsWeak();
         }
 
         public override bool CanExecute(object parameter)
         {
-            return canExecute == null || canExecute();
+            return _canExecute == null || _canExecute();
         }
 
         public bool CanExecute(T parameter)
         {
-            return canExecute == null || canExecute();
+            return _canExecute == null || _canExecute();
         }
 
         public override void Execute(object parameter)
         {
-            if (CanExecute(parameter) && execute != null)
-                execute((T)Convert.ChangeType(parameter, typeof(T)));
+            if (CanExecute(parameter) && _execute != null)
+                _execute((T)Convert.ChangeType(parameter, typeof(T)));
         }
 
         public void Execute(T parameter)
         {
-            execute(parameter);
+            _execute(parameter);
         }
     }
 }

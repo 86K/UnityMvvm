@@ -8,7 +8,7 @@ namespace Fusion.Mvvm
 {
     public class Launcher : MonoBehaviour
     {
-        private ApplicationContext context;
+        private Context context;
         ISubscription<WindowStateEventArgs> subscription;
         void Awake()
         {
@@ -16,7 +16,7 @@ namespace Fusion.Mvvm
             if (windowManager == null)
                 throw new NotFoundException("Not found the GlobalWindowManager.");
 
-            context = Context.GetApplicationContext();
+            context = Context.GetGlobalContext();
 
             IServiceContainer container = context.GetContainer();
 

@@ -18,7 +18,7 @@ namespace Fusion.Mvvm
 
         protected override void OnCreate(IBundle bundle)
         {
-            viewLocator = Context.GetApplicationContext().GetService<IUIViewLocator>();
+            viewLocator = Context.GetGlobalContext().GetService<IUIViewLocator>();
             loginWindowInteractionAction = new AsyncWindowInteractionAction("UI/Logins/Login", viewLocator, WindowManager);
             sceneInteractionAction = new AsynSceneInteractionAction("Prefabs/Cube");
             viewModel = new StartupViewModel();

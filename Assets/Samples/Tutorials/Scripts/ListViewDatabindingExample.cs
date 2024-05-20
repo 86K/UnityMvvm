@@ -28,7 +28,7 @@ namespace Fusion.Mvvm
 
         void Awake()
         {
-            ApplicationContext context = Context.GetApplicationContext();
+            Context context = Context.GetGlobalContext();
             BindingServiceBundle bindingService = new BindingServiceBundle(context.GetContainer());
             bindingService.Start();
 

@@ -1,13 +1,7 @@
-
-
 using System;
 using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
-
-#if NETFX_CORE
-using System.Reflection;
-#endif
 
 using NotifyCollectionChangedEventHandler = System.Collections.Specialized.NotifyCollectionChangedEventHandler;
 using INotifyCollectionChanged = System.Collections.Specialized.INotifyCollectionChanged;
@@ -22,35 +16,58 @@ namespace Fusion.Mvvm
     [Serializable]
     public class ObservableList<T> : IList<T>, IList, INotifyCollectionChanged, INotifyPropertyChanged
     {
-        private static readonly PropertyChangedEventArgs CountEventArgs = new PropertyChangedEventArgs("Count");
-        private static readonly PropertyChangedEventArgs IndexerEventArgs = new PropertyChangedEventArgs("Item[]");
+        private readonly PropertyChangedEventArgs _countEventArgs = new PropertyChangedEventArgs("Count");
+        private readonly PropertyChangedEventArgs _indexerEventArgs = new PropertyChangedEventArgs("Item[]");
 
-        private readonly object propertyChangedLock = new object();
-        private readonly object collectionChangedLock = new object();
-        private PropertyChangedEventHandler propertyChanged;
-        private NotifyCollectionChangedEventHandler collectionChanged;
+        private readonly object _propertyChangedLock = new object();
+        private readonly object _collectionChangedLock = new object();
+        private PropertyChangedEventHandler _propertyChanged;
+        private NotifyCollectionChangedEventHandler _collectionChanged;
 
-        private SimpleMonitor monitor = new SimpleMonitor();
-        private List<T> items;
+        private SimpleMonitor _monitor = new SimpleMonitor();
+        private List<T> _items;
 
-        [NonSerialized]
-        private Object syncRoot;
+        [NonSerialized] private Object _syncRoot;
 
         public event PropertyChangedEventHandler PropertyChanged
         {
-            add { lock (propertyChangedLock) { propertyChanged += value; } }
-            remove { lock (propertyChangedLock) { propertyChanged -= value; } }
+            add
+            {
+                lock (_propertyChangedLock)
+                {
+                    _propertyChanged += value;
+                }
+            }
+            remove
+            {
+                lock (_propertyChangedLock)
+                {
+                    _propertyChanged -= value;
+                }
+            }
         }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged
         {
-            add { lock (collectionChangedLock) { collectionChanged += value; } }
-            remove { lock (collectionChangedLock) { collectionChanged -= value; } }
+            add
+            {
+                lock (_collectionChangedLock)
+                {
+                    _collectionChanged += value;
+                }
+            }
+            remove
+            {
+                lock (_collectionChangedLock)
+                {
+                    _collectionChanged -= value;
+                }
+            }
         }
 
         public ObservableList()
         {
-            items = new List<T>();
+            _items = new List<T>();
         }
 
         public ObservableList(List<T> list)
@@ -58,26 +75,26 @@ namespace Fusion.Mvvm
             if (list == null)
                 throw new ArgumentNullException("list");
 
-            items = new List<T>();
+            _items = new List<T>();
             foreach (T item in list)
             {
-                items.Add(item);
+                _items.Add(item);
             }
         }
 
-        public int Count => items.Count;
+        public int Count => _items.Count;
 
-        protected IList<T> Items => items;
+        protected IList<T> Items => _items;
 
         public T this[int index]
         {
-            get => items[index];
+            get => _items[index];
             set
             {
                 if (IsReadOnly)
                     throw new NotSupportedException("ReadOnlyCollection");
 
-                if (index < 0 || index >= items.Count)
+                if (index < 0 || index >= _items.Count)
                     throw new ArgumentOutOfRangeException($"ArgumentOutOfRangeException:{index}");
 
                 SetItem(index, value);
@@ -89,7 +106,7 @@ namespace Fusion.Mvvm
             if (IsReadOnly)
                 throw new NotSupportedException("ReadOnlyCollection");
 
-            int index = items.Count;
+            int index = _items.Count;
             InsertItem(index, item);
         }
 
@@ -103,17 +120,17 @@ namespace Fusion.Mvvm
 
         public void CopyTo(T[] array, int index)
         {
-            items.CopyTo(array, index);
+            _items.CopyTo(array, index);
         }
 
         public bool Contains(T item)
         {
-            return items.Contains(item);
+            return _items.Contains(item);
         }
 
         public int IndexOf(T item)
         {
-            return items.IndexOf(item);
+            return _items.IndexOf(item);
         }
 
         public void Insert(int index, T item)
@@ -121,7 +138,7 @@ namespace Fusion.Mvvm
             if (IsReadOnly)
                 throw new NotSupportedException("ReadOnlyCollection");
 
-            if (index < 0 || index > items.Count)
+            if (index < 0 || index > _items.Count)
                 throw new ArgumentOutOfRangeException($"ArgumentOutOfRangeException:{index}");
 
             InsertItem(index, item);
@@ -132,7 +149,7 @@ namespace Fusion.Mvvm
             if (IsReadOnly)
                 throw new NotSupportedException("ReadOnlyCollection");
 
-            int index = items.IndexOf(item);
+            int index = _items.IndexOf(item);
             if (index < 0)
                 return false;
             RemoveItem(index);
@@ -144,7 +161,7 @@ namespace Fusion.Mvvm
             if (IsReadOnly)
                 throw new NotSupportedException("ReadOnlyCollection");
 
-            if (index < 0 || index >= items.Count)
+            if (index < 0 || index >= _items.Count)
                 throw new ArgumentOutOfRangeException($"ArgumentOutOfRangeException:{index}");
 
             RemoveItem(index);
@@ -160,7 +177,7 @@ namespace Fusion.Mvvm
             if (IsReadOnly)
                 throw new NotSupportedException("ReadOnlyCollection");
 
-            int index = items.Count;
+            int index = _items.Count;
             InsertItem(index, collection);
         }
 
@@ -169,7 +186,7 @@ namespace Fusion.Mvvm
             if (IsReadOnly)
                 throw new NotSupportedException("ReadOnlyCollection");
 
-            if (index < 0 || index > items.Count)
+            if (index < 0 || index > _items.Count)
                 throw new ArgumentOutOfRangeException($"ArgumentOutOfRangeException:{index}");
 
             InsertItem(index, collection);
@@ -180,7 +197,7 @@ namespace Fusion.Mvvm
             if (IsReadOnly)
                 throw new NotSupportedException("ReadOnlyCollection");
 
-            if (index < 0 || index >= items.Count)
+            if (index < 0 || index >= _items.Count)
                 throw new ArgumentOutOfRangeException($"ArgumentOutOfRangeException:{index}");
 
             RemoveItem(index, count);
@@ -188,7 +205,7 @@ namespace Fusion.Mvvm
 
         public List<T>.Enumerator GetEnumerator()
         {
-            return items.GetEnumerator();
+            return _items.GetEnumerator();
         }
 
         bool IsReadOnly => Items.IsReadOnly;
@@ -197,12 +214,12 @@ namespace Fusion.Mvvm
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
-            return items.GetEnumerator();
+            return _items.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)items).GetEnumerator();
+            return ((IEnumerable)_items).GetEnumerator();
         }
 
         bool ICollection.IsSynchronized => false;
@@ -211,22 +228,23 @@ namespace Fusion.Mvvm
         {
             get
             {
-                if (syncRoot == null)
+                if (_syncRoot == null)
                 {
-                    if (items is ICollection c)
+                    if (_items is ICollection c)
                     {
-                        syncRoot = c.SyncRoot;
+                        _syncRoot = c.SyncRoot;
                     }
                     else
                     {
 #if UNITY_WEBGL
                         this.syncRoot = new object();
 #else
-                        Interlocked.CompareExchange(ref syncRoot, new object(), null);
+                        Interlocked.CompareExchange(ref _syncRoot, new object(), null);
 #endif
                     }
                 }
-                return syncRoot;
+
+                return _syncRoot;
             }
         }
 
@@ -249,24 +267,24 @@ namespace Fusion.Mvvm
 
             if (array is T[] tArray)
             {
-                items.CopyTo(tArray, index);
+                _items.CopyTo(tArray, index);
             }
             else
             {
                 Type targetType = array.GetType().GetElementType();
                 Type sourceType = typeof(T);
-                if (!(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType)))
+                if (targetType != null && !(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType)))
                     throw new ArgumentException("InvalidArrayType");
 
                 if (!(array is object[] objects))
                     throw new ArgumentException("InvalidArrayType");
 
-                int count = items.Count;
+                int count = _items.Count;
                 try
                 {
                     for (int i = 0; i < count; i++)
                     {
-                        objects[index++] = items[i];
+                        objects[index++] = _items[i];
                     }
                 }
                 catch (ArrayTypeMismatchException)
@@ -278,10 +296,10 @@ namespace Fusion.Mvvm
 
         object IList.this[int index]
         {
-            get => items[index];
+            get => _items[index];
             set
             {
-                if (value == null && !(default(T) == null))
+                if (value == null && default(T) != null)
                     throw new ArgumentNullException("value");
 
                 try
@@ -301,10 +319,11 @@ namespace Fusion.Mvvm
         {
             get
             {
-                if (items is IList list)
+                if (_items is IList list)
                 {
                     return list.IsFixedSize;
                 }
+
                 return IsReadOnly;
             }
         }
@@ -314,7 +333,7 @@ namespace Fusion.Mvvm
             if (IsReadOnly)
                 throw new NotSupportedException("ReadOnlyCollection");
 
-            if (value == null && !(default(T) == null))
+            if (value == null && default(T) != null)
                 throw new ArgumentNullException("value");
 
             try
@@ -335,6 +354,7 @@ namespace Fusion.Mvvm
             {
                 return Contains((T)value);
             }
+
             return false;
         }
 
@@ -344,6 +364,7 @@ namespace Fusion.Mvvm
             {
                 return IndexOf((T)value);
             }
+
             return -1;
         }
 
@@ -352,7 +373,7 @@ namespace Fusion.Mvvm
             if (IsReadOnly)
                 throw new NotSupportedException("ReadOnlyCollection");
 
-            if (value == null && !(default(T) == null))
+            if (value == null && default(T) != null)
                 throw new ArgumentNullException("value");
 
             try
@@ -363,7 +384,6 @@ namespace Fusion.Mvvm
             {
                 throw new ArgumentException("", e);
             }
-
         }
 
         void IList.Remove(object value)
@@ -380,9 +400,9 @@ namespace Fusion.Mvvm
         protected virtual void ClearItems()
         {
             CheckReentrancy();
-            items.Clear();
-            OnPropertyChanged(CountEventArgs);
-            OnPropertyChanged(IndexerEventArgs);
+            _items.Clear();
+            OnPropertyChanged(_countEventArgs);
+            OnPropertyChanged(_indexerEventArgs);
             OnCollectionReset();
         }
 
@@ -391,10 +411,10 @@ namespace Fusion.Mvvm
             CheckReentrancy();
             T removedItem = this[index];
 
-            items.RemoveAt(index);
+            _items.RemoveAt(index);
 
-            OnPropertyChanged(CountEventArgs);
-            OnPropertyChanged(IndexerEventArgs);
+            OnPropertyChanged(_countEventArgs);
+            OnPropertyChanged(_indexerEventArgs);
             OnCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem, index);
         }
 
@@ -402,12 +422,12 @@ namespace Fusion.Mvvm
         {
             CheckReentrancy();
 
-            List<T> list = items as List<T>;
+            List<T> list = _items as List<T>;
             List<T> changedItems = list.GetRange(index, count);
             list.RemoveRange(index, count);
 
-            OnPropertyChanged(CountEventArgs);
-            OnPropertyChanged(IndexerEventArgs);
+            OnPropertyChanged(_countEventArgs);
+            OnPropertyChanged(_indexerEventArgs);
             OnCollectionChanged(NotifyCollectionChangedAction.Remove, changedItems, index);
         }
 
@@ -415,10 +435,10 @@ namespace Fusion.Mvvm
         {
             CheckReentrancy();
 
-            items.Insert(index, item);
+            _items.Insert(index, item);
 
-            OnPropertyChanged(CountEventArgs);
-            OnPropertyChanged(IndexerEventArgs);
+            OnPropertyChanged(_countEventArgs);
+            OnPropertyChanged(_indexerEventArgs);
             OnCollectionChanged(NotifyCollectionChangedAction.Add, item, index);
         }
 
@@ -426,10 +446,10 @@ namespace Fusion.Mvvm
         {
             CheckReentrancy();
 
-            (items as List<T>).InsertRange(index, collection);
+            _items.InsertRange(index, collection);
 
-            OnPropertyChanged(CountEventArgs);
-            OnPropertyChanged(IndexerEventArgs);
+            OnPropertyChanged(_countEventArgs);
+            OnPropertyChanged(_indexerEventArgs);
             OnCollectionChanged(NotifyCollectionChangedAction.Add, ToList(collection), index);
         }
 
@@ -438,9 +458,9 @@ namespace Fusion.Mvvm
             CheckReentrancy();
             T originalItem = this[index];
 
-            items[index] = item;
+            _items[index] = item;
 
-            OnPropertyChanged(IndexerEventArgs);
+            OnPropertyChanged(_indexerEventArgs);
             OnCollectionChanged(NotifyCollectionChangedAction.Replace, originalItem, item, index);
         }
 
@@ -450,44 +470,44 @@ namespace Fusion.Mvvm
 
             T removedItem = this[oldIndex];
 
-            items.RemoveAt(oldIndex);
-            items.Insert(newIndex, removedItem);
+            _items.RemoveAt(oldIndex);
+            _items.Insert(newIndex, removedItem);
 
-            OnPropertyChanged(IndexerEventArgs);
+            OnPropertyChanged(_indexerEventArgs);
             OnCollectionChanged(NotifyCollectionChangedAction.Move, removedItem, newIndex, oldIndex);
         }
 
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            if (propertyChanged != null)
+            if (_propertyChanged != null)
             {
-                propertyChanged(this, e);
+                _propertyChanged(this, e);
             }
         }
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (collectionChanged != null)
+            if (_collectionChanged != null)
             {
                 using (BlockReentrancy())
                 {
-                    collectionChanged(this, e);
+                    _collectionChanged(this, e);
                 }
             }
         }
 
         protected IDisposable BlockReentrancy()
         {
-            monitor.Enter();
-            return monitor;
+            _monitor.Enter();
+            return _monitor;
         }
 
         protected void CheckReentrancy()
         {
-            if (monitor.Busy)
+            if (_monitor.Busy)
             {
-                if ((collectionChanged != null) && (collectionChanged.GetInvocationList().Length > 1))
+                if ((_collectionChanged != null) && (_collectionChanged.GetInvocationList().Length > 1))
                     throw new InvalidOperationException();
             }
         }
@@ -504,36 +524,36 @@ namespace Fusion.Mvvm
 
         private static bool IsCompatibleObject(object value)
         {
-            return ((value is T) || (value == null && default(T) == null));
+            return value is T || (value == null && default(T) == null);
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index)
         {
-            if (collectionChanged != null)
+            if (_collectionChanged != null)
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, item, index));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, IList changedItems, int index)
         {
-            if (collectionChanged != null)
+            if (_collectionChanged != null)
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItems, index));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index, int oldIndex)
         {
-            if (collectionChanged != null)
+            if (_collectionChanged != null)
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, item, index, oldIndex));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, object oldItem, object newItem, int index)
         {
-            if (collectionChanged != null)
+            if (_collectionChanged != null)
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem, index));
         }
 
         private void OnCollectionReset()
         {
-            if (collectionChanged != null)
+            if (_collectionChanged != null)
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 

@@ -1,10 +1,7 @@
-
-
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 
@@ -13,45 +10,48 @@ namespace Fusion.Mvvm
     [Serializable]
     public abstract class ObservableObject : INotifyPropertyChanged
     {
-        private static readonly PropertyChangedEventArgs NULL_EVENT_ARGS = new PropertyChangedEventArgs(null);
-        private static readonly Dictionary<string, PropertyChangedEventArgs> PROPERTY_EVENT_ARGS = new Dictionary<string, PropertyChangedEventArgs>();
+        private static readonly Dictionary<string, PropertyChangedEventArgs> _PropertyChangedEventArgs = new Dictionary<string, PropertyChangedEventArgs>();
 
         private static PropertyChangedEventArgs GetPropertyChangedEventArgs(string propertyName)
         {
             if (propertyName == null)
-                return NULL_EVENT_ARGS;
+                return new PropertyChangedEventArgs(null);
 
-            if (PROPERTY_EVENT_ARGS.TryGetValue(propertyName, out var eventArgs))
+            if (_PropertyChangedEventArgs.TryGetValue(propertyName, out var eventArgs))
                 return eventArgs;
 
             eventArgs = new PropertyChangedEventArgs(propertyName);
-            PROPERTY_EVENT_ARGS[propertyName] = eventArgs;
+            _PropertyChangedEventArgs[propertyName] = eventArgs;
             return eventArgs;
         }
 
         private readonly object _lock = new object();
-        private PropertyChangedEventHandler propertyChanged;
+        private PropertyChangedEventHandler _propertyChanged;
+
         public event PropertyChangedEventHandler PropertyChanged
         {
-            add { lock (_lock) { propertyChanged += value; } }
-            remove { lock (_lock) { propertyChanged -= value; } }
+            add
+            {
+                lock (_lock)
+                {
+                    _propertyChanged += value;
+                }
+            }
+            remove
+            {
+                lock (_lock)
+                {
+                    _propertyChanged -= value;
+                }
+            }
         }
-
-        //[Conditional("DEBUG")]
-        //protected void VerifyPropertyName(string propertyName)
-        //{
-        //    var type = this.GetType();
-        //    if (!string.IsNullOrEmpty(propertyName) && type.GetProperty(propertyName) == null)
-        //        throw new ArgumentException("Property not found", propertyName);
-        //}
-
+        
         /// <summary>
         /// Raises the PropertyChanging event.
         /// </summary>
         /// <param name="propertyName">Property name.</param>
         protected virtual void RaisePropertyChanged(string propertyName = null)
         {
-            //RaisePropertyChanged(new PropertyChangedEventArgs(propertyName));
             RaisePropertyChanged(GetPropertyChangedEventArgs(propertyName));
         }
 
@@ -63,10 +63,8 @@ namespace Fusion.Mvvm
         {
             try
             {
-                //VerifyPropertyName(eventArgs.PropertyName);
-
-                if (propertyChanged != null)
-                    propertyChanged(this, eventArgs);
+                if (_propertyChanged != null)
+                    _propertyChanged(this, eventArgs);
             }
             catch (Exception e)
             {
@@ -84,10 +82,8 @@ namespace Fusion.Mvvm
             {
                 try
                 {
-                    //VerifyPropertyName(args.PropertyName);
-
-                    if (propertyChanged != null)
-                        propertyChanged(this, args);
+                    if (_propertyChanged != null)
+                        _propertyChanged(this, args);
                 }
                 catch (Exception e)
                 {
@@ -110,14 +106,7 @@ namespace Fusion.Mvvm
 
             return property.Name;
         }
-
-        [Conditional("DEBUG")]
-        protected void VerifyPropertyType(Type type)
-        {
-            if (type.IsValueType)
-                UnityEngine.Debug.Log("Please use Set(field,newValue) instead of Set<T>(field,newValue) to avoid value types being boxed.");
-        }
-
+        
         /// <summary>
         /// Set the specified propertyExpression, field and newValue.
         /// </summary>
@@ -127,8 +116,6 @@ namespace Fusion.Mvvm
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         protected bool Set<T>(ref T field, T newValue, Expression<Func<T>> propertyExpression)
         {
-            //VerifyPropertyType(typeof(T));
-            //if (object.Equals(field, newValue))
             if (EqualityComparer<T>.Default.Equals(field, newValue))
                 return false;
 
@@ -148,8 +135,6 @@ namespace Fusion.Mvvm
         /// <returns></returns>
         protected bool Set<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
         {
-            //VerifyPropertyType(typeof(T));
-            //if (object.Equals(field, newValue))
             if (EqualityComparer<T>.Default.Equals(field, newValue))
                 return false;
 

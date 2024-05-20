@@ -1,5 +1,3 @@
-
-
 using System.Collections;
 using System.Collections.Generic;
 using System;
@@ -9,8 +7,8 @@ namespace Fusion.Mvvm
 {
     public class Context : IDisposable
     {
-        private static ApplicationContext context;
-        private static Dictionary<string, Context> contexts;
+        private static Context _applicationContext;
+        private static Dictionary<string, Context> _contexts;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnInitialize()
@@ -19,36 +17,38 @@ namespace Fusion.Mvvm
 #if UNITY_2019_3_OR_NEWER //&& UNITY_EDITOR
             try
             {
-                if (context != null)
-                    context.Dispose();
+                if (_applicationContext != null)
+                    _applicationContext.Dispose();
 
-                if (contexts != null)
+                if (_contexts != null)
                 {
-                    foreach (var context in contexts.Values)
+                    foreach (var context in _contexts.Values)
                         context.Dispose();
-                    contexts.Clear();
+                    _contexts.Clear();
                 }
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                // ignored
+            }
 #endif
 
-            context = new ApplicationContext();
-            contexts = new Dictionary<string, Context>();
+            _applicationContext = new Context();
+            _contexts = new Dictionary<string, Context>();
         }
 
-        public static ApplicationContext GetApplicationContext()
+        /// <summary>
+        /// 获取全局上下文。
+        /// </summary>
+        /// <returns></returns>
+        public static Context GetGlobalContext()
         {
-            return context;
+            return _applicationContext;
         }
 
-        public static void SetApplicationContext(ApplicationContext context)
+        private static Context GetContext(string key)
         {
-            Context.context = context;
-        }
-
-        public static Context GetContext(string key)
-        {
-            contexts.TryGetValue(key, out var context);
+            _contexts.TryGetValue(key, out var context);
             return context;
         }
 
@@ -59,12 +59,12 @@ namespace Fusion.Mvvm
 
         public static void AddContext(string key, Context context)
         {
-            contexts.Add(key, context);
+            _contexts.Add(key, context);
         }
 
         public static void RemoveContext(string key)
         {
-            contexts.Remove(key);
+            _contexts.Remove(key);
         }
 
         private readonly bool innerContainer;
@@ -76,7 +76,7 @@ namespace Fusion.Mvvm
         {
         }
 
-        public Context(IServiceContainer container, Context contextBase)
+        protected Context(IServiceContainer container, Context contextBase)
         {
             attributes = new Dictionary<string, object>();
             this.contextBase = contextBase;
@@ -88,7 +88,7 @@ namespace Fusion.Mvvm
             }
         }
 
-        public virtual bool Contains(string name, bool cascade = true)
+        public bool Contains(string name, bool cascade = true)
         {
             if (attributes.ContainsKey(name))
                 return true;
@@ -99,12 +99,12 @@ namespace Fusion.Mvvm
             return false;
         }
 
-        public virtual object Get(string name, bool cascade = true)
+        public object Get(string name, bool cascade = true)
         {
             return Get<object>(name, cascade);
         }
 
-        public virtual T Get<T>(string name, bool cascade = true)
+        public T Get<T>(string name, bool cascade = true)
         {
             if (attributes.TryGetValue(name, out var v))
                 return (T)v;
@@ -115,22 +115,22 @@ namespace Fusion.Mvvm
             return default;
         }
 
-        public virtual void Set(string name, object value)
+        public void Set(string name, object value)
         {
             Set<object>(name, value);
         }
 
-        public virtual void Set<T>(string name, T value)
+        public void Set<T>(string name, T value)
         {
             attributes[name] = value;
         }
 
-        public virtual object Remove(string name)
+        public object Remove(string name)
         {
             return Remove<object>(name);
         }
 
-        public virtual T Remove<T>(string name)
+        public T Remove<T>(string name)
         {
             if (!attributes.ContainsKey(name))
                 return default;
@@ -140,41 +140,17 @@ namespace Fusion.Mvvm
             return (T)v;
         }
 
-        public virtual IEnumerator GetEnumerator()
+        public IEnumerator GetEnumerator()
         {
             return attributes.GetEnumerator();
         }
 
-        public virtual IServiceContainer GetContainer()
+        public IServiceContainer GetContainer()
         {
             return container;
         }
 
-        public virtual object GetService(Type type)
-        {
-            object result = container.Resolve(type);
-            if (result != null)
-                return result;
-
-            if (contextBase != null)
-                return contextBase.GetService(type);
-
-            return null;
-        }
-
-        public virtual object GetService(string name)
-        {
-            object result = container.Resolve(name);
-            if (result != null)
-                return result;
-
-            if (contextBase != null)
-                return contextBase.GetService(name);
-
-            return null;
-        }
-
-        public virtual T GetService<T>()
+        public T GetService<T>()
         {
             T result = container.Resolve<T>();
             if (result != null)
@@ -186,7 +162,7 @@ namespace Fusion.Mvvm
             return default;
         }
 
-        public virtual T GetService<T>(string name)
+        public T GetService<T>(string name)
         {
             T result = container.Resolve<T>(name);
             if (result != null)
@@ -199,6 +175,7 @@ namespace Fusion.Mvvm
         }
 
         #region IDisposable Support
+
         private bool disposed;
 
         protected virtual void Dispose(bool disposing)
@@ -207,12 +184,9 @@ namespace Fusion.Mvvm
             {
                 if (disposing)
                 {
-                    if (innerContainer && container != null)
-                    {
-                        if (container is IDisposable dis)
-                            dis.Dispose();
-                    }
+                    if (innerContainer && container is IDisposable dis) dis.Dispose();
                 }
+
                 disposed = true;
             }
         }
@@ -227,6 +201,7 @@ namespace Fusion.Mvvm
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }
