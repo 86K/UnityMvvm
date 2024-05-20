@@ -1,28 +1,26 @@
-
-
 namespace Fusion.Mvvm
 {
-    public abstract class AbstractServiceBundle : IServiceBundle
+    public abstract class ServiceBundleBase : IServiceBundle
     {
-        private readonly IServiceContainer container;
-        public AbstractServiceBundle(IServiceContainer container)
+        private readonly IServiceContainer _container;
+
+        protected ServiceBundleBase(IServiceContainer container)
         {
-            this.container = container;
+            _container = container;
         }
 
         public void Start()
         {
-            OnStart(container);
+            OnStart(_container);
         }
 
         protected abstract void OnStart(IServiceContainer container);
 
         public void Stop()
         {
-            OnStop(container);
+            OnStop(_container);
         }
 
         protected abstract void OnStop(IServiceContainer container);
-
     }
 }

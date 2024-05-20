@@ -2,28 +2,21 @@ using System;
 
 namespace Fusion.Mvvm
 {
-    public class RelayCommand : CommandBase
+    /// <summary>
+    /// 条件命令。
+    /// 当条件不存在或者条件满足时，才会执行命令委托。
+    /// </summary>
+    public class ConditionCommand : CommandBase
     {
         private readonly Action _execute;
         private readonly Func<bool> _canExecute;
 
-        public RelayCommand(Action execute) : this(execute, null)
+        public ConditionCommand(Action execute, Func<bool> canExecute = null)
         {
-        }
-
-        public RelayCommand(Action execute, bool keepStrongRef) : this(execute, null, keepStrongRef)
-        {
-        }
-
-        public RelayCommand(Action execute, Func<bool> canExecute, bool keepStrongRef = false)
-        {
-            if (execute == null)
-                throw new ArgumentNullException("execute");
-
-            this._execute = keepStrongRef ? execute : execute.AsWeak();
+            _execute = execute ?? throw new ArgumentNullException("execute");
 
             if (canExecute != null)
-                this._canExecute = keepStrongRef ? canExecute : canExecute.AsWeak();
+                _canExecute = canExecute;
         }
 
         public override bool CanExecute(object parameter)
@@ -38,28 +31,17 @@ namespace Fusion.Mvvm
         }
     }
 
-    public class RelayCommand<T> : CommandBase, ICommand<T>
+    public class ConditionCommand<T> : CommandBase, ICommand<T>
     {
         private readonly Action<T> _execute;
         private readonly Func<bool> _canExecute;
 
-        public RelayCommand(Action<T> execute) : this(execute, null)
+        public ConditionCommand(Action<T> execute, Func<bool> canExecute = null)
         {
-        }
-
-        public RelayCommand(Action<T> execute, bool keepStrongRef) : this(execute, null, keepStrongRef)
-        {
-        }
-
-        public RelayCommand(Action<T> execute, Func<bool> canExecute, bool keepStrongRef = false)
-        {
-            if (execute == null)
-                throw new ArgumentNullException("execute");
-
-            this._execute = keepStrongRef ? execute : execute.AsWeak();
+            _execute = execute ?? throw new ArgumentNullException("execute");
 
             if (canExecute != null)
-                this._canExecute = keepStrongRef ? canExecute : canExecute.AsWeak();
+                _canExecute = canExecute;
         }
 
         public override bool CanExecute(object parameter)

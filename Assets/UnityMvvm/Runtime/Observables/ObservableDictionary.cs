@@ -70,7 +70,7 @@ namespace Fusion.Mvvm
 
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
         {
-            this._dictionary = new Dictionary<TKey, TValue>(dictionary);
+            _dictionary = new Dictionary<TKey, TValue>(dictionary);
         }
 
         public ObservableDictionary(IEqualityComparer<TKey> comparer)
@@ -85,7 +85,7 @@ namespace Fusion.Mvvm
 
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
         {
-            this._dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
+            _dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
         }
 
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> comparer)

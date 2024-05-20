@@ -4,26 +4,23 @@ namespace Fusion.Mvvm
 {
     public class SimpleCommand : CommandBase
     {
-        private bool enabled = true;
-        private readonly Action execute;
+        private bool _enabled = true;
+        private readonly Action _execute;
 
-        public SimpleCommand(Action execute, bool keepStrongRef = false)
+        public SimpleCommand(Action execute)
         {
-            if (execute == null)
-                throw new ArgumentNullException("execute");
-
-            this.execute = keepStrongRef ? execute : execute.AsWeak();
+            _execute = execute ?? throw new ArgumentNullException("execute");
         }
 
         public bool Enabled
         {
-            get => enabled;
+            get => _enabled;
             set
             {
-                if (enabled == value)
+                if (_enabled == value)
                     return;
 
-                enabled = value;
+                _enabled = value;
                 RaiseCanExecuteChanged();
             }
         }
@@ -35,33 +32,30 @@ namespace Fusion.Mvvm
 
         public override void Execute(object parameter)
         {
-            if (CanExecute(parameter) && execute != null)
-                execute();
+            if (CanExecute(parameter) && _execute != null)
+                _execute();
         }
     }
 
     public class SimpleCommand<T> : CommandBase, ICommand<T>
     {
-        private bool enabled = true;
-        private readonly Action<T> execute;
+        private bool _enabled = true;
+        private readonly Action<T> _execute;
 
-        public SimpleCommand(Action<T> execute, bool keepStrongRef = false)
+        public SimpleCommand(Action<T> execute)
         {
-            if (execute == null)
-                throw new ArgumentNullException("execute");
-
-            this.execute = keepStrongRef ? execute : execute.AsWeak();
+            _execute = execute ?? throw new ArgumentNullException("execute");
         }
 
         public bool Enabled
         {
-            get => enabled;
+            get => _enabled;
             set
             {
-                if (enabled == value)
+                if (_enabled == value)
                     return;
 
-                enabled = value;
+                _enabled = value;
                 RaiseCanExecuteChanged();
             }
         }
@@ -73,8 +67,8 @@ namespace Fusion.Mvvm
 
         public override void Execute(object parameter)
         {
-            if (CanExecute(parameter) && execute != null)
-                execute((T)Convert.ChangeType(parameter, typeof(T)));
+            if (CanExecute(parameter) && _execute != null)
+                _execute((T)Convert.ChangeType(parameter, typeof(T)));
         }
 
         public bool CanExecute(T parameter)
@@ -84,7 +78,7 @@ namespace Fusion.Mvvm
 
         public void Execute(T parameter)
         {
-            execute(parameter);
+            _execute(parameter);
         }
     }
 }

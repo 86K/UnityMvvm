@@ -5,81 +5,36 @@ namespace Fusion.Mvvm
 {
     public class ServiceContainer : IServiceContainer, IDisposable
     {
-        private readonly object _lock = new object();
-        private ConcurrentDictionary<string, Entry> nameServiceMappings = new ConcurrentDictionary<string, Entry>();
-        private ConcurrentDictionary<Type, Entry> typeServiceMappings = new ConcurrentDictionary<Type, Entry>();
+        private ConcurrentDictionary<string, Entry> _nameServiceMappings = new ConcurrentDictionary<string, Entry>();
+        private ConcurrentDictionary<Type, Entry> _typeServiceMappings = new ConcurrentDictionary<Type, Entry>();
 
-        public virtual object Resolve(Type type)
+        public T Resolve<T>()
         {
-            if (typeServiceMappings.TryGetValue(type, out var entry))
-                return entry.Factory.Create();
-            return null;
-        }
-
-        public virtual T Resolve<T>()
-        {
-            if (typeServiceMappings.TryGetValue(typeof(T), out var entry))
+            if (_typeServiceMappings.TryGetValue(typeof(T), out var entry))
                 return (T)entry.Factory.Create();
             return default;
         }
 
-        public virtual object Resolve(string name)
+        public T Resolve<T>(string name)
         {
-            if (nameServiceMappings.TryGetValue(name, out var entry))
-                return entry.Factory.Create();
-            return null;
-        }
-
-        public virtual T Resolve<T>(string name)
-        {
-            if (nameServiceMappings.TryGetValue(name, out var entry))
+            if (_nameServiceMappings.TryGetValue(name, out var entry))
                 return (T)entry.Factory.Create();
             return default;
         }
 
-        public virtual void Register<T>(Func<T> factory)
-        {
-            Register0(typeof(T), new GenericFactory<T>(factory));
-        }
-
-        public virtual void Register(Type type, object target)
-        {
-            Register0(type, new SingleInstanceFactory(target));
-        }
-
-        public virtual void Register(string name, object target)
-        {
-            Register0(name, new SingleInstanceFactory(target));
-        }
-
-        public virtual void Register<T>(T target)
+        public void Register<T>(T target)
         {
             Register0(typeof(T), new SingleInstanceFactory(target));
         }
-
-        public virtual void Register<T>(string name, Func<T> factory)
-        {
-            Register0(name, new GenericFactory<T>(factory));
-        }
-
-        public virtual void Register<T>(string name, T target)
+        
+        public void Register<T>(string name, T target)
         {
             Register0(name, new SingleInstanceFactory(target));
         }
 
-        public virtual void Unregister(Type type)
-        {
-            Unregister0(type);
-        }
-
-        public virtual void Unregister<T>()
+        public void Unregister<T>()
         {
             Unregister0(typeof(T));
-        }
-
-        public virtual void Unregister(string name)
-        {
-            Unregister0(name);
         }
 
         /// <summary>
@@ -88,18 +43,15 @@ namespace Fusion.Mvvm
         /// </summary>
         /// <param name="type"></param>
         /// <param name="factory"></param>
-        internal void Register0(Type type, IFactory factory)
+        private void Register0(Type type, IFactory factory)
         {
-            lock (_lock)
-            {
-                string name = type.IsGenericType ? null : type.Name;
-                Entry entry = new Entry(name, type, factory);
-                if (!typeServiceMappings.TryAdd(type, entry))
-                    throw new Exception($"Duplicate key {type}");
+            string name = type.IsGenericType ? null : type.Name;
+            Entry entry = new Entry(name, type, factory);
+            if (!_typeServiceMappings.TryAdd(type, entry))
+                throw new Exception($"Duplicate key {type}");
 
-                if (!string.IsNullOrEmpty(name))
-                    nameServiceMappings.TryAdd(name, entry);
-            }
+            if (!string.IsNullOrEmpty(name))
+                _nameServiceMappings.TryAdd(name, entry);
         }
 
         /// <summary>
@@ -107,64 +59,44 @@ namespace Fusion.Mvvm
         /// </summary>
         /// <param name="name"></param>
         /// <param name="factory"></param>
-        internal void Register0(string name, IFactory factory)
+        private void Register0(string name, IFactory factory)
         {
-            lock (_lock)
-            {
-                if (!nameServiceMappings.TryAdd(name, new Entry(name, null, factory)))
-                    throw new Exception($"Duplicate key {name}");
-            }
+            if (!_nameServiceMappings.TryAdd(name, new Entry(name, null, factory)))
+                throw new Exception($"Duplicate key {name}");
         }
 
-        internal void Unregister0(string name)
+        private void Unregister0(Type type)
         {
-            lock (_lock)
-            {
-                if (!nameServiceMappings.TryRemove(name, out var entry) || entry == null || entry.Type == null)
-                    return;
+            if (!_typeServiceMappings.TryRemove(type, out var entry) || entry == null || string.IsNullOrEmpty(entry.Name))
+                return;
 
-                if (!typeServiceMappings.TryGetValue(entry.Type, out var entry2) || entry != entry2)
-                    return;
+            if (!_nameServiceMappings.TryGetValue(entry.Name, out var entry2) || entry != entry2)
+                return;
 
-                typeServiceMappings.TryRemove(entry.Type, out _);
-            }
-        }
-
-        internal void Unregister0(Type type)
-        {
-            lock (_lock)
-            {
-                if (!typeServiceMappings.TryRemove(type, out var entry) || entry == null || string.IsNullOrEmpty(entry.Name))
-                    return;
-
-                if (!nameServiceMappings.TryGetValue(entry.Name, out var entry2) || entry != entry2)
-                    return;
-
-                nameServiceMappings.TryRemove(entry.Name, out _);
-            }
+            _nameServiceMappings.TryRemove(entry.Name, out _);
         }
 
         #region IDisposable Support
 
         private bool disposed;
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposed)
             {
                 if (disposing)
                 {
-                    foreach (var kv in nameServiceMappings)
+                    foreach (var kv in _nameServiceMappings)
                         kv.Value.Dispose();
 
-                    nameServiceMappings.Clear();
-                    nameServiceMappings = null;
+                    _nameServiceMappings.Clear();
+                    _nameServiceMappings = null;
 
-                    foreach (var kv in typeServiceMappings)
+                    foreach (var kv in _typeServiceMappings)
                         kv.Value.Dispose();
 
-                    typeServiceMappings.Clear();
-                    typeServiceMappings = null;
+                    _typeServiceMappings.Clear();
+                    _typeServiceMappings = null;
                 }
 
                 disposed = true;
@@ -184,7 +116,7 @@ namespace Fusion.Mvvm
 
         #endregion
 
-        internal class Entry : IDisposable
+        private class Entry : IDisposable
         {
             public Entry(string name, Type type, IFactory factory)
             {
@@ -203,28 +135,9 @@ namespace Fusion.Mvvm
             }
         }
 
-        internal interface IFactory : IDisposable
+        private interface IFactory : IDisposable
         {
             object Create();
-        }
-
-        internal class GenericFactory<T> : IFactory
-        {
-            private readonly Func<T> func;
-
-            public GenericFactory(Func<T> func)
-            {
-                this.func = func;
-            }
-
-            public virtual object Create()
-            {
-                return func();
-            }
-
-            public void Dispose()
-            {
-            }
         }
 
         private class SingleInstanceFactory : IFactory
@@ -245,7 +158,7 @@ namespace Fusion.Mvvm
 
             private bool disposed;
 
-            protected virtual void Dispose(bool disposing)
+            private void Dispose(bool disposing)
             {
                 if (!disposed)
                 {

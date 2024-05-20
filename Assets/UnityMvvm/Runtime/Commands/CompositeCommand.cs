@@ -6,7 +6,8 @@ using UnityEngine;
 namespace Fusion.Mvvm
 {
     /// <summary>
-    /// The CompositeCommand composes one or more ICommands.
+    /// 组合命令。
+    /// 所有的命令组合满足时，执行命令。
     /// </summary>
     public class CompositeCommand : CommandBase
     {
@@ -27,7 +28,7 @@ namespace Fusion.Mvvm
         /// <param name="monitorCommandActivity">Indicates when the command activity is going to be monitored.</param>
         public CompositeCommand(bool monitorCommandActivity)
         {
-            this._monitorCommandActivity = monitorCommandActivity;
+            _monitorCommandActivity = monitorCommandActivity;
             _onCanExecuteChangedHandler = new EventHandler(OnCanExecuteChanged);
         }
 
@@ -141,9 +142,9 @@ namespace Fusion.Mvvm
         public override void Execute(object parameter)
         {
             Queue<ICommand> commands;
-            lock (this._commands)
+            lock (_commands)
             {
-                commands = new Queue<ICommand>(this._commands.Where(ShouldExecute).ToList());
+                commands = new Queue<ICommand>(_commands.Where(ShouldExecute).ToList());
             }
 
             while (commands.Count > 0)

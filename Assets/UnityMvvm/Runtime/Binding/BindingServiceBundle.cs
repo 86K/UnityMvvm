@@ -1,6 +1,6 @@
 namespace Fusion.Mvvm
 {
-    public class BindingServiceBundle : AbstractServiceBundle
+    public class BindingServiceBundle : ServiceBundleBase
     {
         public BindingServiceBundle(IServiceContainer container) : base(container)
         {
