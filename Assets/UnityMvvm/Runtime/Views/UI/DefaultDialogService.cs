@@ -51,7 +51,7 @@ namespace Fusion.Mvvm
                 {
                     Debug.Log("Not found the \"IUIViewLocator\".");
 
-                    throw new NotFoundException("Not found the \"IUIViewLocator\".");
+                    throw new Exception("Not found the \"IUIViewLocator\".");
                 }
 
                 if (string.IsNullOrEmpty(viewName))
@@ -62,7 +62,7 @@ namespace Fusion.Mvvm
                 {
                     Debug.LogWarning($"Not found the dialog window named \"{viewName}\".");
 
-                    throw new NotFoundException($"Not found the dialog window named \"{viewName}\".");
+                    throw new Exception($"Not found the dialog window named \"{viewName}\".");
                 }
 
                 if (window is AlertDialogWindowBase @base && viewModel is AlertDialogViewModel model)

@@ -1,5 +1,6 @@
+using System;
 using System.Threading.Tasks;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Fusion.Mvvm
 {
@@ -18,7 +19,7 @@ namespace Fusion.Mvvm
             IUIViewLocator locator = GetUIViewLocator();
             UIView view = locator.LoadView<UIView>(viewName);
             if (view == null)
-                throw new NotFoundException("Not found the \"UIView\".");
+                throw new Exception("Not found the \"UIView\".");
 
             if (viewGroup == null)
                 viewGroup = GetCurrentViewGroup();
@@ -32,7 +33,7 @@ namespace Fusion.Mvvm
             IUIViewLocator locator = GetUIViewLocator();
             UIView view = await locator.LoadViewAsync<UIView>(viewName);
             if (view == null)
-                throw new NotFoundException("Not found the \"UIView\".");
+                throw new Exception("Not found the \"UIView\".");
 
             if (viewGroup == null)
                 viewGroup = GetCurrentViewGroup();

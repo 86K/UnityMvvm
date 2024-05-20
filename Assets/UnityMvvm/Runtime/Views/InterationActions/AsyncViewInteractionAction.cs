@@ -43,7 +43,7 @@ namespace Fusion.Mvvm
                     view = await LoadViewAsync<UIView>();
 
                 if (view == null)
-                    throw new NotFoundException($"Not found the view named \"{ViewName}\".");
+                    throw new Exception($"Not found the view named \"{ViewName}\".");
 
                 if (viewGroup != null)
                     viewGroup.AddView(view);

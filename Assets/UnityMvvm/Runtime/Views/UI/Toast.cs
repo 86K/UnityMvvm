@@ -61,7 +61,7 @@ namespace Fusion.Mvvm
             IUIViewLocator locator = GetUIViewLocator();
             ToastViewBase view = locator.LoadView<ToastViewBase>(viewName);
             if (view == null)
-                throw new NotFoundException("Not found the \"ToastView\".");
+                throw new Exception("Not found the \"ToastView\".");
 
             if (viewGroup == null)
                 viewGroup = GetCurrentViewGroup();

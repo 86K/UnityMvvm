@@ -43,7 +43,7 @@ namespace Fusion.Mvvm
         {
             var locator = Locator;
             if (locator == null)
-                throw new NotFoundException("Not found the \"IUIViewLocator\".");
+                throw new Exception("Not found the \"IUIViewLocator\".");
 
             if (string.IsNullOrEmpty(viewName))
                 throw new ArgumentNullException("The view name is null.");
@@ -55,7 +55,7 @@ namespace Fusion.Mvvm
         {
             var locator = Locator;
             if (locator == null)
-                throw new NotFoundException("Not found the \"IUIViewLocator\".");
+                throw new Exception("Not found the \"IUIViewLocator\".");
 
             if (string.IsNullOrEmpty(viewName))
                 throw new ArgumentNullException("The view name is null.");

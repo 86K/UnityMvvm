@@ -29,7 +29,7 @@ namespace Fusion.Mvvm
 
             globalWindowManager = Object.FindObjectOfType<GlobalWindowManagerBase>();
             if (globalWindowManager == null)
-                throw new NotFoundException("GlobalWindowManager");
+                throw new Exception("GlobalWindowManager");
 
             return globalWindowManager;
         }
@@ -133,7 +133,7 @@ namespace Fusion.Mvvm
             if (viewTemplateGo == null || viewTemplateGo.GetComponent<T>() == null)
             {
                 promise.UpdateProgress(1f);
-                promise.SetException(new NotFoundException(name));
+                promise.SetException(new Exception(name));
                 yield break;
             }
 
@@ -143,7 +143,7 @@ namespace Fusion.Mvvm
             if (view == null)
             {
                 Object.Destroy(go);
-                promise.SetException(new NotFoundException(name));
+                promise.SetException(new Exception(name));
             }
             else
             {

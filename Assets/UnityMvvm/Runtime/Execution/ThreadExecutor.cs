@@ -4,7 +4,7 @@ using System;
 
 namespace Fusion.Mvvm
 {
-    public class ThreadExecutor : AbstractExecutor, IThreadExecutor
+    public class ThreadExecutor : ExecutorBase, IThreadExecutor
     {
         public virtual IAsyncResult Execute(Action action)
         {

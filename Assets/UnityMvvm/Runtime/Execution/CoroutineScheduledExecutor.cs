@@ -11,7 +11,7 @@ namespace Fusion.Mvvm
         float Time { get; }
     }
 
-    public class CoroutineScheduledExecutor : AbstractExecutor, IScheduledExecutor
+    public class CoroutineScheduledExecutor : ExecutorBase, IScheduledExecutor
     {
         private readonly ComparerImpl<IDelayTask> comparer = new ComparerImpl<IDelayTask>();
         private readonly List<IDelayTask> queue = new List<IDelayTask>();

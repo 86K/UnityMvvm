@@ -19,14 +19,14 @@ namespace Fusion.Mvvm
                 Context context = Context.GetGlobalContext();
                 IUIViewLocator locator = context.GetService<IUIViewLocator>();
                 if (locator == null)
-                    throw new NotFoundException("Not found the \"IUIViewLocator\".");
+                    throw new Exception("Not found the \"IUIViewLocator\".");
 
                 if (string.IsNullOrEmpty(viewName))
                     throw new ArgumentNullException("The view name is null.");
 
                 window = locator.LoadView<Window>(viewName);
                 if (window == null)
-                    throw new NotFoundException($"Not found the dialog window named \"{viewName}\".");
+                    throw new Exception($"Not found the dialog window named \"{viewName}\".");
 
                 if (window is AlertDialogWindowBase @base && viewModel is AlertDialogViewModel model)
                 {

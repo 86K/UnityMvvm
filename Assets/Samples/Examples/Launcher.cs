@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Globalization;
 using System.Collections;
@@ -12,7 +13,7 @@ namespace Fusion.Mvvm
         {
             GlobalWindowManagerBase windowManager = FindObjectOfType<GlobalWindowManagerBase>();
             if (windowManager == null)
-                throw new NotFoundException("Not found the GlobalWindowManager.");
+                throw new Exception("Not found the GlobalWindowManager.");
 
             context = Context.GetGlobalContext();
 

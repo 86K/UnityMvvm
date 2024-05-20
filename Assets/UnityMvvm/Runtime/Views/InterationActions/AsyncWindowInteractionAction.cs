@@ -47,7 +47,7 @@ namespace Fusion.Mvvm
             {
                 window = await LoadWindowAsync<Window>();
                 if (window == null)
-                    throw new NotFoundException($"Not found the window named \"{ViewName}\".");
+                    throw new Exception($"Not found the window named \"{ViewName}\".");
 
                 if (viewModel != null)
                     window.SetDataContext(viewModel);

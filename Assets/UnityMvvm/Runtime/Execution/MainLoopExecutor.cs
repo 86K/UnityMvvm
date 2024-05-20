@@ -4,7 +4,7 @@ using System;
 
 namespace Fusion.Mvvm
 {
-    public class MainLoopExecutor : AbstractExecutor, IMainLoopExecutor
+    public class MainLoopExecutor : ExecutorBase, IMainLoopExecutor
     {
         public virtual void RunOnMainThread(Action action, bool waitForExecution = false)
         {

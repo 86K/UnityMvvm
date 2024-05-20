@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Fusion.Mvvm
 {
-    public class ThreadScheduledExecutor : AbstractExecutor, IScheduledExecutor
+    public class ThreadScheduledExecutor : ExecutorBase, IScheduledExecutor
     {
         private readonly IComparer<IDelayTask> comparer = new ComparerImpl<IDelayTask>();
         private readonly List<IDelayTask> queue = new List<IDelayTask>();

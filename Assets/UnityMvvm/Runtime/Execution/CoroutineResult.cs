@@ -1,14 +1,11 @@
-
-
 using UnityEngine;
 using System.Collections.Generic;
-
 
 namespace Fusion.Mvvm
 {
     public class CoroutineResult : AsyncResult, ICoroutinePromise
     {
-        protected List<Coroutine> coroutines = new List<Coroutine>();
+        private readonly List<Coroutine> _coroutines = new List<Coroutine>();
 
         public CoroutineResult() : base(true)
         {
@@ -20,23 +17,24 @@ namespace Fusion.Mvvm
                 return false;
 
             cancellationRequested = true;
-            foreach (Coroutine coroutine in coroutines)
+            foreach (Coroutine coroutine in _coroutines)
             {
                 Executors.StopCoroutine(coroutine);
             }
+
             SetCancelled();
             return true;
         }
 
         public void AddCoroutine(Coroutine coroutine)
         {
-            coroutines.Add(coroutine);
+            _coroutines.Add(coroutine);
         }
     }
 
     public class CoroutineResult<TResult> : AsyncResult<TResult>, ICoroutinePromise<TResult>
     {
-        protected List<Coroutine> coroutines = new List<Coroutine>();
+        private readonly List<Coroutine> _coroutines = new List<Coroutine>();
 
         public CoroutineResult() : base(true)
         {
@@ -48,23 +46,24 @@ namespace Fusion.Mvvm
                 return false;
 
             cancellationRequested = true;
-            foreach (Coroutine coroutine in coroutines)
+            foreach (Coroutine coroutine in _coroutines)
             {
                 Executors.StopCoroutine(coroutine);
             }
+
             SetCancelled();
             return true;
         }
 
         public void AddCoroutine(Coroutine coroutine)
         {
-            coroutines.Add(coroutine);
+            _coroutines.Add(coroutine);
         }
     }
 
     public class CoroutineProgressResult<TProgress> : ProgressResult<TProgress>, ICoroutineProgressPromise<TProgress>
     {
-        protected List<Coroutine> coroutines = new List<Coroutine>();
+        private readonly List<Coroutine> _coroutines = new List<Coroutine>();
 
         public CoroutineProgressResult() : base(true)
         {
@@ -76,23 +75,24 @@ namespace Fusion.Mvvm
                 return false;
 
             cancellationRequested = true;
-            foreach (Coroutine coroutine in coroutines)
+            foreach (Coroutine coroutine in _coroutines)
             {
                 Executors.StopCoroutine(coroutine);
             }
+
             SetCancelled();
             return true;
         }
 
         public void AddCoroutine(Coroutine coroutine)
         {
-            coroutines.Add(coroutine);
+            _coroutines.Add(coroutine);
         }
     }
 
     public class CoroutineProgressResult<TProgress, TResult> : ProgressResult<TProgress, TResult>, ICoroutineProgressPromise<TProgress, TResult>
     {
-        protected List<Coroutine> coroutines = new List<Coroutine>();
+        private readonly List<Coroutine> _coroutines = new List<Coroutine>();
 
         public CoroutineProgressResult() : base(true)
         {
@@ -104,17 +104,18 @@ namespace Fusion.Mvvm
                 return false;
 
             cancellationRequested = true;
-            foreach (Coroutine coroutine in coroutines)
+            foreach (Coroutine coroutine in _coroutines)
             {
                 Executors.StopCoroutine(coroutine);
             }
+
             SetCancelled();
             return true;
         }
 
         public void AddCoroutine(Coroutine coroutine)
         {
-            coroutines.Add(coroutine);
+            _coroutines.Add(coroutine);
         }
     }
 }

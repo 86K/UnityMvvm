@@ -44,7 +44,7 @@ namespace Fusion.Mvvm
             {
                 window = await LoadWindowAsync<Window>();
                 if (window == null)
-                    throw new NotFoundException($"Not found the dialog window named \"{ViewName}\".");
+                    throw new Exception($"Not found the dialog window named \"{ViewName}\".");
 
                 if (window is AlertDialogWindowBase @base && viewModel is AlertDialogViewModel model)
                 {

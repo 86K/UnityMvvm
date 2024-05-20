@@ -1,5 +1,3 @@
-
-
 using UnityEngine;
 
 namespace Fusion.Mvvm
@@ -11,7 +9,7 @@ namespace Fusion.Mvvm
     {
         string Name { get; set; }
 
-        Transform Parent { get; }
+        // Transform Parent { get; }
 
         GameObject Owner { get; }
 
@@ -25,4 +23,3 @@ namespace Fusion.Mvvm
         IAttributes ExtraAttributes { get; }
     }
 }
-

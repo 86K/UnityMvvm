@@ -1,10 +1,8 @@
-
-
 namespace Fusion.Mvvm
 {
-    public abstract class AbstractExecutor
+    public abstract class ExecutorBase
     {
-        static AbstractExecutor()
+        static ExecutorBase()
         {
             Executors.Create();
         }

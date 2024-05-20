@@ -156,7 +156,7 @@ namespace Fusion.Mvvm
             {
                 Debug.LogWarning($"Not found the dialog window named \"{viewName}\".");
 
-                throw new NotFoundException($"Not found the dialog window named \"{viewName}\".");
+                throw new Exception($"Not found the dialog window named \"{viewName}\".");
             }
 
             AlertDialog dialog = new AlertDialog(window, contentView, viewModel);
@@ -207,7 +207,7 @@ namespace Fusion.Mvvm
                 {
                     Debug.LogWarning($"Not found the dialog window named \"{viewName}\".");
 
-                    throw new NotFoundException($"Not found the dialog window named \"{viewName}\".");
+                    throw new Exception($"Not found the dialog window named \"{viewName}\".");
                 }
 
                 if (!string.IsNullOrEmpty(contentViewName))

@@ -1,38 +1,37 @@
-
-
 using System;
 using System.Collections;
 
 namespace Fusion.Mvvm
 {
-    public class CoroutineExecutor : AbstractExecutor, ICoroutineExecutor
+    public class CoroutineExecutor : ExecutorBase, ICoroutineExecutor
     {
-        public virtual void RunOnCoroutineNoReturn(IEnumerator routine)
+        public void RunOnCoroutineNoReturn(IEnumerator routine)
         {
             Executors.RunOnCoroutineNoReturn(routine);
         }
 
-        public virtual IAsyncResult RunOnCoroutine(IEnumerator routine)
+        public IAsyncResult RunOnCoroutine(IEnumerator routine)
         {
             return Executors.RunOnCoroutine(routine);
         }
 
-        public virtual IAsyncResult RunOnCoroutine(Func<IPromise, IEnumerator> func)
+        public IAsyncResult RunOnCoroutine(Func<IPromise, IEnumerator> func)
         {
             return Executors.RunOnCoroutine(func);
         }
 
-        public virtual IAsyncResult<TResult> RunOnCoroutine<TResult>(Func<IPromise<TResult>, IEnumerator> func)
+        public IAsyncResult<TResult> RunOnCoroutine<TResult>(Func<IPromise<TResult>, IEnumerator> func)
         {
             return Executors.RunOnCoroutine(func);
         }
 
-        public virtual IProgressResult<TProgress> RunOnCoroutine<TProgress>(Func<IProgressPromise<TProgress>, IEnumerator> func)
+        public IProgressResult<TProgress> RunOnCoroutine<TProgress>(Func<IProgressPromise<TProgress>, IEnumerator> func)
         {
             return Executors.RunOnCoroutine(func);
         }
 
-        public virtual IProgressResult<TProgress, TResult> RunOnCoroutine<TProgress, TResult>(Func<IProgressPromise<TProgress, TResult>, IEnumerator> func)
+        public IProgressResult<TProgress, TResult> RunOnCoroutine<TProgress, TResult>(
+            Func<IProgressPromise<TProgress, TResult>, IEnumerator> func)
         {
             return Executors.RunOnCoroutine(func);
         }
