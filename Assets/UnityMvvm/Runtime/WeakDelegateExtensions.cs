@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -314,6 +312,5 @@ namespace Fusion.Mvvm
             return isNested && isCompilerGenerated && isInvisible;
 #endif
         }
-
     }
 }
