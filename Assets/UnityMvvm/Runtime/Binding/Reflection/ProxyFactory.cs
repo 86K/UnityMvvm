@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using UnityEngine;
 
 namespace Fusion.Mvvm

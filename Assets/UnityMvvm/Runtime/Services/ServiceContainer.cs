@@ -1,6 +1,5 @@
-
-
 using System;
+using System.Collections.Concurrent;
 
 namespace Fusion.Mvvm
 {
@@ -146,6 +145,7 @@ namespace Fusion.Mvvm
         }
 
         #region IDisposable Support
+
         private bool disposed;
 
         protected virtual void Dispose(bool disposing)
@@ -166,6 +166,7 @@ namespace Fusion.Mvvm
                     typeServiceMappings.Clear();
                     typeServiceMappings = null;
                 }
+
                 disposed = true;
             }
         }
@@ -180,6 +181,7 @@ namespace Fusion.Mvvm
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         #endregion
 
         internal class Entry : IDisposable
@@ -194,6 +196,7 @@ namespace Fusion.Mvvm
             public string Name { get; }
             public Type Type { get; }
             public IFactory Factory { get; }
+
             public void Dispose()
             {
                 Factory.Dispose();
@@ -239,6 +242,7 @@ namespace Fusion.Mvvm
             }
 
             #region IDisposable Support
+
             private bool disposed;
 
             protected virtual void Dispose(bool disposing)
@@ -266,6 +270,7 @@ namespace Fusion.Mvvm
                 Dispose(true);
                 GC.SuppressFinalize(this);
             }
+
             #endregion
         }
     }
